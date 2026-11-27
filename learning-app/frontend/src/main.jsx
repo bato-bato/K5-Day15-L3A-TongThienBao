@@ -1058,7 +1058,6 @@ function App() {
         labId={view === 'lab' ? currentLabFocusId : undefined}
         focus={view === 'lab' ? currentLabFocus : chatFocus}
         inspectorOpen={view !== 'lab' && Boolean(selectedNode)}
-        hasMinimap={view === 'mindmap' && !selectedNode}
         onJumpToConcept={jumpToConcept}
       />
     </div>

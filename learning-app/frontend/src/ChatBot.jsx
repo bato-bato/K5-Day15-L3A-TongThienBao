@@ -119,7 +119,7 @@ function Markdown({ text, citations, onCite }) {
 }
 
 /* ---------------------------------- component ---------------------------------- */
-export function ChatBot({ day, focus, labId, inspectorOpen = false, hasMinimap = false, onJumpToConcept }) {
+export function ChatBot({ day, focus, labId, inspectorOpen = false, onJumpToConcept }) {
   const [open, setOpen] = useState(false);
   const storageKey = labId ? STORAGE_KEY + "/" + labId : STORAGE_KEY;
   const [messages, setMessages] = useState(() => loadStored(storageKey));
@@ -204,17 +204,11 @@ export function ChatBot({ day, focus, labId, inspectorOpen = false, hasMinimap =
       ]
     : [`Tóm tắt ngày ${day}`, 'RAG là gì?', 'So sánh Generative và Agentic AI', 'Lethal Trifecta là gì?'];
 
-  const pillPositionClass = inspectorOpen
-    ? 'right-4 bottom-4'
-    : hasMinimap
-      ? 'right-4 bottom-5 md:bottom-40'
-      : 'right-4 bottom-5';
+  const pillPositionClass = 'right-4 bottom-4';
 
   const panelPositionClass = inspectorOpen
     ? 'right-4 md:right-[476px] bottom-24 h-[min(580px,calc(100vh-11rem))]'
-    : hasMinimap
-      ? 'right-4 bottom-5 md:bottom-40 h-[min(640px,calc(100vh-9rem))] md:h-[min(640px,calc(100vh-14rem))]'
-      : 'right-4 bottom-5 h-[min(640px,calc(100vh-9rem))] md:h-[min(640px,calc(100vh-11rem))]';
+    : 'right-4 bottom-5 h-[min(640px,calc(100vh-9rem))] md:h-[min(640px,calc(100vh-11rem))]';
 
   if (!open) {
     return (

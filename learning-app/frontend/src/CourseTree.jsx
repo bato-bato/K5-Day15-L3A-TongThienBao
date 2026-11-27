@@ -617,7 +617,7 @@ export function CourseTree({
     () => (selectedNodeId ? tree.nodes.find(n => n.conceptId === selectedNodeId && n.kind === 'l1') : null),
     [tree.nodes, selectedNodeId],
   );
-  const { zoom, stepZoom, fitToView, centerView, viewportProps, layerStyle, minimapStyle } =
+  const { zoom, stepZoom, fitToView, centerView, viewportProps, layerStyle } =
     useMindmapViewport(tree, {
       viewKey: `mindmap:${page}`,
       layoutTrigger: 0,
@@ -985,34 +985,6 @@ export function CourseTree({
           </button>
         </div>
       </div>
-
-      {/* Live Minimap (hidden when right NodeInspector drawer is open) */}
-      {!selectedNodeId && (
-        <div className="absolute bottom-5 right-5 z-20 bg-white/95 backdrop-blur-sm border border-slate-200 rounded-xl p-2 shadow-lg hidden md:block w-48 h-32">
-          <div className="flex items-center justify-between pb-1 border-b border-slate-100 mb-1.5">
-            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-              Bản đồ thu nhỏ
-            </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          </div>
-          <div className="w-full h-20 bg-slate-100 rounded relative overflow-hidden border border-slate-200">
-            {tree.nodes.map(n => (
-              <div
-                key={n.id}
-                className={`absolute rounded ${n.kind === 'root' ? 'bg-slate-900 w-3 h-2.5' : `${n.theme?.mini || 'bg-slate-400'} w-3 h-1`}`}
-                style={{
-                  left: `${Math.max(0, Math.min(92, (n.x / tree.canvasW) * 100))}%`,
-                  top: `${Math.max(0, Math.min(90, (n.y / tree.canvasH) * 100))}%`,
-                }}
-              />
-            ))}
-            <div
-              className="absolute border border-blue-600 bg-blue-500/10 rounded pointer-events-none"
-              style={minimapStyle}
-            />
-          </div>
-        </div>
-      )}
     </section>
   );
 }
