@@ -5,54 +5,51 @@ const MAX_ZOOM = 1.45;
 const clampZoom = value => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Number(value.toFixed(2))));
 
 export const COURSE_LEVELS = [
-  {
-    id: 'lv1',
-    title: 'Cấp độ 1: Nền tảng & Bài toán AI',
-    badge: 'Cơ bản',
-    bg: '#B5D3FA',
-    edge: '#3B82F6',
-    mini: 'bg-blue-400',
-    days: [1, 2, 3],
-  },
-  {
-    id: 'lv2',
-    title: 'Cấp độ 2: Prompt, UX, Data & RAG',
-    badge: 'Trung cấp',
-    bg: '#C4B5FD',
-    edge: '#7C3AED',
-    mini: 'bg-purple-400',
-    days: [4, 5, 6, 7],
-  },
-  {
-    id: 'lv3',
-    title: 'Cấp độ 3: Agent, Eval & Safety',
-    badge: 'Nâng cao',
-    bg: '#6EE7B7',
-    edge: '#10B981',
-    mini: 'bg-emerald-400',
-    days: [8, 9, 10, 11],
-  },
-  {
-    id: 'lv4',
-    title: 'Cấp độ 4: Deploy, Kinh tế & Lab',
-    badge: 'Production',
-    bg: '#FCD34D',
-    edge: '#F59E0B',
-    mini: 'bg-amber-400',
-    days: [12, 13, 14],
-  },
+  { id: 'lv1', title: 'Cấp độ 1: Nền tảng & Bài toán AI', badge: 'Cơ bản', days: [1, 2, 3] },
+  { id: 'lv2', title: 'Cấp độ 2: Prompt, UX, Data & RAG', badge: 'Trung cấp', days: [4, 5, 6, 7] },
+  { id: 'lv3', title: 'Cấp độ 3: Agent, Eval & Safety', badge: 'Nâng cao', days: [8, 9, 10, 11] },
+  { id: 'lv4', title: 'Cấp độ 4: Deploy, Kinh tế & Lab', badge: 'Production', days: [12, 13, 14] },
 ];
 
-const TYPE_COLORS = {
-  concept: { bg: '#DBEAFE', edge: '#3B82F6', mini: 'bg-blue-400' },
-  pattern: { bg: '#EDE9FE', edge: '#7C3AED', mini: 'bg-purple-400' },
-  checkpoint: { bg: '#E0E7FF', edge: '#4F46E5', mini: 'bg-indigo-400' },
-  metric: { bg: '#D1FAE5', edge: '#10B981', mini: 'bg-emerald-400' },
-  trap: { bg: '#FCE7F3', edge: '#EC4899', mini: 'bg-pink-400' },
-  case_study: { bg: '#FEF3C7', edge: '#F59E0B', mini: 'bg-amber-400' },
-  code_ref: { bg: '#CCFBF1', edge: '#14B8A6', mini: 'bg-teal-400' },
-  note: { bg: '#FFEDD5', edge: '#F97316', mini: 'bg-orange-400' },
-};
+const LEFT_THEMES = [
+  { solid: '#1D63B8', tint: '#EFF6FF', tintBorder: '#93C5FD', tintText: '#1E40AF', mini: 'bg-blue-600' },
+  { solid: '#00897B', tint: '#F0FDFA', tintBorder: '#5EEAD4', tintText: '#0F766E', mini: 'bg-teal-600' },
+  { solid: '#7C3AED', tint: '#F5F3FF', tintBorder: '#C4B5FD', tintText: '#5B21B6', mini: 'bg-purple-600' },
+  { solid: '#C2591A', tint: '#FFF7ED', tintBorder: '#FDBA74', tintText: '#9A3412', mini: 'bg-orange-600' },
+];
+
+const RIGHT_THEMES = [
+  { solid: '#0284C7', tint: '#F0F9FF', tintBorder: '#7DD3FC', tintText: '#0369A1', mini: 'bg-sky-600' },
+  { solid: '#A2256E', tint: '#FDF2F8', tintBorder: '#F9A8D4', tintText: '#9D174D', mini: 'bg-pink-700' },
+  { solid: '#3D7A38', tint: '#F0FDF4', tintBorder: '#86EFAC', tintText: '#166534', mini: 'bg-green-700' },
+  { solid: '#B93848', tint: '#FEF2F2', tintBorder: '#FCA5A5', tintText: '#991B1B', mini: 'bg-rose-700' },
+];
+
+function truncateText(str, maxLen) {
+  const s = (str || '').trim();
+  if (s.length <= maxLen) return s;
+  return `${s.slice(0, maxLen - 1).trim()}…`;
+}
+
+function splitTopLevelBy(str, sep) {
+  const items = [];
+  let buf = '';
+  let depth = 0;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (ch === '(') depth++;
+    else if (ch === ')' && depth > 0) depth--;
+    if (depth === 0 && str.slice(i, i + sep.length) === sep) {
+      if (buf.trim()) items.push(buf.trim());
+      buf = '';
+      i += sep.length - 1;
+    } else {
+      buf += ch;
+    }
+  }
+  if (buf.trim()) items.push(buf.trim());
+  return items;
+}
 
 function getDayShortTitle(workspace, day) {
   const root = workspace?.mindmaps?.[day]?.nodes?.find(n => n.node_type === 'day_root');
@@ -61,209 +58,345 @@ function getDayShortTitle(workspace, day) {
   return firstLine || `Ngày ${day}`;
 }
 
-function getConceptShortLabel(node) {
+function getNodeTitle(node) {
   const line = (node?.text || '').split('\n')[0] || '';
   return line.replace(/^\[[^\]]+\]\s*/, '').trim() || 'Ý tưởng mới';
 }
 
-function computeTreeLayout({
-  workspace,
-  edits,
-  contentTab,
-  expandedLevels,
-  expandedDays,
-  searchQuery,
-  page,
-}) {
-  const qLower = searchQuery.trim().toLowerCase();
-  const LEAF_H = 66;
-  const DAY_H = 74;
-  const LEVEL_H = 82;
-  const COL_X = { root: 80, level: 340, day: 680, concept: 1030 };
-  const WIDTHS = { root: 190, level: 260, day: 270, concept: 275 };
+function shortenL2Label(rawLabel, fallbackIdx) {
+  if (!rawLabel) return `Nhánh ${fallbackIdx}`;
+  const cleaned = rawLabel
+    .replace(/^\(\d+\)\s*/, '')
+    .replace(/\([^)]*\)/g, '')
+    .trim();
+  const words = cleaned.split(/\s+/);
+  if (words.length <= 4) return truncateText(cleaned, 22);
+  return truncateText(words.slice(0, 4).join(' '), 22);
+}
 
-  const nodes = [];
-  const edges = [];
+function extractSubBranches(node) {
+  const raw = (node?.text || '').trim();
+  const lines = raw.split('\n').map(l => l.trim()).filter(l => l && l !== '—');
+  const body = lines.slice(1).join(' ').trim();
 
-  const isSinglePage = page !== 'all' && !qLower;
-  const targetLevels = isSinglePage
-    ? COURSE_LEVELS.filter(l => l.days.includes(page))
-    : COURSE_LEVELS;
+  if (!body) {
+    return [{
+      label: node?.source_ref?.pdf_pages?.length ? `Tr.${node.source_ref.pdf_pages.join(',')}` : 'Ghi chú',
+      leaves: [truncateText(getNodeTitle(node), 36)],
+    }];
+  }
 
-  let cursorY = 80;
-  const levelCenters = [];
+  const normalized = body.replace(/\s+(?=\(\d+\)\s)/g, '; ');
+  const chunks = normalized
+    .split(/;\s+|(?<!\d)\.(?!\d)\s+/)
+    .map(c => c.replace(/\.$/, '').replace(/->/g, '→').trim())
+    .filter(Boolean);
 
-  for (const level of targetLevels) {
-    const isLevelOpen = isSinglePage || qLower ? true : !!expandedLevels[level.id];
-    const levelNodeId = `tree:${level.id}`;
+  const groups = [];
+  for (let i = 0; i < chunks.length && groups.length < 3; i++) {
+    const chunk = chunks[i];
+    const eqIdx = chunk.indexOf(' = ');
+    if (eqIdx > 0 && eqIdx <= 32 && !chunk.slice(0, eqIdx).includes(':')) {
+      const lhs = chunk.slice(0, eqIdx).trim();
+      const rhs = chunk.slice(eqIdx + 3).trim();
+      if (rhs.includes(' + ')) {
+        const terms = rhs.split(/\s+\+\s+/).map(t => truncateText(t.replace(/\([^)]*\)/g, '').trim(), 36)).filter(Boolean);
+        if (terms.length >= 2) {
+          groups.push({ label: truncateText(lhs, 20), leaves: terms.slice(0, 4) });
+          continue;
+        }
+      }
+    }
 
-    if (!isLevelOpen) {
-      const y = cursorY;
-      cursorY += LEVEL_H;
-      nodes.push({
-        id: levelNodeId,
-        kind: 'level',
-        level,
-        x: COL_X.level,
-        y,
-        width: WIDTHS.level,
-        height: 58,
-        expanded: false,
-        dimmed: false,
+    const colonIdx = chunk.indexOf(': ');
+    const hasLabel = colonIdx > 0 && colonIdx <= 65;
+    const label = hasLabel ? chunk.slice(0, colonIdx).trim() : '';
+    const rest = hasLabel ? chunk.slice(colonIdx + 2).trim() : chunk;
+
+    const commaItems = splitTopLevelBy(rest, ',');
+    if (hasLabel && commaItems.length >= 2) {
+      groups.push({
+        label: shortenL2Label(label, groups.length + 1),
+        leaves: commaItems.slice(0, 4).map(it => truncateText(it, 36)),
       });
-      edges.push({
-        id: `e:root->${levelNodeId}`,
-        fromId: 'tree:root',
-        toId: levelNodeId,
-        color: level.edge,
-      });
-      levelCenters.push(y + 29);
       continue;
     }
 
-    const levelDays = isSinglePage ? [page] : level.days;
-    const dayCenters = [];
-    for (const d of levelDays) {
-      const dayNodes = (edits[`${contentTab}/${d}`] ?? workspace?.[contentTab]?.[d])?.nodes || [];
-      const childConcepts = dayNodes.filter(n => n.node_type !== 'day_root');
-      const dayTitle = getDayShortTitle(workspace, d);
-      const dayMatches = !qLower
-        || dayTitle.toLowerCase().includes(qLower)
-        || `d${d}`.includes(qLower)
-        || childConcepts.some(c => (c.text || '').toLowerCase().includes(qLower));
-
-      const hasMatchingChild = qLower && childConcepts.some(c => (c.text || '').toLowerCase().includes(qLower));
-      const isDayOpen = isSinglePage ? true : (qLower ? hasMatchingChild : !!expandedDays[d]);
-      const dayNodeId = `tree:day:${d}`;
-
-      if (!isDayOpen || childConcepts.length === 0) {
-        const y = cursorY;
-        cursorY += DAY_H;
-        nodes.push({
-          id: dayNodeId,
-          kind: 'day',
-          day: d,
-          title: dayTitle,
-          childCount: childConcepts.length,
-          level,
-          x: COL_X.day,
-          y,
-          width: WIDTHS.day,
-          height: 54,
-          expanded: false,
-          dimmed: !dayMatches,
-        });
-        edges.push({
-          id: `e:${levelNodeId}->${dayNodeId}`,
-          fromId: levelNodeId,
-          toId: dayNodeId,
-          color: level.edge,
-        });
-        dayCenters.push(y + 27);
-        continue;
-      }
-
-      const conceptStartY = cursorY;
-      childConcepts.forEach(cNode => {
-        const cLabel = getConceptShortLabel(cNode);
-        const cMatch = !qLower
-          || (cNode.text || '').toLowerCase().includes(qLower)
-          || (cNode.source_ref?.concept_id || '').toLowerCase().includes(qLower);
-        const cy = cursorY;
-        cursorY += LEAF_H;
-
-        const style = TYPE_COLORS[cNode.node_type] || TYPE_COLORS.concept;
-        nodes.push({
-          id: cNode.id,
-          kind: 'concept',
-          day: d,
-          rawNode: cNode,
-          title: cLabel,
-          style,
-          x: COL_X.concept,
-          y: cy,
-          width: WIDTHS.concept,
-          height: 50,
-          dimmed: !cMatch,
-        });
-        edges.push({
-          id: `e:${dayNodeId}->${cNode.id}`,
-          fromId: dayNodeId,
-          toId: cNode.id,
-          color: style.edge,
-        });
+    const arrowSteps = splitTopLevelBy(rest, '→');
+    if (arrowSteps.length >= 2) {
+      groups.push({
+        label: shortenL2Label(label || 'Quy trình', groups.length + 1),
+        leaves: arrowSteps.slice(0, 4).map(st => truncateText(st, 36)),
       });
-
-      const conceptEndY = cursorY - LEAF_H + 50;
-      const dayY = Math.round((conceptStartY + conceptEndY) / 2 - 27);
-      nodes.push({
-        id: dayNodeId,
-        kind: 'day',
-        day: d,
-        title: dayTitle,
-        childCount: childConcepts.length,
-        level,
-        x: COL_X.day,
-        y: dayY,
-        width: WIDTHS.day,
-        height: 54,
-        expanded: true,
-        dimmed: !dayMatches,
-      });
-      edges.push({
-        id: `e:${levelNodeId}->${dayNodeId}`,
-        fromId: levelNodeId,
-        toId: dayNodeId,
-        color: level.edge,
-      });
-      dayCenters.push(dayY + 27);
-      cursorY += 14;
+      continue;
     }
 
-    const levelCenterY = dayCenters.length
-      ? (dayCenters[0] + dayCenters[dayCenters.length - 1]) / 2
-      : cursorY;
-    const levelY = Math.round(levelCenterY - 29);
-    nodes.push({
-      id: levelNodeId,
-      kind: 'level',
-      level,
-      x: COL_X.level,
-      y: levelY,
-      width: WIDTHS.level,
-      height: 58,
-      expanded: true,
-      dimmed: false,
+    const verbMatch = chunk.match(/^(.{6,45}?\b(?:đòi hỏi|bao gồm|gồm|qua \d+ [^:]+))\s+([^:]+)$/i);
+    if (verbMatch) {
+      const vItems = splitTopLevelBy(verbMatch[2], ',');
+      if (vItems.length >= 2) {
+        groups.push({
+          label: shortenL2Label(verbMatch[1], groups.length + 1),
+          leaves: vItems.slice(0, 4).map(it => truncateText(it, 36)),
+        });
+        continue;
+      }
+    }
+
+    // Compact fallback leaf
+    const fallbackItems = commaItems.length >= 2
+      ? commaItems.slice(0, 4).map(it => truncateText(it, 36))
+      : [truncateText(rest, 38)];
+    groups.push({
+      label: shortenL2Label(label || `Ý ${groups.length + 1}`, groups.length + 1),
+      leaves: fallbackItems,
     });
-    edges.push({
-      id: `e:root->${levelNodeId}`,
-      fromId: 'tree:root',
-      toId: levelNodeId,
-      color: level.edge,
-    });
-    levelCenters.push(levelY + 29);
-    cursorY += 22;
   }
 
-  const rootCenterY = levelCenters.length
-    ? (levelCenters[0] + levelCenters[levelCenters.length - 1]) / 2
-    : 320;
-  const rootY = Math.round(rootCenterY - 46);
-  nodes.unshift({
-    id: 'tree:root',
-    kind: 'root',
-    title: 'Khóa học AI in Action',
-    subtitle: isSinglePage ? `Trang ${page}/14 · Bài ${page}` : '14 ngày · 4 cấp độ',
-    x: COL_X.root,
-    y: rootY,
-    width: WIDTHS.root,
-    height: 92,
-    dimmed: false,
+  // Add provenance / code reference leaf if only 1 group exists
+  if (groups.length === 1 && node?.source_ref?.pdf_pages?.length) {
+    groups.push({
+      label: 'Nguồn PDF',
+      leaves: [`Ngày ${node.source_ref.day} · Tr.${node.source_ref.pdf_pages.join(', ')}`],
+    });
+  } else if (groups.length === 1 && node?.code_link?.file_path) {
+    groups.push({
+      label: 'Code Lab',
+      leaves: [truncateText(node.code_link.file_path.split('/').slice(-2).join('/'), 36)],
+    });
+  }
+
+  return groups.slice(0, 3);
+}
+
+function layoutSideBranches(branches, side, themes, startX) {
+  const LEAF_W = 214;
+  const LEAF_H = 26;
+  const LEAF_GAP = 4;
+  const L2_W = 136;
+  const L2_H = 30;
+  const L2_GAP = 14;
+  const L1_W = 166;
+  const L1_H = 36;
+  const L1_GAP = 26;
+
+  // X positions for each column on left vs right side
+  const l1X = side === 'left' ? startX - 180 - L1_W : startX + 180;
+  const l2X = side === 'left' ? l1X - 58 - L2_W : l1X + L1_W + 58;
+  const l3X = side === 'left' ? l2X - 52 - LEAF_W : l2X + L2_W + 52;
+
+  const placedNodes = [];
+  const placedEdges = [];
+  let cursorY = 0;
+
+  branches.forEach((branch, bIdx) => {
+    const theme = themes[bIdx % themes.length];
+    const l1Id = `l1:${branch.id}`;
+    const l2Centers = [];
+    const l1StartY = cursorY;
+
+    branch.subGroups.forEach((sg, sgIdx) => {
+      const l2Id = `l2:${branch.id}:${sgIdx}`;
+      const leafCount = Math.max(1, sg.leaves.length);
+      const leavesBlockH = leafCount * LEAF_H + (leafCount - 1) * LEAF_GAP;
+      const l2StartY = cursorY;
+
+      sg.leaves.forEach((leafText, lIdx) => {
+        const l3Id = `l3:${branch.id}:${sgIdx}:${lIdx}`;
+        const ly = l2StartY + lIdx * (LEAF_H + LEAF_GAP);
+        placedNodes.push({
+          id: l3Id,
+          kind: 'l3',
+          side,
+          conceptId: branch.conceptId,
+          day: branch.day,
+          text: leafText,
+          theme,
+          x: l3X,
+          y: ly,
+          width: LEAF_W,
+          height: LEAF_H,
+        });
+        placedEdges.push({
+          id: `e:${l2Id}->${l3Id}`,
+          fromId: l2Id,
+          toId: l3Id,
+          side,
+          theme,
+          conceptId: branch.conceptId,
+        });
+      });
+
+      const l2Y = Math.round(l2StartY + (leavesBlockH - L2_H) / 2);
+      placedNodes.push({
+        id: l2Id,
+        kind: 'l2',
+        side,
+        conceptId: branch.conceptId,
+        day: branch.day,
+        text: sg.label,
+        theme,
+        x: l2X,
+        y: l2Y,
+        width: L2_W,
+        height: L2_H,
+      });
+      placedEdges.push({
+        id: `e:${l1Id}->${l2Id}`,
+        fromId: l1Id,
+        toId: l2Id,
+        side,
+        theme,
+        conceptId: branch.conceptId,
+      });
+
+      l2Centers.push(l2Y + L2_H / 2);
+      cursorY += Math.max(L2_H, leavesBlockH) + L2_GAP;
+    });
+
+    const l1EndY = cursorY - L2_GAP;
+    const l1CenterY = l2Centers.length
+      ? (l2Centers[0] + l2Centers[l2Centers.length - 1]) / 2
+      : (l1StartY + l1EndY) / 2;
+    const l1Y = Math.round(l1CenterY - L1_H / 2);
+
+    placedNodes.push({
+      id: l1Id,
+      kind: 'l1',
+      side,
+      conceptId: branch.conceptId,
+      day: branch.day,
+      text: branch.label,
+      verified: branch.verified,
+      theme,
+      x: l1X,
+      y: l1Y,
+      width: L1_W,
+      height: L1_H,
+    });
+    placedEdges.push({
+      id: `e:root->${l1Id}`,
+      fromId: 'root',
+      toId: l1Id,
+      side,
+      theme,
+      conceptId: branch.conceptId,
+    });
+
+    cursorY += L1_GAP - L2_GAP;
   });
 
-  const canvasW = 1480;
-  const canvasH = Math.max(640, cursorY + 140);
-  return { nodes, edges, canvasW, canvasH };
+  const totalHeight = Math.max(120, cursorY - L1_GAP);
+  return { nodes: placedNodes, edges: placedEdges, height: totalHeight };
+}
+
+function computeSymmetricLayout({ workspace, edits, contentTab, page, searchQuery }) {
+  const CENTER_X = 940;
+  const ROOT_W = 196;
+  const ROOT_H = 114;
+  const ROOT_X = CENTER_X - ROOT_W / 2;
+  const qLower = searchQuery.trim().toLowerCase();
+
+  let rawBranches = [];
+  let rootTitle = '';
+  let rootLines = [];
+  let rootConceptId = null;
+
+  if (page === 'all') {
+    rootTitle = 'AI20K · 14 Ngày';
+    rootLines = ['4 Cấp độ học', 'Knowledge Graph', 'Lab Mapping'];
+    rawBranches = COURSE_LEVELS.map(lvl => ({
+      id: lvl.id,
+      conceptId: null,
+      day: lvl.days[0],
+      label: lvl.title.replace(/^Cấp độ \d+:\s*/i, ''),
+      verified: true,
+      subGroups: lvl.days.map(d => {
+        const dNodes = (edits[`${contentTab}/${d}`] ?? workspace?.[contentTab]?.[d])?.nodes || [];
+        const concepts = dNodes.filter(n => n.node_type !== 'day_root');
+        return {
+          label: `D${String(d).padStart(2, '0')} · ${truncateText(getDayShortTitle(workspace, d), 14)}`,
+          leaves: concepts.slice(0, 4).map(c => truncateText(getNodeTitle(c), 34)),
+          dayOverride: d,
+        };
+      }),
+    }));
+  } else {
+    const dayNodes = (edits[`${contentTab}/${page}`] ?? workspace?.[contentTab]?.[page])?.nodes || [];
+    const rootNode = dayNodes.find(n => n.node_type === 'day_root') || null;
+    rootConceptId = rootNode?.id || null;
+    rootTitle = `AI20K · Ngày ${page}`;
+    const dayShort = getDayShortTitle(workspace, page);
+    rootLines = [truncateText(dayShort, 24), contentTab === 'lab' ? 'Lab Mapping' : 'Knowledge Graph'];
+
+    const children = dayNodes.filter(n => n.node_type !== 'day_root');
+    if (children.length === 0) {
+      rawBranches = [{
+        id: 'empty',
+        conceptId: rootConceptId,
+        day: page,
+        label: 'Chưa có nút con',
+        verified: false,
+        subGroups: [{
+          label: 'Gợi ý',
+          leaves: ['Chuyển sang Mindmap ngày để tự vẽ', 'Hoặc dùng AI GraphRAG nạp bài'],
+        }],
+      }];
+    } else {
+      rawBranches = children.map(node => ({
+        id: node.id,
+        conceptId: node.id,
+        day: page,
+        label: truncateText(getNodeTitle(node), 26),
+        verified: node.verification_status === 'verified',
+        matchesSearch: !qLower || (node.text || '').toLowerCase().includes(qLower),
+        subGroups: extractSubBranches(node),
+      }));
+    }
+  }
+
+  const half = Math.ceil(rawBranches.length / 2);
+  const leftBranches = rawBranches.slice(0, half);
+  const rightBranches = rawBranches.slice(half);
+
+  const leftLayout = layoutSideBranches(leftBranches, 'left', LEFT_THEMES, CENTER_X);
+  const rightLayout = layoutSideBranches(rightBranches, 'right', RIGHT_THEMES, CENTER_X);
+
+  const maxH = Math.max(leftLayout.height, rightLayout.height, ROOT_H + 80);
+  const topPad = 64;
+  const leftOffsetY = topPad + Math.round((maxH - leftLayout.height) / 2);
+  const rightOffsetY = topPad + Math.round((maxH - rightLayout.height) / 2);
+  const rootY = topPad + Math.round((maxH - ROOT_H) / 2);
+
+  const allNodes = [
+    {
+      id: 'root',
+      kind: 'root',
+      conceptId: rootConceptId,
+      day: page === 'all' ? 1 : page,
+      title: rootTitle,
+      lines: rootLines,
+      x: ROOT_X,
+      y: rootY,
+      width: ROOT_W,
+      height: ROOT_H,
+    },
+    ...leftLayout.nodes.map(n => ({
+      ...n,
+      y: n.y + leftOffsetY,
+      dimmed: qLower ? !rawBranches.find(b => b.id === n.conceptId)?.matchesSearch : false,
+    })),
+    ...rightLayout.nodes.map(n => ({
+      ...n,
+      y: n.y + rightOffsetY,
+      dimmed: qLower ? !rawBranches.find(b => b.id === n.conceptId)?.matchesSearch : false,
+    })),
+  ];
+
+  const allEdges = [...leftLayout.edges, ...rightLayout.edges];
+  const canvasW = 1880;
+  const canvasH = Math.max(760, maxH + topPad * 2 + 90);
+  return { nodes: allNodes, edges: allEdges, canvasW, canvasH };
 }
 
 export function CourseTree({
@@ -284,18 +417,13 @@ export function CourseTree({
 }) {
   const viewport = useRef(null);
   const pan = useRef(null);
-  const [zoom, setZoom] = useState(0.95);
+  const [zoom, setZoom] = useState(0.88);
   const [page, setPage] = useState(activeDay || 1);
-  const [expandedLevels, setExpandedLevels] = useState(() => {
-    const activeLvl = COURSE_LEVELS.find(l => l.days.includes(activeDay))?.id || 'lv1';
-    return { lv1: activeLvl === 'lv1', lv2: activeLvl === 'lv2', lv3: activeLvl === 'lv3', lv4: activeLvl === 'lv4' };
-  });
-  const [expandedDays, setExpandedDays] = useState(() => ({ [activeDay]: true }));
-  const [vpRect, setVpRect] = useState({ left: 0, top: 0, width: 1000, height: 600 });
+  const [vpRect, setVpRect] = useState({ left: 0, top: 0, width: 1200, height: 700 });
 
   const tree = useMemo(
-    () => computeTreeLayout({ workspace, edits, contentTab, expandedLevels, expandedDays, searchQuery, page }),
-    [workspace, edits, contentTab, expandedLevels, expandedDays, searchQuery, page],
+    () => computeSymmetricLayout({ workspace, edits, contentTab, page, searchQuery }),
+    [workspace, edits, contentTab, page, searchQuery],
   );
   const byId = useMemo(() => new Map(tree.nodes.map(n => [n.id, n])), [tree.nodes]);
 
@@ -323,10 +451,10 @@ export function CourseTree({
       maxX = Math.max(maxX, n.x + n.width);
       maxY = Math.max(maxY, n.y + n.height);
     }
-    const pad = 70;
-    const contentW = Math.max(460, maxX - minX + pad * 2);
-    const contentH = Math.max(320, maxY - minY + pad * 2);
-    const fitZ = clampZoom(Math.min(1.02, (vp.clientWidth - 40) / contentW, (vp.clientHeight - 90) / contentH));
+    const pad = 64;
+    const contentW = Math.max(600, maxX - minX + pad * 2);
+    const contentH = Math.max(380, maxY - minY + pad * 2);
+    const fitZ = clampZoom(Math.min(1.05, (vp.clientWidth - 40) / contentW, (vp.clientHeight - 110) / contentH));
     setZoom(fitZ);
 
     const cx = (minX + maxX) / 2;
@@ -334,7 +462,7 @@ export function CourseTree({
     requestAnimationFrame(() => {
       vp.scrollTo({
         left: Math.max(0, cx * fitZ - vp.clientWidth / 2),
-        top: Math.max(0, cy * fitZ - (vp.clientHeight - 40) / 2),
+        top: Math.max(0, cy * fitZ - (vp.clientHeight - 70) / 2),
         behavior: 'smooth',
       });
       syncViewportRect();
@@ -344,18 +472,10 @@ export function CourseTree({
   function centerView() {
     const vp = viewport.current;
     if (!vp || !tree.nodes.length) return;
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-    for (const n of tree.nodes) {
-      minX = Math.min(minX, n.x);
-      minY = Math.min(minY, n.y);
-      maxX = Math.max(maxX, n.x + n.width);
-      maxY = Math.max(maxY, n.y + n.height);
-    }
-    const cx = (minX + maxX) / 2;
-    const cy = (minY + maxY) / 2;
+    const root = byId.get('root');
+    if (!root) return;
+    const cx = root.x + root.width / 2;
+    const cy = root.y + root.height / 2;
     vp.scrollTo({
       left: Math.max(0, cx * zoom - vp.clientWidth / 2),
       top: Math.max(0, cy * zoom - vp.clientHeight / 2),
@@ -374,11 +494,6 @@ export function CourseTree({
   }, [layoutTrigger]);
 
   useEffect(() => {
-    const lvl = COURSE_LEVELS.find(l => l.days.includes(activeDay))?.id;
-    if (lvl) {
-      setExpandedLevels(prev => (prev[lvl] ? prev : { ...prev, [lvl]: true }));
-    }
-    setExpandedDays(prev => (prev[activeDay] ? prev : { ...prev, [activeDay]: true }));
     if (page !== 'all' && activeDay && page !== activeDay) {
       setPage(activeDay);
     }
@@ -388,30 +503,18 @@ export function CourseTree({
   useEffect(() => {
     fitToView();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
-
-  function goToPage(nextPage) {
-    setPage(nextPage);
-    if (nextPage !== 'all') {
-      onSelectDay?.(nextPage);
-    }
-  }
+  }, [page, contentTab]);
 
   useEffect(() => {
     syncViewportRect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoom, tree.nodes.length]);
 
-  function expandAll() {
-    setExpandedLevels({ lv1: true, lv2: true, lv3: true, lv4: true });
-    const allDays = {};
-    for (let d = 1; d <= 14; d++) allDays[d] = true;
-    setExpandedDays(allDays);
-  }
-
-  function collapseToLevels() {
-    setExpandedLevels({ lv1: true, lv2: true, lv3: true, lv4: true });
-    setExpandedDays({});
+  function goToPage(nextPage) {
+    setPage(nextPage);
+    if (nextPage !== 'all') {
+      onSelectDay?.(nextPage);
+    }
   }
 
   function startPan(event) {
@@ -431,35 +534,38 @@ export function CourseTree({
     syncViewportRect();
   }
 
+  function buildSymmetricEdge(edge) {
+    const from = byId.get(edge.fromId);
+    const to = byId.get(edge.toId);
+    if (!from || !to) return null;
+
+    const isLeft = edge.side === 'left';
+    const x1 = isLeft ? from.x : from.x + from.width;
+    const y1 = from.y + from.height / 2;
+    const x2 = isLeft ? to.x + to.width : to.x;
+    const y2 = to.y + to.height / 2;
+
+    const dx = Math.abs(x2 - x1);
+    const c1 = isLeft ? x1 - dx * 0.55 : x1 + dx * 0.55;
+    const c2 = isLeft ? x2 + dx * 0.45 : x2 - dx * 0.45;
+    return `M ${x1} ${y1} C ${c1} ${y1}, ${c2} ${y2}, ${x2} ${y2}`;
+  }
+
   return (
-    <section className="flex-1 relative overflow-hidden flex" aria-label="Cây rẽ nhánh khóa học">
-      {/* Left Floating Tree Controls */}
+    <section className="flex-1 relative overflow-hidden flex" aria-label="Sơ đồ cây đối xứng">
+      {/* Left Compact Controls */}
       <aside className="absolute left-4 top-4 z-20 flex flex-col bg-white border border-slate-200/90 rounded-xl shadow-lg shadow-slate-900/5 p-1.5 space-y-1">
         <button
           type="button"
-          onClick={expandAll}
+          onClick={() => onOpenDayCanvas?.(page === 'all' ? activeDay : page)}
           className="p-2 text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition group relative"
-          title="Mở rộng toàn bộ cây"
+          title="Chỉnh sửa Mindmap ngày này"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+            <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
           </svg>
           <span className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-[11px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none shadow z-30">
-            Mở rộng tất cả
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={collapseToLevels}
-          className="p-2 text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition group relative"
-          title="Thu gọn về 4 cấp độ"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M20 12H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-          </svg>
-          <span className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-[11px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none shadow z-30">
-            Thu gọn nhánh con
+            Mở chế độ chỉnh sửa
           </span>
         </button>
 
@@ -484,18 +590,16 @@ export function CourseTree({
         <button
           type="button"
           onClick={() => onSwitchContentTab?.('mindmaps')}
-          className={`px-1.5 py-1 rounded text-[10px] font-bold transition ${
-            contentTab === 'mindmaps' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
-          }`}
+          className={`px-1.5 py-1 rounded text-[10px] font-bold transition ${contentTab === 'mindmaps' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
+            }`}
         >
           KG
         </button>
         <button
           type="button"
           onClick={() => onSwitchContentTab?.('lab')}
-          className={`px-1.5 py-1 rounded text-[10px] font-bold transition ${
-            contentTab === 'lab' ? 'bg-purple-600 text-white' : 'text-slate-600 hover:bg-slate-100'
-          }`}
+          className={`px-1.5 py-1 rounded text-[10px] font-bold transition ${contentTab === 'lab' ? 'bg-purple-600 text-white' : 'text-slate-600 hover:bg-slate-100'
+            }`}
         >
           Lab
         </button>
@@ -506,7 +610,7 @@ export function CourseTree({
         ref={viewport}
         onScroll={syncViewportRect}
         tabIndex={0}
-        aria-label="Canvas cây khóa học"
+        aria-label="Canvas sơ đồ đối xứng"
         className={`flex-1 h-full w-full relative overflow-auto ${showGrid ? 'bg-dot-grid' : 'bg-plain-canvas'}`}
       >
         <div style={{ width: Math.round(tree.canvasW * zoom), height: Math.round(tree.canvasH * zoom) }} className="relative">
@@ -524,163 +628,117 @@ export function CourseTree({
               if (event.target === event.currentTarget) pan.current = null;
             }}
           >
-            {/* Curved Bezier Branches */}
+            {/* Color-matched Smooth Bezier Branches */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <marker id="tree-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-                  <path d="M 1 1.5 L 9 5 L 1 8.5 z" fill="#94a3b8" />
-                </marker>
-                <marker id="tree-arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">
-                  <path d="M 1 1.5 L 9 5 L 1 8.5 z" fill="#2563eb" />
-                </marker>
-              </defs>
               {tree.edges.map(edge => {
-                const from = byId.get(edge.fromId);
-                const to = byId.get(edge.toId);
-                if (!from || !to) return null;
-                const x1 = from.x + from.width;
-                const y1 = from.y + from.height / 2;
-                const x2 = to.x;
-                const y2 = to.y + to.height / 2;
-                const dist = Math.max(40, (x2 - x1) * 0.5);
-                const d = `M ${x1} ${y1} C ${x1 + dist} ${y1}, ${x2 - dist} ${y2}, ${x2} ${y2}`;
-                const isSelectedEdge = to.id === selectedNodeId || (to.kind === 'day' && to.day === activeDay);
+                const d = buildSymmetricEdge(edge);
+                if (!d) return null;
+                const isSelected = edge.conceptId && edge.conceptId === selectedNodeId;
                 return (
                   <path
                     key={edge.id}
                     d={d}
                     fill="none"
-                    stroke={isSelectedEdge ? '#2563eb' : edge.color}
-                    strokeWidth={isSelectedEdge ? 2.5 : 1.8}
-                    opacity={to.dimmed ? 0.2 : isSelectedEdge ? 0.95 : 0.65}
-                    markerEnd={isSelectedEdge ? 'url(#tree-arrow-active)' : 'url(#tree-arrow)'}
+                    stroke={edge.theme.solid}
+                    strokeWidth={isSelected ? 2.4 : 1.5}
+                    strokeLinecap="round"
+                    opacity={isSelected ? 1 : 0.72}
                   />
                 );
               })}
             </svg>
 
-            {/* Tree Nodes */}
+            {/* Symmetric Nodes */}
             {tree.nodes.map(node => {
               if (node.kind === 'root') {
-                return (
-                  <div
-                    key={node.id}
-                    style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
-                    className="mindmap-node rounded-full bg-[#B5D3FA] border-2 border-blue-600 shadow-md flex flex-col items-center justify-center text-center px-4 z-10"
-                  >
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/75 text-blue-800 mb-1">
-                      Khóa học AI
-                    </span>
-                    <div className="text-[13px] font-bold text-slate-900 leading-tight">{node.title}</div>
-                    <div className="text-[10.5px] font-medium text-slate-700 mt-0.5">{node.subtitle}</div>
-                  </div>
-                );
-              }
-
-              if (node.kind === 'level') {
                 return (
                   <button
                     key={node.id}
                     type="button"
-                    onClick={() => setExpandedLevels(prev => ({ ...prev, [node.level.id]: !prev[node.level.id] }))}
+                    onClick={() => node.conceptId && onSelectConcept?.(node.day, node.conceptId)}
+                    style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
+                    className="mindmap-node rounded-2xl bg-[#111E38] text-white shadow-xl hover:shadow-2xl px-4 py-3 flex flex-col items-center justify-center text-center z-10 border border-slate-700"
+                  >
+                    <div className="text-[13.5px] font-bold tracking-tight text-white mb-1.5">
+                      {node.title}
+                    </div>
+                    {node.lines.map((line, i) => (
+                      <div key={i} className="text-[11px] text-slate-300 leading-snug truncate max-w-full">
+                        {line}
+                      </div>
+                    ))}
+                  </button>
+                );
+              }
+
+              const isSelected = node.conceptId && node.conceptId === selectedNodeId;
+
+              if (node.kind === 'l1') {
+                return (
+                  <button
+                    key={node.id}
+                    type="button"
+                    onClick={() => {
+                      if (node.conceptId) {
+                        onSelectConcept?.(node.day, node.conceptId);
+                      } else if (page === 'all') {
+                        goToPage(node.day);
+                      }
+                    }}
                     style={{
                       position: 'absolute',
                       left: node.x,
                       top: node.y,
                       width: node.width,
                       height: node.height,
-                      backgroundColor: node.level.bg,
+                      backgroundColor: node.theme.solid,
                     }}
-                    className="mindmap-node rounded-full shadow-sm hover:shadow-md border border-white/60 px-4 flex items-center justify-between gap-2 text-left z-10"
+                    className={`mindmap-node rounded-lg px-3 flex items-center justify-center text-center text-white font-bold text-[12px] shadow-md hover:brightness-105 z-10 ${isSelected ? 'ring-2 ring-offset-2 ring-slate-900' : ''
+                      } ${node.dimmed ? 'opacity-25' : ''}`}
+                    title={node.text}
                   >
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[9.5px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-white/70 text-slate-800">
-                          {node.level.badge}
-                        </span>
-                        <span className="text-[10px] font-mono text-slate-700">
-                          D{node.level.days[0]}–D{node.level.days[node.level.days.length - 1]}
-                        </span>
-                      </div>
-                      <div className="text-[12px] font-bold text-slate-900 truncate mt-0.5">
-                        {node.level.title.replace(/^Cấp độ \d+:\s*/i, '')}
-                      </div>
-                    </div>
-                    <span className="w-6 h-6 rounded-full bg-white/75 text-slate-800 font-bold text-xs grid place-items-center shrink-0">
-                      {node.expanded ? '▾' : '▸'}
-                    </span>
+                    <span className="truncate">{node.text}</span>
                   </button>
                 );
               }
 
-              if (node.kind === 'day') {
-                const isActive = node.day === activeDay;
+              if (node.kind === 'l2') {
                 return (
-                  <div
+                  <button
                     key={node.id}
-                    style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
-                    className={`mindmap-node rounded-full bg-white shadow-sm hover:shadow-md px-3 flex items-center gap-2 z-10 ${
-                      isActive ? 'border-2 border-blue-600 ring-2 ring-blue-100' : 'border border-slate-300'
-                    } ${node.dimmed ? 'opacity-25' : ''}`}
+                    type="button"
+                    onClick={() => node.conceptId && onSelectConcept?.(node.day, node.conceptId)}
+                    style={{
+                      position: 'absolute',
+                      left: node.x,
+                      top: node.y,
+                      width: node.width,
+                      height: node.height,
+                      backgroundColor: node.theme.tint,
+                      borderColor: node.theme.tintBorder,
+                      color: node.theme.tintText,
+                    }}
+                    className={`mindmap-node rounded-md border px-2.5 flex items-center justify-center text-center font-semibold text-[11.5px] shadow-2xs hover:shadow-sm z-10 ${isSelected ? 'ring-2 ring-blue-500' : ''
+                      } ${node.dimmed ? 'opacity-25' : ''}`}
+                    title={node.text}
                   >
-                    <button
-                      type="button"
-                      onClick={() => setExpandedDays(prev => ({ ...prev, [node.day]: !prev[node.day] }))}
-                      className="flex-1 min-w-0 flex items-center gap-2 text-left"
-                    >
-                      <span className={`px-2 py-0.5 rounded-full font-mono text-[10.5px] font-bold shrink-0 ${
-                        isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'
-                      }`}>
-                        D{String(node.day).padStart(2, '0')}
-                      </span>
-                      <span className="text-[12px] font-semibold text-slate-900 truncate flex-1">
-                        {node.title}
-                      </span>
-                      <span className="text-[10.5px] font-mono text-slate-400 shrink-0">
-                        {node.childCount} {node.expanded ? '▾' : '▸'}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onOpenDayCanvas?.(node.day)}
-                      className="w-6 h-6 rounded-full bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold grid place-items-center shrink-0 transition"
-                      title={`Mở sơ đồ riêng của Ngày ${node.day}`}
-                    >
-                      ↗
-                    </button>
-                  </div>
+                    <span className="truncate">{node.text}</span>
+                  </button>
                 );
               }
 
-              // Concept leaf pill
-              const isSelected = node.id === selectedNodeId;
+              // Level 3 compact white leaf bar
               return (
                 <button
                   key={node.id}
                   type="button"
-                  onClick={() => onSelectConcept?.(node.day, node.id)}
-                  style={{
-                    position: 'absolute',
-                    left: node.x,
-                    top: node.y,
-                    width: node.width,
-                    height: node.height,
-                    backgroundColor: node.style.bg,
-                  }}
-                  className={`mindmap-node rounded-full px-4 flex items-center justify-between gap-2 text-left shadow-sm hover:shadow-md z-10 ${
-                    isSelected
-                      ? 'border-2 border-blue-600 ring-2 ring-blue-200'
-                      : 'border border-white/70'
-                  } ${node.dimmed ? 'opacity-25' : ''}`}
+                  onClick={() => node.conceptId && onSelectConcept?.(node.day, node.conceptId)}
+                  style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
+                  className={`mindmap-node rounded-md bg-white px-2.5 flex items-center justify-center text-center text-[11px] font-medium text-slate-700 border shadow-2xs hover:border-slate-400 z-10 ${isSelected ? 'border-blue-600 ring-1 ring-blue-300' : 'border-slate-300/85'
+                    } ${node.dimmed ? 'opacity-25' : ''}`}
+                  title={node.text}
                 >
-                  <span className="text-[11.5px] font-semibold text-slate-900 truncate flex-1">
-                    {node.title}
-                  </span>
-                  {node.rawNode?.verification_status === 'verified' && (
-                    <span className="w-4 h-4 rounded-full bg-white text-emerald-600 text-[9px] font-bold grid place-items-center shrink-0">
-                      ✓
-                    </span>
-                  )}
+                  <span className="truncate">{node.text}</span>
                 </button>
               );
             })}
@@ -688,9 +746,8 @@ export function CourseTree({
         </div>
       </div>
 
-      {/* Floating Bottom Controls + Lesson Pagination (1 trang = 1 bài) */}
+      {/* Floating Bottom Controls + 1-to-14 Lesson Pagination */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1.5 max-w-[calc(100vw-2rem)]">
-        {/* Pagination Bar */}
         <div
           className="bg-white/95 backdrop-blur-sm border border-slate-200 shadow-lg rounded-xl px-2.5 py-1 flex items-center gap-1 overflow-x-auto max-w-full"
           aria-label="Phân trang bài học"
@@ -707,24 +764,20 @@ export function CourseTree({
           >
             ‹
           </button>
-          {Array.from({ length: 14 }, (_, idx) => idx + 1).map(num => {
-            const isCurr = page === num;
-            return (
-              <button
-                key={num}
-                type="button"
-                onClick={() => goToPage(num)}
-                title={`Trang ${num}: Bài ${num}`}
-                className={`w-6 h-6 rounded-md text-[11px] font-mono font-semibold transition shrink-0 ${
-                  isCurr
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+          {Array.from({ length: 14 }, (_, idx) => idx + 1).map(num => (
+            <button
+              key={num}
+              type="button"
+              onClick={() => goToPage(num)}
+              title={`Trang ${num}: Ngày ${num}`}
+              className={`w-6 h-6 rounded-md text-[11px] font-mono font-semibold transition shrink-0 ${page === num
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
-              >
-                {num}
-              </button>
-            );
-          })}
+            >
+              {num}
+            </button>
+          ))}
           <button
             type="button"
             disabled={page === 'all' || page >= 14}
@@ -738,87 +791,85 @@ export function CourseTree({
           <button
             type="button"
             onClick={() => goToPage(page === 'all' ? activeDay : 'all')}
-            className={`px-2 py-0.5 rounded-md text-[11px] font-semibold whitespace-nowrap transition ${
-              page === 'all'
+            className={`px-2 py-0.5 rounded-md text-[11px] font-semibold whitespace-nowrap transition ${page === 'all'
                 ? 'bg-slate-900 text-white'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
+              }`}
           >
             Tất cả
           </button>
         </div>
 
-        {/* Canvas Zoom & View Switcher */}
         <div className="bg-white/95 backdrop-blur-sm border border-slate-200 shadow-xl rounded-xl px-3 py-1.5 flex items-center space-x-2 overflow-x-auto max-w-full">
-        <button
-          type="button"
-          onClick={() => setZoom(z => clampZoom(z - 0.1))}
-          className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
-          title="Thu nhỏ"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M20 12H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-          </svg>
-        </button>
-        <span className="text-xs font-semibold text-slate-700 px-1 min-w-[42px] text-center font-mono">
-          {Math.round(zoom * 100)}%
-        </span>
-        <button
-          type="button"
-          onClick={() => setZoom(z => clampZoom(z + 0.1))}
-          className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
-          title="Phóng to"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-          </svg>
-        </button>
-
-        <div className="h-4 w-px bg-slate-200 shrink-0" />
-
-        <button
-          type="button"
-          onClick={centerView}
-          className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition"
-          title="Căn giữa cây"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-          </svg>
-        </button>
-        <button
-          type="button"
-          onClick={fitToView}
-          className="px-2 py-1 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition font-medium whitespace-nowrap"
-        >
-          Vừa khung hình
-        </button>
-
-        <div className="h-4 w-px bg-slate-200 shrink-0" />
-
-        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg shrink-0">
           <button
             type="button"
-            onClick={() => onSwitchView?.('tree')}
-            className="px-2.5 py-1 text-[11px] rounded-md font-semibold bg-white text-blue-700 shadow-sm"
+            onClick={() => setZoom(z => clampZoom(z - 0.1))}
+            className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
+            title="Thu nhỏ"
           >
-            Cây khóa học
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M20 12H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+            </svg>
+          </button>
+          <span className="text-xs font-semibold text-slate-700 px-1 min-w-[42px] text-center font-mono">
+            {Math.round(zoom * 100)}%
+          </span>
+          <button
+            type="button"
+            onClick={() => setZoom(z => clampZoom(z + 0.1))}
+            className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
+            title="Phóng to"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+            </svg>
+          </button>
+
+          <div className="h-4 w-px bg-slate-200 shrink-0" />
+
+          <button
+            type="button"
+            onClick={centerView}
+            className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition"
+            title="Căn giữa sơ đồ"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+            </svg>
           </button>
           <button
             type="button"
-            onClick={() => onSwitchView?.('mindmaps')}
-            className="px-2.5 py-1 text-[11px] rounded-md font-semibold text-slate-600 hover:text-slate-900"
+            onClick={fitToView}
+            className="px-2 py-1 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition font-medium whitespace-nowrap"
           >
-            Mindmap ngày
+            Vừa khung hình
           </button>
-          <button
-            type="button"
-            onClick={() => onSwitchView?.('lab')}
-            className="px-2.5 py-1 text-[11px] rounded-md font-semibold text-slate-600 hover:text-slate-900"
-          >
-            Lab
-          </button>
-        </div>
+
+          <div className="h-4 w-px bg-slate-200 shrink-0" />
+
+          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg shrink-0">
+            <button
+              type="button"
+              onClick={() => onSwitchView?.('tree')}
+              className="px-2.5 py-1 text-[11px] rounded-md font-semibold bg-white text-blue-700 shadow-sm"
+            >
+              Cây khóa học
+            </button>
+            <button
+              type="button"
+              onClick={() => onSwitchView?.('mindmaps')}
+              className="px-2.5 py-1 text-[11px] rounded-md font-semibold text-slate-600 hover:text-slate-900"
+            >
+              Mindmap ngày
+            </button>
+            <button
+              type="button"
+              onClick={() => onSwitchView?.('lab')}
+              className="px-2.5 py-1 text-[11px] rounded-md font-semibold text-slate-600 hover:text-slate-900"
+            >
+              Lab
+            </button>
+          </div>
         </div>
       </div>
 
@@ -834,7 +885,7 @@ export function CourseTree({
           {tree.nodes.map(n => (
             <div
               key={n.id}
-              className={`absolute rounded-full ${n.kind === 'level' ? n.level.mini : n.kind === 'concept' ? n.style.mini : 'bg-blue-500'} w-3.5 h-1.5`}
+              className={`absolute rounded ${n.kind === 'root' ? 'bg-slate-900 w-3 h-2.5' : `${n.theme?.mini || 'bg-slate-400'} w-3 h-1`}`}
               style={{
                 left: `${Math.max(0, Math.min(92, (n.x / tree.canvasW) * 100))}%`,
                 top: `${Math.max(0, Math.min(90, (n.y / tree.canvasH) * 100))}%`,
