@@ -2,12 +2,20 @@
 
 > Bản đầu cho CP2 (27/11/2026). Không commit nguyên file tài liệu khóa học, dữ liệu cá nhân thật hay nguyên bộ log hành vi BTC cấp — chỉ lưu cấu trúc trích xuất, số tổng hợp và mẫu ngắn phục vụ kiểm thử.
 
+## Snapshot chạy mock CP2
+
+Nguồn đọc ở runtime là [knowledge-graph.json](../../data/lab-mapping/knowledge-graph.json) trong chính commit CP2. Tệp chứa 65 khái niệm, 92 quan hệ, 77 checkpoint/phase và 34 lời giải thích code mẫu. Dữ liệu được diễn giải từ tài liệu Lab công khai, với nguồn tra lại theo commit. Các khái niệm ở đây đang chờ đối chiếu với Lecture chính thức. CP2 không dùng PDF Lecture, ví dụ Inclass từ người dùng, repo học viên hay log Preclass làm đầu vào runtime.
+
+Fixture chạy mock dùng dữ liệu Lab dẫn nguồn và bộ luật chọn khái niệm tất định. Benchmark có 11 câu dựng từ dữ liệu Lab và 9 câu tự viết. Không dùng benchmark làm đầu vào truy xuất. Không dùng dữ liệu sinh có seed ở snapshot này. Lịch Day 12 từ README công khai, phần yêu cầu chi tiết cần Lab Board.
+
+Các dataset bên dưới ghi nguồn cho backend đang phát triển và cho phần đánh giá pain. Khái niệm có trang PDF thuộc dataset Lecture riêng với graph dựa trên Lab của CLI mock.
+
 ## Dataset 1 · Knowledge Graph Giáo trình AI20K (Day 01–Day 13)
 
 | | |
 |---|---|
 | Dùng để làm gì | Nguồn tri thức gốc cho công cụ truy xuất Knowledge Graph / GraphRAG (`kg_store.py`, `graph_db.py`), hiển thị Mindmap và kiểm chứng nguồn (`verify_mapping`) |
-| Từ đâu | Tài liệu giáo trình khóa AI20K Level 3–4 (trích tóm tắt có cấu trúc kèm số trang PDF và mục giáo trình; file `learning-app/backend/kg_data/kg_aicb_p1.json` và `data/lab-mapping/knowledge-graph.json`) |
+| Từ đâu | Tài liệu giáo trình khóa AI20K Level 3–4 (trích tóm tắt có cấu trúc kèm số trang PDF và mục giáo trình; file `learning-app/backend/kg_data/kg_aicb_p1.json` ) |
 | Xử lý những bước gì | Chuẩn hóa Unicode NFC, tách node theo loại (`CoreConcept`, `ArchitecturePattern`, `MetricOrFormula`, `FailureOrTrap`, `CaseStudy`, `LabDeliverable`), gắn metadata `day`, `pdf_pages` (1–88), `section_ref`, `key_quote`, lập chỉ mục FTS5 và kiểm hợp lệ bằng `kg_builder.py` |
 | Số dòng / số đoạn | 71 node (13 node ngày + 58 khái niệm) và 84 cạnh quan hệ trong `kg_aicb_p1.json` |
 | Phiên bản / ngày lấy | v1.0 · 27/11/2026 |

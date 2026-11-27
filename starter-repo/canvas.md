@@ -11,4 +11,4 @@
 | 5 | Lát cắt một câu | Khi một học viên L3 bị kẹt ở một checkpoint Lab, AI dựa trên hướng dẫn của checkpoint, nút Mindmap Preclass và ví dụ Inclass để chọn một gợi ý có dẫn nguồn, giúp học viên tự thử và kiểm tra kết quả bước tiếp theo. |
 | 6 | Mức tự động và lý do | AI đưa một gợi ý có dẫn nguồn hoặc hỏi một câu làm rõ khi thiếu thông tin. Học viên xem lại đúng nút kiến thức, tự làm bước đó và đối chiếu kết quả mong đợi để phát hiện sai sót trước khi sang checkpoint tiếp theo. |
 | 7 | Phân công | **Tống Thiên Bảo** — đội trưởng, Mindmap Lab · **Lê Thái Dương** — chatbot · **Vũ Trọng Quang** — Mindmap Lec · **Nguyễn Thị Thanh Bình** — phân tích nghiệp vụ (BA), điều phối nhóm. |
-| — | CP2 · Đã đổi gì so với CP1 | Cập nhật sau khi tổng hợp bằng chứng và chốt lát cắt. |
+| — | CP2 · Đã đổi gì so với CP1 | Chốt một gợi ý có nguồn cho một checkpoint. Đã thêm sơ đồ workflow, benchmark 20 câu, chuẩn đạt và khung mock chạy qua nguồn Lab. Mốc 102/453 là tín hiệu từ Canvas CP1. Đã soạn bộ câu hỏi khảo sát; số phản hồi và phỏng vấn chưa được xác nhận. |
