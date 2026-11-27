@@ -16,7 +16,8 @@ from graph_db import (
     list_lectures,
     traverse_subgraph,
 )
-from guardrails import check_input_guard
+from chat_engine import chat_turn
+from guardrails import chat_rate_limiter, check_input_guard
 from kg_store import ensure_kg_loaded, get_day_mindmap_seed, get_kg_summary, search_kg
 from lecture_extractor import extract_lecture_knowledge
 from mapper import ensure_repo_index, get_day_lab_seed, map_lecture_to_lab
@@ -75,6 +76,20 @@ class MapRequest(BaseModel):
     direction: Literal["both", "theory_to_practice", "practice_to_theory"] = "both"
 
 
+class ChatTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(max_length=4000)
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=2000)
+    history: list[ChatTurn] = Field(default_factory=list, max_length=20)
+    level: Literal["eli5", "standard", "deep"] = "standard"
+    day: int | None = Field(default=None, ge=1, le=14)
+    focus_id: str | None = Field(default=None, max_length=200)
+    prev_citation_ids: list[str] = Field(default_factory=list, max_length=8)
+
+
 class LectureIngestRequest(BaseModel):
     title: str = Field(min_length=2, max_length=200)
     content: str = Field(min_length=20, max_length=50000)
@@ -119,6 +134,16 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="AI in Action · Knowledge Graph & Mapper", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    response.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+    return response
 
 
 def get_workspace_id(
@@ -258,6 +283,30 @@ def ai_lecture_to_lab_map(req: MapRequest) -> dict[str, Any]:
     if not req.query.strip():
         raise HTTPException(status_code=400, detail="Query không được rỗng")
     return map_lecture_to_lab(req.query, day=req.day, mode=req.mode, direction=req.direction)
+
+
+@app.post("/api/chat")
+def kg_rag_chat(req: ChatRequest, request: Request, response: Response) -> dict[str, Any]:
+    """KG-RAG tutor: explain concepts/lessons at eli5|standard|deep, grounded + cited on the GraphRAG DB."""
+    response.headers["Cache-Control"] = "no-store"
+    client_key = request.cookies.get(COOKIE_NAME) or (request.client.host if request.client else "unknown")
+    max_req = int(os.environ.get("CHAT_RATE_LIMIT_MAX", "20"))
+    window_s = int(os.environ.get("CHAT_RATE_LIMIT_WINDOW_S", "60"))
+    allowed, retry_after = chat_rate_limiter.check(client_key, max_req, window_s)
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Bạn đang gửi quá nhanh. Vui lòng đợi vài giây rồi thử lại.",
+            headers={"Retry-After": str(retry_after)},
+        )
+    return chat_turn(
+        req.message,
+        history=[t.model_dump() for t in req.history],
+        level=req.level,
+        scope_day=req.day,
+        focus_id=req.focus_id,
+        prev_citation_ids=req.prev_citation_ids,
+    )
 
 
 @app.get("/api/graph/stats")
