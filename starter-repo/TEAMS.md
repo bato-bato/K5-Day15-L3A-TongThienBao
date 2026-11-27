@@ -4,16 +4,17 @@
 > Giữ nguyên tên file `TEAMS.md` ở thư mục gốc repo, giữ nguyên các dòng `- Tên nhóm:` … và tiêu đề cột của bảng. Chỉ thay chỗ `____`.
 > Kiểm bằng `python run.py check`: phần "Kiểm TEAMS.md" không báo gì là đúng format.
 
-- Tên nhóm: ____
-- Lớp: ____
-- Track: ____
-- Link repo: ____
+- Tên nhóm: nhomnhomnhom
+- Lớp: L3A
+- Track: A
+- Link repo: https://github.com/bato-bato/K5-Day15-L3A-TongThienBao
 
 | STT | Họ và tên | Mã học viên | Vai trò | Phần việc chính |
 |---|---|---|---|---|
-| 1 | ____ | ____ | Đội trưởng | ____ |
-| 2 | ____ | ____ | Thành viên | ____ |
-| 3 | ____ | ____ | Thành viên | ____ |
+| 1 | Tống Thiên Bảo | 2A202603461 | Đội trưởng | System Design, Mindmap Lab |
+| 2 | Lê Thái Dương | 2A202603415 | Thành viên | QA&QC, Chatbot & Eval |
+| 3 | Vũ Trọng Quang | 2A202603535 | Thành viên | BackEnd, Mindmap Lec |
+| 4 | Nguyễn Thị Thanh Bình | 2A202603497 | Thành viên | FrontEnd, BA & điều phối nhóm |
 
 **Quy tắc điền**
 - **Lớp:** `L3A` hoặc `L3B`. **Track:** một chữ `A` (EdTech), `B` (Y tế), `C` (Du lịch), `D` (Thương mại điện tử), `E` (Tài chính) hoặc `F` (Làn khác). **Link repo:** link GitHub công khai của nhóm.
