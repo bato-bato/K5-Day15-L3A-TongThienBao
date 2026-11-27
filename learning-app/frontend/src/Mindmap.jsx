@@ -1,97 +1,299 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  LEFT_THEMES,
+  RIGHT_THEMES,
+  truncateText,
+  getNodeTitle,
+  extractSubBranches,
+} from './CourseTree.jsx';
 
 const MAX_POSITION = 4096;
 const MAX_NODES = 100;
-const CANVAS_W = 2400;
-const CANVAS_H = 1400;
-const MIN_ZOOM = 0.5;
+const MIN_ZOOM = 0.45;
 const MAX_ZOOM = 1.45;
 const clamp = value => Math.max(0, Math.min(MAX_POSITION, Math.round(value)));
 const clampZoom = value => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Number(value.toFixed(2))));
 
-const PASTEL_PALETTE = {
-  blue: { label: 'Xanh biển', bg: '#B5D3FA', border: '#60A5FA', text: '#0F172A', mini: 'bg-blue-400' },
-  pink: { label: 'Hồng phấn', bg: '#F7A1C4', border: '#F472B6', text: '#0F172A', mini: 'bg-pink-400' },
-  yellow: { label: 'Vàng nắng', bg: '#FCD34D', border: '#F59E0B', text: '#0F172A', mini: 'bg-amber-400' },
-  purple: { label: 'Tím pastel', bg: '#C4B5FD', border: '#A78BFA', text: '#0F172A', mini: 'bg-purple-400' },
-  green: { label: 'Xanh lá', bg: '#6EE7B7', border: '#34D399', text: '#0F172A', mini: 'bg-emerald-400' },
-  peach: { label: 'Cam đào', bg: '#FDBA74', border: '#FB923C', text: '#0F172A', mini: 'bg-orange-400' },
-  teal: { label: 'Xanh ngọc', bg: '#99F6E4', border: '#2DD4BF', text: '#0F172A', mini: 'bg-teal-400' },
-};
+const XMIND_THEMES = [...LEFT_THEMES, ...RIGHT_THEMES];
 
-const TYPE_DEFAULT_COLOR = {
-  day_root: 'blue',
-  concept: 'blue',
-  pattern: 'purple',
-  checkpoint: 'purple',
-  metric: 'green',
-  trap: 'pink',
-  case_study: 'yellow',
-  code_ref: 'teal',
-  note: 'peach',
-};
-
-function getNodeSize(node) {
-  if (node.node_type === 'day_root') {
-    return { width: 156, height: 156 };
-  }
-  return { width: 230, height: 68 };
+function makeId() {
+  const bytes = globalThis.crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 15) | 64;
+  bytes[8] = (bytes[8] & 63) | 128;
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+  return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join('-');
 }
 
-function parseNodeContent(node) {
-  const raw = (node.text || '').trim();
-  if (!raw) {
-    return { title: 'Ý tưởng mới', body: '', isEmpty: true };
-  }
-  const lines = raw.split('\n').map(l => l.trim()).filter(l => l && l !== '—');
-  const first = (lines[0] || '')
-    .replace(/^\[(CoreConcept|ArchitecturePattern|MetricOrFormula|FailureOrTrap|CaseStudy|LabDeliverable|Code|D\d+[^\]]*)\]\s*/i, '')
-    .trim();
-  const rest = lines.slice(1).join(' ');
-  return { title: first || raw, body: rest, isEmpty: false };
+function layoutDaySide(branches, side, defaultThemes, startX, nodeColors) {
+  const LEAF_W = 220;
+  const LEAF_H = 26;
+  const LEAF_GAP = 4;
+  const L2_W = 148;
+  const L2_H = 30;
+  const L2_GAP = 14;
+  const L1_W = 180;
+  const L1_H = 36;
+  const L1_GAP = 26;
+
+  const l1X = side === 'left' ? startX - 180 - L1_W : startX + 180;
+  const l2X = side === 'left' ? l1X - 58 - L2_W : l1X + L1_W + 58;
+  const l3X = side === 'left' ? l2X - 52 - LEAF_W : l2X + L2_W + 52;
+
+  const placedNodes = [];
+  const placedEdges = [];
+  let cursorY = 0;
+
+  branches.forEach((branch, bIdx) => {
+    const customIdx = nodeColors[branch.nodeId];
+    const theme = customIdx !== undefined && XMIND_THEMES[customIdx]
+      ? XMIND_THEMES[customIdx]
+      : defaultThemes[bIdx % defaultThemes.length];
+    const l1Id = `l1:${branch.nodeId}`;
+    const l2Centers = [];
+    const l1StartY = cursorY;
+
+    branch.subGroups.forEach((sg, sgIdx) => {
+      const l2Id = `l2:${branch.nodeId}:${sgIdx}`;
+      const leaves = sg.leaves?.length ? sg.leaves : [];
+      const leafCount = Math.max(1, leaves.length);
+      const leavesBlockH = leaves.length ? leafCount * LEAF_H + (leafCount - 1) * LEAF_GAP : L2_H;
+      const l2StartY = cursorY;
+
+      leaves.forEach((leaf, lIdx) => {
+        const l3Id = `l3:${branch.nodeId}:${sgIdx}:${lIdx}`;
+        const ly = l2StartY + lIdx * (LEAF_H + LEAF_GAP);
+        placedNodes.push({
+          id: l3Id,
+          kind: 'l3',
+          side,
+          nodeId: leaf.nodeId,
+          rawNode: leaf.rawNode,
+          text: leaf.text,
+          theme,
+          x: l3X,
+          y: ly,
+          width: LEAF_W,
+          height: LEAF_H,
+        });
+        placedEdges.push({
+          id: `e:${l2Id}->${l3Id}`,
+          fromId: l2Id,
+          toId: l3Id,
+          side,
+          theme,
+          nodeId: leaf.nodeId,
+        });
+      });
+
+      const l2Y = Math.round(l2StartY + (leavesBlockH - L2_H) / 2);
+      placedNodes.push({
+        id: l2Id,
+        kind: 'l2',
+        side,
+        nodeId: sg.nodeId,
+        rawNode: sg.rawNode,
+        text: sg.label,
+        theme,
+        x: l2X,
+        y: l2Y,
+        width: L2_W,
+        height: L2_H,
+      });
+      placedEdges.push({
+        id: `e:${l1Id}->${l2Id}`,
+        fromId: l1Id,
+        toId: l2Id,
+        side,
+        theme,
+        nodeId: sg.nodeId,
+      });
+
+      l2Centers.push(l2Y + L2_H / 2);
+      cursorY += Math.max(L2_H, leavesBlockH) + L2_GAP;
+    });
+
+    const l1EndY = cursorY - L2_GAP;
+    const l1CenterY = l2Centers.length
+      ? (l2Centers[0] + l2Centers[l2Centers.length - 1]) / 2
+      : (l1StartY + l1EndY) / 2;
+    const l1Y = Math.round(l1CenterY - L1_H / 2);
+
+    placedNodes.push({
+      id: l1Id,
+      kind: 'l1',
+      side,
+      nodeId: branch.nodeId,
+      rawNode: branch.rawNode,
+      text: branch.label,
+      verified: branch.verified,
+      theme,
+      x: l1X,
+      y: l1Y,
+      width: L1_W,
+      height: L1_H,
+    });
+    placedEdges.push({
+      id: `e:root->${l1Id}`,
+      fromId: 'root',
+      toId: l1Id,
+      side,
+      theme,
+      nodeId: branch.nodeId,
+    });
+
+    cursorY += L1_GAP - L2_GAP;
+  });
+
+  const totalHeight = branches.length ? Math.max(120, cursorY - L1_GAP) : 0;
+  return { nodes: placedNodes, edges: placedEdges, height: totalHeight };
 }
 
-function buildRadialBezierPath(parent, child) {
-  const pSize = getNodeSize(parent);
-  const cSize = getNodeSize(child);
-  const pCx = parent.x + pSize.width / 2;
-  const pCy = parent.y + pSize.height / 2;
-  const cCx = child.x + cSize.width / 2;
-  const cCy = child.y + cSize.height / 2;
-  const dx = cCx - pCx;
-  const dy = cCy - pCy;
+function computeDayXMindLayout({ nodes, day, tab, nodeColors, filterType, searchQuery }) {
+  const CENTER_X = 980;
+  const ROOT_W = 196;
+  const ROOT_H = 114;
+  const ROOT_X = CENTER_X - ROOT_W / 2;
+  const qLower = searchQuery.trim().toLowerCase();
 
-  // Vertical fallback when stacked directly above/below
-  if (Math.abs(dx) < 55) {
-    const goingDown = dy >= 0;
-    const x1 = pCx;
-    const y1 = goingDown ? parent.y + pSize.height : parent.y;
-    const x2 = cCx;
-    const y2 = goingDown ? child.y : child.y + cSize.height;
-    const off = Math.max(36, Math.abs(y2 - y1) * 0.45);
-    return `M ${x1} ${y1} C ${x1} ${goingDown ? y1 + off : y1 - off}, ${x2} ${goingDown ? y2 - off : y2 + off}, ${x2} ${y2}`;
+  const byId = new Map(nodes.map(n => [n.id, n]));
+  const rootNode = nodes.find(n => n.node_type === 'day_root') || null;
+  const childrenByParent = new Map();
+
+  for (const n of nodes) {
+    if (n.parent_id && byId.has(n.parent_id)) {
+      const list = childrenByParent.get(n.parent_id) || [];
+      list.push(n);
+      childrenByParent.set(n.parent_id, list);
+    }
   }
 
-  const goingRight = dx >= 0;
-  let x1;
-  let y1;
-  if (parent.node_type === 'day_root') {
-    // Anchor neatly along the perimeter of the central circle
-    const angle = Math.atan2(dy, dx);
-    const radius = pSize.width / 2;
-    x1 = pCx + Math.cos(angle) * radius;
-    y1 = pCy + Math.sin(angle) * radius;
+  let l1Nodes = [];
+  if (rootNode) {
+    const direct = childrenByParent.get(rootNode.id) || [];
+    const orphans = nodes.filter(
+      n => n.id !== rootNode.id && (!n.parent_id || !byId.has(n.parent_id)),
+    );
+    l1Nodes = [...direct, ...orphans];
   } else {
-    x1 = goingRight ? parent.x + pSize.width : parent.x;
-    y1 = pCy;
+    l1Nodes = nodes.filter(n => !n.parent_id || !byId.has(n.parent_id));
   }
 
-  const x2 = goingRight ? child.x : child.x + cSize.width;
-  const y2 = cCy;
-  const dist = Math.max(48, Math.abs(x2 - x1) * 0.5);
-  const cx1 = goingRight ? x1 + dist : x1 - dist;
-  const cx2 = goingRight ? x2 - dist : x2 + dist;
-  return `M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`;
+  const rawBranches = l1Nodes.map(b => {
+    const explicitKids = childrenByParent.get(b.id) || [];
+    let subGroups;
+
+    if (explicitKids.length > 0) {
+      subGroups = explicitKids.map(c => {
+        const grandKids = childrenByParent.get(c.id) || [];
+        let leaves;
+        if (grandKids.length > 0) {
+          leaves = grandKids.map(gc => ({
+            text: truncateText(getNodeTitle(gc), 36),
+            nodeId: gc.id,
+            rawNode: gc,
+          }));
+        } else {
+          const flatLeaves = extractSubBranches(c).flatMap(sg => sg.leaves).slice(0, 4);
+          leaves = (flatLeaves.length ? flatLeaves : [truncateText(getNodeTitle(c), 36)]).map(t => ({
+            text: t,
+            nodeId: c.id,
+            rawNode: c,
+          }));
+        }
+        return {
+          label: truncateText(getNodeTitle(c), 24),
+          nodeId: c.id,
+          rawNode: c,
+          leaves,
+        };
+      });
+    } else {
+      subGroups = extractSubBranches(b).map(sg => ({
+        label: sg.label,
+        nodeId: b.id,
+        rawNode: b,
+        leaves: sg.leaves.map(t => ({
+          text: t,
+          nodeId: b.id,
+          rawNode: b,
+        })),
+      }));
+    }
+
+    return {
+      nodeId: b.id,
+      rawNode: b,
+      label: truncateText(getNodeTitle(b), 26),
+      verified: b.verification_status === 'verified',
+      subGroups,
+    };
+  });
+
+  function isDimmed(rawNode) {
+    if (!rawNode) return false;
+    const typeKey = rawNode.node_type || 'note';
+    const matchesFilter = !filterType
+      || typeKey === filterType
+      || (filterType === 'pattern' && typeKey === 'checkpoint')
+      || (filterType === 'trap' && typeKey === 'case_study');
+    const matchesSearch = !qLower
+      || (rawNode.text || '').toLowerCase().includes(qLower)
+      || (rawNode.source_ref?.concept_id || '').toLowerCase().includes(qLower);
+    return !matchesFilter || !matchesSearch;
+  }
+
+  const half = Math.ceil(rawBranches.length / 2);
+  const leftBranches = rawBranches.slice(0, half);
+  const rightBranches = rawBranches.slice(half);
+
+  const leftLayout = layoutDaySide(leftBranches, 'left', LEFT_THEMES, CENTER_X, nodeColors);
+  const rightLayout = layoutDaySide(rightBranches, 'right', RIGHT_THEMES, CENTER_X, nodeColors);
+
+  const maxH = Math.max(leftLayout.height, rightLayout.height, ROOT_H + 80);
+  const topPad = 64;
+  const leftOffsetY = topPad + Math.round((maxH - leftLayout.height) / 2);
+  const rightOffsetY = topPad + Math.round((maxH - rightLayout.height) / 2);
+  const rootY = topPad + Math.round((maxH - ROOT_H) / 2);
+
+  const shortTitle = rootNode
+    ? getNodeTitle(rootNode).replace(/^Ngày\s+\d+:\s*/i, '').trim()
+    : `Ngày ${day}`;
+  const rootTitle = tab === 'lab' ? `Lab · Ngày ${day}` : `AI20K · Ngày ${day}`;
+  const rootLines = [
+    truncateText(shortTitle, 24),
+    tab === 'lab' ? 'Lab Mapping' : 'Knowledge Graph',
+  ];
+
+  const allNodes = [
+    {
+      id: 'root',
+      kind: 'root',
+      nodeId: rootNode?.id || null,
+      rawNode: rootNode,
+      title: rootTitle,
+      lines: rootLines,
+      x: ROOT_X,
+      y: rootY,
+      width: ROOT_W,
+      height: ROOT_H,
+      dimmed: rootNode ? isDimmed(rootNode) : false,
+    },
+    ...leftLayout.nodes.map(n => ({
+      ...n,
+      y: n.y + leftOffsetY,
+      dimmed: isDimmed(n.rawNode),
+    })),
+    ...rightLayout.nodes.map(n => ({
+      ...n,
+      y: n.y + rightOffsetY,
+      dimmed: isDimmed(n.rawNode),
+    })),
+  ];
+
+  const allEdges = [...leftLayout.edges, ...rightLayout.edges];
+  const canvasW = 1960;
+  const canvasH = Math.max(760, maxH + topPad * 2 + 90);
+  return { nodes: allNodes, edges: allEdges, canvasW, canvasH };
 }
 
 export function Mindmap({
@@ -111,22 +313,24 @@ export function Mindmap({
   onSwitchView,
 }) {
   const viewport = useRef(null);
-  const drag = useRef(null);
   const pan = useRef(null);
   const newNode = useRef(null);
-  const [zoom, setZoom] = useState(0.95);
+  const [zoom, setZoom] = useState(0.88);
   const [editingId, setEditingId] = useState(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [nodeColors, setNodeColors] = useState({});
   const [filterType, setFilterType] = useState(null);
-  const [vpRect, setVpRect] = useState({ left: 0, top: 0, width: 1000, height: 600 });
-  const byId = new Map(nodes.map(node => [node.id, node]));
-  const selectedNode = nodes.find(n => n.id === selectedId) || null;
+  const [vpRect, setVpRect] = useState({ left: 0, top: 0, width: 1200, height: 700 });
 
-  function getSwatch(node) {
-    const key = nodeColors[node.id] || TYPE_DEFAULT_COLOR[node.node_type] || 'blue';
-    return PASTEL_PALETTE[key] || PASTEL_PALETTE.blue;
-  }
+  const byId = useMemo(() => new Map(nodes.map(node => [node.id, node])), [nodes]);
+  const selectedNode = nodes.find(n => n.id === selectedId) || null;
+  const rootNode = nodes.find(n => n.node_type === 'day_root') || null;
+
+  const layout = useMemo(
+    () => computeDayXMindLayout({ nodes, day, tab, nodeColors, filterType, searchQuery }),
+    [nodes, day, tab, nodeColors, filterType, searchQuery],
+  );
+  const placedById = useMemo(() => new Map(layout.nodes.map(n => [n.id, n])), [layout.nodes]);
 
   function syncViewportRect() {
     const vp = viewport.current;
@@ -139,52 +343,23 @@ export function Mindmap({
     });
   }
 
-  function centerView(targetNodes = nodes) {
+  function fitToView() {
     const vp = viewport.current;
-    if (!vp || !targetNodes.length) return;
+    if (!vp || !layout.nodes.length) return;
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
     let maxY = -Infinity;
-    for (const n of targetNodes) {
-      const s = getNodeSize(n);
+    for (const n of layout.nodes) {
       minX = Math.min(minX, n.x);
       minY = Math.min(minY, n.y);
-      maxX = Math.max(maxX, n.x + s.width);
-      maxY = Math.max(maxY, n.y + s.height);
+      maxX = Math.max(maxX, n.x + n.width);
+      maxY = Math.max(maxY, n.y + n.height);
     }
-    const cx = (minX + maxX) / 2;
-    const cy = (minY + maxY) / 2;
-    vp.scrollTo({
-      left: Math.max(0, cx * zoom - vp.clientWidth / 2),
-      top: Math.max(0, cy * zoom - vp.clientHeight / 2),
-      behavior: 'smooth',
-    });
-  }
-
-  function fitToView(targetNodes = nodes) {
-    const vp = viewport.current;
-    if (!vp) return;
-    if (!targetNodes.length) {
-      setZoom(1);
-      vp.scrollTo({ left: 0, top: 0 });
-      return;
-    }
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-    for (const n of targetNodes) {
-      const s = getNodeSize(n);
-      minX = Math.min(minX, n.x);
-      minY = Math.min(minY, n.y);
-      maxX = Math.max(maxX, n.x + s.width);
-      maxY = Math.max(maxY, n.y + s.height);
-    }
-    const pad = 90;
-    const contentW = Math.max(460, maxX - minX + pad * 2);
-    const contentH = Math.max(320, maxY - minY + pad * 2);
-    const fitZ = clampZoom(Math.min(1.05, (vp.clientWidth - 40) / contentW, (vp.clientHeight - 90) / contentH));
+    const pad = 64;
+    const contentW = Math.max(600, maxX - minX + pad * 2);
+    const contentH = Math.max(380, maxY - minY + pad * 2);
+    const fitZ = clampZoom(Math.min(1.05, (vp.clientWidth - 40) / contentW, (vp.clientHeight - 110) / contentH));
     setZoom(fitZ);
 
     const cx = (minX + maxX) / 2;
@@ -192,21 +367,35 @@ export function Mindmap({
     requestAnimationFrame(() => {
       vp.scrollTo({
         left: Math.max(0, cx * fitZ - vp.clientWidth / 2),
-        top: Math.max(0, cy * fitZ - (vp.clientHeight - 40) / 2),
-        behavior: 'auto',
+        top: Math.max(0, cy * fitZ - (vp.clientHeight - 60) / 2),
+        behavior: 'smooth',
       });
       syncViewportRect();
     });
   }
 
+  function centerView() {
+    const vp = viewport.current;
+    if (!vp) return;
+    const root = placedById.get('root');
+    if (!root) return;
+    const cx = root.x + root.width / 2;
+    const cy = root.y + root.height / 2;
+    vp.scrollTo({
+      left: Math.max(0, cx * zoom - vp.clientWidth / 2),
+      top: Math.max(0, cy * zoom - vp.clientHeight / 2),
+      behavior: 'smooth',
+    });
+  }
+
   useEffect(() => {
-    fitToView(nodes);
+    fitToView();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [day, tab]);
 
   useEffect(() => {
     if (layoutTrigger > 0) {
-      autoLayout();
+      fitToView();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [layoutTrigger]);
@@ -214,10 +403,10 @@ export function Mindmap({
   useEffect(() => {
     syncViewportRect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [zoom, nodes.length]);
+  }, [zoom, layout.nodes.length]);
 
   function update(id, changes) {
-    onChange(nodes.map(node => node.id === id ? { ...node, ...changes } : node));
+    onChange(nodes.map(node => (node.id === id ? { ...node, ...changes } : node)));
   }
 
   function add(x, y, parentId = null) {
@@ -225,113 +414,51 @@ export function Mindmap({
     const id = globalThis.crypto?.randomUUID?.() ?? makeId();
     newNode.current = id;
     setEditingId(id);
-    onChange([...nodes, {
-      id,
-      text: '',
-      x: clamp(x),
-      y: clamp(y),
-      parent_id: parentId,
-      node_type: 'note',
-      source_ref: null,
-      code_link: null,
-      verification_status: 'user_note',
-    }]);
+    onChange([
+      ...nodes,
+      {
+        id,
+        text: '',
+        x: clamp(x),
+        y: clamp(y),
+        parent_id: parentId,
+        node_type: 'note',
+        source_ref: null,
+        code_link: null,
+        verification_status: 'user_note',
+      },
+    ]);
     onSelect?.(id);
   }
 
   function addChild(parent) {
-    const siblings = nodes.filter(n => n.parent_id === parent.id);
-    const root = nodes.find(n => n.node_type === 'day_root') || nodes[0];
-    const onLeft = parent.node_type === 'day_root'
-      ? siblings.length % 2 === 1
-      : root && parent.x < root.x;
-    const stepY = (siblings.length - Math.floor(siblings.length / 2)) * 96;
-    const nextX = onLeft ? parent.x - 320 : parent.x + (parent.node_type === 'day_root' ? 280 : 300);
-    const nextY = parent.y + (siblings.length % 2 === 0 ? stepY : -stepY);
-    add(clamp(nextX), clamp(nextY), parent.id);
+    add(clamp(parent.x + 280), clamp(parent.y + 80), parent.id);
   }
 
   function addInView() {
-    const vp = viewport.current;
-    const cx = (vp.scrollLeft + vp.clientWidth / 2) / zoom - 115;
-    const cy = (vp.scrollTop + vp.clientHeight / 2) / zoom - 34;
-    add(clamp(cx + (nodes.length % 4) * 35), clamp(cy + (nodes.length % 3) * 35), null);
+    add(980, 380, rootNode?.id ?? null);
   }
 
-  function addAtPointer(event) {
-    if (event.target !== event.currentTarget) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    add((event.clientX - bounds.left) / zoom - 115, (event.clientY - bounds.top) / zoom - 34, null);
+  function remove(id) {
+    if (selectedId === id) {
+      onSelect?.(null);
+      setPaletteOpen(false);
+    }
+    if (editingId === id) setEditingId(null);
+    onChange(
+      nodes
+        .filter(node => node.id !== id)
+        .map(node => (node.parent_id === id ? { ...node, parent_id: null } : node)),
+    );
   }
 
-  function autoLayout() {
-    if (!nodes.length) return;
-    const childrenMap = new Map();
-    const roots = [];
-    for (const n of nodes) {
-      if (n.parent_id && byId.has(n.parent_id)) {
-        const list = childrenMap.get(n.parent_id) || [];
-        list.push(n);
-        childrenMap.set(n.parent_id, list);
-      } else {
-        roots.push(n);
-      }
+  function canLink(node, target) {
+    let ancestor = target;
+    while (ancestor) {
+      if (ancestor.id === node.id) return false;
+      ancestor = byId.get(ancestor.parent_id);
     }
-
-    const posMap = new Map();
-    const isLabFlow = roots.some(r => r.node_type === 'checkpoint');
-
-    if (isLabFlow) {
-      let cursorY = 120;
-      for (const root of roots) {
-        const kids = childrenMap.get(root.id) || [];
-        const codeKids = kids.filter(k => k.node_type === 'code_ref');
-        const kgKids = kids.filter(k => k.node_type !== 'code_ref');
-        const rows = Math.max(1, codeKids.length, kgKids.length);
-        const blockH = rows * 100;
-        posMap.set(root.id, { x: 220, y: clamp(cursorY + (blockH - 68) / 2) });
-        codeKids.forEach((k, idx) => posMap.set(k.id, { x: 590, y: clamp(cursorY + idx * 100) }));
-        kgKids.forEach((k, idx) => posMap.set(k.id, { x: 960, y: clamp(cursorY + idx * 100) }));
-        cursorY += blockH + 75;
-      }
-    } else {
-      const centerX = 920;
-      let cursorCenterY = 460;
-      for (const root of roots) {
-        posMap.set(root.id, { x: centerX, y: clamp(cursorCenterY) });
-        const kids = childrenMap.get(root.id) || [];
-        const half = Math.ceil(kids.length / 2);
-        const leftKids = kids.slice(0, half);
-        const rightKids = kids.slice(half);
-
-        leftKids.forEach((kid, idx) => {
-          const ky = clamp(cursorCenterY + 44 + (idx - (leftKids.length - 1) / 2) * 125);
-          posMap.set(kid.id, { x: 510, y: ky });
-          const gKids = childrenMap.get(kid.id) || [];
-          gKids.forEach((gk, gIdx) => {
-            posMap.set(gk.id, { x: 180, y: clamp(ky + (gIdx - (gKids.length - 1) / 2) * 90) });
-          });
-        });
-
-        rightKids.forEach((kid, idx) => {
-          const ky = clamp(cursorCenterY + 44 + (idx - (rightKids.length - 1) / 2) * 125);
-          posMap.set(kid.id, { x: 1270, y: ky });
-          const gKids = childrenMap.get(kid.id) || [];
-          gKids.forEach((gk, gIdx) => {
-            posMap.set(gk.id, { x: 1600, y: clamp(ky + (gIdx - (gKids.length - 1) / 2) * 90) });
-          });
-        });
-
-        cursorCenterY += Math.max(leftKids.length, rightKids.length, 2) * 130 + 120;
-      }
-    }
-
-    const updated = nodes.map(n => {
-      const p = posMap.get(n.id);
-      return p ? { ...n, x: p.x, y: p.y } : n;
-    });
-    onChange(updated);
-    fitToView(updated);
+    return true;
   }
 
   function startPan(event) {
@@ -353,62 +480,37 @@ export function Mindmap({
     syncViewportRect();
   }
 
-  function remove(id) {
-    if (selectedId === id) {
-      onSelect?.(null);
-      setPaletteOpen(false);
-    }
-    if (editingId === id) setEditingId(null);
-    onChange(nodes.filter(node => node.id !== id).map(node => (
-      node.parent_id === id ? { ...node, parent_id: null } : node
-    )));
+  function buildSymmetricEdge(edge) {
+    const from = placedById.get(edge.fromId);
+    const to = placedById.get(edge.toId);
+    if (!from || !to) return null;
+
+    const isLeft = edge.side === 'left';
+    const x1 = isLeft ? from.x : from.x + from.width;
+    const y1 = from.y + from.height / 2;
+    const x2 = isLeft ? to.x + to.width : to.x;
+    const y2 = to.y + to.height / 2;
+
+    const dx = Math.abs(x2 - x1);
+    const c1 = isLeft ? x1 - dx * 0.55 : x1 + dx * 0.55;
+    const c2 = isLeft ? x2 + dx * 0.45 : x2 - dx * 0.45;
+    return `M ${x1} ${y1} C ${c1} ${y1}, ${c2} ${y2}, ${x2} ${y2}`;
   }
 
-  function canLink(node, target) {
-    let ancestor = target;
-    while (ancestor) {
-      if (ancestor.id === node.id) return false;
-      ancestor = byId.get(ancestor.parent_id);
-    }
-    return true;
-  }
+  const editingNode = editingId ? byId.get(editingId) : null;
+  const editingAnchor = editingId
+    ? layout.nodes.find(n => n.nodeId === editingId && n.kind === 'l1')
+      || layout.nodes.find(n => n.nodeId === editingId && n.kind === 'l2')
+      || layout.nodes.find(n => n.nodeId === editingId)
+      || layout.nodes[0]
+    : null;
 
-  function startDrag(event, node) {
-    if (event.button !== 0 || event.target.closest('button, textarea, select')) return;
-    onSelect?.(node.id);
-    drag.current = {
-      pointer: event.pointerId, x: node.x, y: node.y,
-      startX: event.clientX, startY: event.clientY,
-    };
-    event.currentTarget.setPointerCapture(event.pointerId);
-  }
-
-  function moveDrag(event, node) {
-    const start = drag.current;
-    if (start?.pointer !== event.pointerId) return;
-    update(node.id, {
-      x: clamp(start.x + (event.clientX - start.startX) / zoom),
-      y: clamp(start.y + (event.clientY - start.startY) / zoom),
-    });
-  }
-
-  function handleMinimapClick(event) {
-    const vp = viewport.current;
-    if (!vp) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const relX = (event.clientX - rect.left) / rect.width;
-    const relY = (event.clientY - rect.top) / rect.height;
-    vp.scrollTo({
-      left: Math.max(0, relX * CANVAS_W * zoom - vp.clientWidth / 2),
-      top: Math.max(0, relY * CANVAS_H * zoom - vp.clientHeight / 2),
-      behavior: 'smooth',
-    });
-  }
-
-  const qLower = searchQuery.trim().toLowerCase();
+  const selectedTheme = selectedNode
+    ? layout.nodes.find(n => n.nodeId === selectedNode.id)?.theme || XMIND_THEMES[0]
+    : XMIND_THEMES[0];
 
   return (
-    <section className="flex-1 relative overflow-hidden flex" aria-label="Sơ đồ tư duy">
+    <section className="flex-1 relative overflow-hidden flex" aria-label="Sơ đồ tư duy XMind">
       {/* Left Floating Quick Toolbar */}
       <aside className="absolute left-4 top-4 z-20 flex flex-col bg-white border border-slate-200/90 rounded-xl shadow-lg shadow-slate-900/5 p-1.5 space-y-1">
         <button
@@ -472,14 +574,14 @@ export function Mindmap({
 
         <div className="w-full h-px bg-slate-200" />
         <div className="px-1 py-1 text-[9px] font-semibold text-slate-400 uppercase tracking-wider text-center">
-          Màu nút
+          Loại
         </div>
         {[
-          ['concept', 'bg-blue-400 ring-blue-200', 'Khái niệm'],
-          ['pattern', 'bg-purple-400 ring-purple-200', 'Kiến trúc / CP'],
-          ['metric', 'bg-emerald-400 ring-emerald-200', 'Chỉ số'],
-          ['trap', 'bg-pink-400 ring-pink-200', 'Bẫy / Lỗi'],
-          ['code_ref', 'bg-teal-400 ring-teal-200', 'Code Lab'],
+          ['concept', 'bg-blue-500 ring-blue-200', 'Khái niệm'],
+          ['pattern', 'bg-purple-500 ring-purple-200', 'Kiến trúc / CP'],
+          ['metric', 'bg-emerald-500 ring-emerald-200', 'Chỉ số'],
+          ['trap', 'bg-pink-600 ring-pink-200', 'Bẫy / Lỗi'],
+          ['code_ref', 'bg-teal-500 ring-teal-200', 'Code Lab'],
         ].map(([typeKey, cls, title]) => (
           <button
             key={typeKey}
@@ -493,7 +595,7 @@ export function Mindmap({
         ))}
       </aside>
 
-      {/* Floating Contextual Toolbar (appears when a node is selected, like Miro/Mockup) */}
+      {/* Floating Contextual Toolbar */}
       {selectedNode && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center">
           <div className="bg-white border border-slate-200 shadow-xl rounded-xl px-2 py-1.5 flex items-center gap-1 text-xs">
@@ -525,11 +627,11 @@ export function Mindmap({
               className={`p-1.5 rounded-lg transition flex items-center gap-1 ${
                 paletteOpen ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200' : 'hover:bg-slate-100 text-slate-700'
               }`}
-              title="Đổi màu thẻ"
+              title="Đổi màu nhánh XMind"
             >
               <span
                 className="w-4 h-4 rounded-full border border-slate-300 shadow-inner"
-                style={{ backgroundColor: getSwatch(selectedNode).bg }}
+                style={{ backgroundColor: selectedTheme.solid }}
               />
               <span className="text-[11px] font-medium pr-0.5">Màu</span>
             </button>
@@ -548,21 +650,21 @@ export function Mindmap({
 
           {paletteOpen && (
             <div className="mt-2 bg-white border border-slate-200 shadow-2xl rounded-xl p-2.5 flex items-center gap-2">
-              {Object.entries(PASTEL_PALETTE).map(([colorKey, sw]) => {
-                const isActive = (nodeColors[selectedNode.id] || TYPE_DEFAULT_COLOR[selectedNode.node_type] || 'blue') === colorKey;
+              {XMIND_THEMES.map((theme, idx) => {
+                const isActive = nodeColors[selectedNode.id] === idx;
                 return (
                   <button
-                    key={colorKey}
+                    key={idx}
                     type="button"
-                    title={sw.label}
+                    title={`Màu nhánh ${idx + 1}`}
                     onClick={() => {
-                      setNodeColors(prev => ({ ...prev, [selectedNode.id]: colorKey }));
+                      setNodeColors(prev => ({ ...prev, [selectedNode.id]: idx }));
                       setPaletteOpen(false);
                     }}
                     className={`w-6 h-6 rounded-full transition transform hover:scale-110 ${
                       isActive ? 'ring-2 ring-offset-2 ring-slate-800 scale-110' : 'border border-slate-200'
                     }`}
-                    style={{ backgroundColor: sw.bg }}
+                    style={{ backgroundColor: theme.solid }}
                   />
                 );
               })}
@@ -571,192 +673,226 @@ export function Mindmap({
         </div>
       )}
 
-      {/* Interactive Canvas Area */}
+      {/* Interactive XMind Canvas */}
       <div
         id="canvas-container"
         ref={viewport}
         onScroll={syncViewportRect}
         tabIndex={0}
-        aria-label="Canvas sơ đồ tư duy"
+        aria-label="Canvas sơ đồ tư duy XMind"
         className={`flex-1 h-full w-full relative overflow-auto ${showGrid ? 'bg-dot-grid' : 'bg-plain-canvas'}`}
       >
         <div
           className="relative"
-          style={{ width: Math.round(CANVAS_W * zoom), height: Math.round(CANVAS_H * zoom) }}
+          style={{ width: Math.round(layout.canvasW * zoom), height: Math.round(layout.canvasH * zoom) }}
         >
           <div
             className="relative"
             style={{
-              width: CANVAS_W,
-              height: CANVAS_H,
+              width: layout.canvasW,
+              height: layout.canvasH,
               transform: `scale(${zoom})`,
               transformOrigin: '0 0',
             }}
-            onDoubleClick={addAtPointer}
             onPointerDown={startPan}
             onPointerMove={movePan}
             onLostPointerCapture={event => {
               if (event.target === event.currentTarget) pan.current = null;
             }}
           >
-            {/* Organic Curved Bezier Arrow Connectors */}
+            {/* Color-matched Smooth Bezier Branches */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <marker id="mm-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
-                  <path d="M 1 1.5 L 9 5 L 1 8.5 z" fill="#64748b" />
-                </marker>
-                <marker id="mm-arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                  <path d="M 1 1.5 L 9 5 L 1 8.5 z" fill="#2563eb" />
-                </marker>
-              </defs>
-              {nodes.map(node => {
-                const parent = byId.get(node.parent_id);
-                if (!parent) return null;
-                const d = buildRadialBezierPath(parent, node);
-                const isHighlighted = selectedId === node.id || selectedId === parent.id;
+              {layout.edges.map(edge => {
+                const d = buildSymmetricEdge(edge);
+                if (!d) return null;
+                const isSelected = edge.nodeId && edge.nodeId === selectedId;
                 return (
                   <path
-                    key={node.id}
+                    key={edge.id}
                     d={d}
                     fill="none"
-                    stroke={isHighlighted ? '#2563eb' : '#64748b'}
+                    stroke={edge.theme.solid}
+                    strokeWidth={isSelected ? 2.4 : 1.5}
                     strokeLinecap="round"
-                    strokeWidth={isHighlighted ? 2.6 : 1.9}
-                    opacity={isHighlighted ? 1 : 0.8}
-                    markerEnd={isHighlighted ? 'url(#mm-arrow-active)' : 'url(#mm-arrow)'}
+                    opacity={isSelected ? 1 : 0.72}
                   />
                 );
               })}
             </svg>
 
-            {/* Radial Pastel Pill Nodes */}
-            {nodes.map((node, index) => {
-              const typeKey = node.node_type || 'note';
-              const isRoot = typeKey === 'day_root';
-              const isSelected = selectedId === node.id;
-              const isEditing = editingId === node.id;
-              const parsed = parseNodeContent(node);
-              const swatch = getSwatch(node);
+            {/* Symmetric 3-Level XMind Nodes */}
+            {layout.nodes.map(node => {
+              const isSelected = node.nodeId && node.nodeId === selectedId;
 
-              const matchesFilter = !filterType
-                || typeKey === filterType
-                || (filterType === 'pattern' && typeKey === 'checkpoint')
-                || (filterType === 'trap' && typeKey === 'case_study');
-              const matchesSearch = !qLower || (node.text || '').toLowerCase().includes(qLower)
-                || (node.source_ref?.concept_id || '').toLowerCase().includes(qLower);
-              const dimmed = !matchesFilter || !matchesSearch;
+              if (node.kind === 'root') {
+                return (
+                  <button
+                    key={node.id}
+                    type="button"
+                    onClick={e => {
+                      e.stopPropagation();
+                      if (node.nodeId) onSelect?.(node.nodeId);
+                    }}
+                    onDoubleClick={e => {
+                      e.stopPropagation();
+                      if (node.nodeId) setEditingId(node.nodeId);
+                    }}
+                    style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
+                    className={`mindmap-node rounded-2xl bg-[#111E38] text-white shadow-xl hover:shadow-2xl px-4 py-3 flex flex-col items-center justify-center text-center z-10 border border-slate-700 cursor-pointer ${
+                      isSelected ? 'ring-2 ring-offset-2 ring-blue-500' : ''
+                    } ${node.dimmed ? 'opacity-25' : ''}`}
+                    title="Bấm chọn · Bấm đúp để chỉnh sửa"
+                  >
+                    <div className="text-[13.5px] font-bold tracking-tight text-white mb-1.5">
+                      {node.title}
+                    </div>
+                    {node.lines.map((line, i) => (
+                      <div key={i} className="text-[11px] text-slate-300 leading-snug truncate max-w-full">
+                        {line}
+                      </div>
+                    ))}
+                  </button>
+                );
+              }
+
+              if (node.kind === 'l1') {
+                return (
+                  <button
+                    key={node.id}
+                    type="button"
+                    onClick={e => {
+                      e.stopPropagation();
+                      if (node.nodeId) onSelect?.(node.nodeId);
+                    }}
+                    onDoubleClick={e => {
+                      e.stopPropagation();
+                      if (node.nodeId) setEditingId(node.nodeId);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      left: node.x,
+                      top: node.y,
+                      width: node.width,
+                      height: node.height,
+                      backgroundColor: node.theme.solid,
+                    }}
+                    className={`mindmap-node rounded-lg px-3 flex items-center justify-center text-center text-white font-bold text-[12px] shadow-md hover:brightness-105 z-10 cursor-pointer ${
+                      isSelected ? 'ring-2 ring-offset-2 ring-slate-900' : ''
+                    } ${node.dimmed ? 'opacity-25' : ''}`}
+                    title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
+                  >
+                    <span className="truncate">{node.text}</span>
+                  </button>
+                );
+              }
+
+              if (node.kind === 'l2') {
+                return (
+                  <button
+                    key={node.id}
+                    type="button"
+                    onClick={e => {
+                      e.stopPropagation();
+                      if (node.nodeId) onSelect?.(node.nodeId);
+                    }}
+                    onDoubleClick={e => {
+                      e.stopPropagation();
+                      if (node.nodeId) setEditingId(node.nodeId);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      left: node.x,
+                      top: node.y,
+                      width: node.width,
+                      height: node.height,
+                      backgroundColor: node.theme.tint,
+                      borderColor: node.theme.tintBorder,
+                      color: node.theme.tintText,
+                    }}
+                    className={`mindmap-node rounded-md border px-2.5 flex items-center justify-center text-center font-semibold text-[11.5px] shadow-2xs hover:shadow-sm z-10 cursor-pointer ${
+                      isSelected ? 'ring-2 ring-blue-500' : ''
+                    } ${node.dimmed ? 'opacity-25' : ''}`}
+                    title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
+                  >
+                    <span className="truncate">{node.text}</span>
+                  </button>
+                );
+              }
 
               return (
-                <div
+                <button
                   key={node.id}
-                  style={{
-                    position: 'absolute',
-                    left: node.x,
-                    top: node.y,
-                    width: isRoot ? 156 : 230,
-                    height: isRoot ? 156 : undefined,
-                    minHeight: isRoot ? 156 : 64,
-                  }}
+                  type="button"
                   onClick={e => {
                     e.stopPropagation();
-                    onSelect?.(node.id);
+                    if (node.nodeId) onSelect?.(node.nodeId);
                   }}
                   onDoubleClick={e => {
                     e.stopPropagation();
-                    setEditingId(node.id);
+                    if (node.nodeId) setEditingId(node.nodeId);
                   }}
-                  onPointerDown={event => !isEditing && startDrag(event, node)}
-                  onPointerMove={event => !isEditing && moveDrag(event, node)}
-                  onLostPointerCapture={() => { drag.current = null; }}
-                  className={`z-10 transition-opacity ${dimmed ? 'opacity-25' : ''}`}
+                  style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
+                  className={`mindmap-node rounded-md bg-white px-2.5 flex items-center justify-center text-center text-[11px] font-medium text-slate-700 border shadow-2xs hover:border-slate-400 z-10 cursor-pointer ${
+                    isSelected ? 'border-blue-600 ring-1 ring-blue-300' : 'border-slate-300/85'
+                  } ${node.dimmed ? 'opacity-25' : ''}`}
+                  title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
                 >
-                  {/* Selection Frame with 4 Corner Handles (exact Image 1 aesthetic) */}
-                  {isSelected && !isEditing && (
-                    <div className="absolute -inset-1.5 border-2 border-sky-600 pointer-events-none z-20 rounded-2xl">
-                      <span className="absolute -top-1 -left-1 w-2 h-2 bg-white border border-sky-600" />
-                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-white border border-sky-600" />
-                      <span className="absolute -bottom-1 -left-1 w-2 h-2 bg-white border border-sky-600" />
-                      <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-white border border-sky-600" />
-                    </div>
-                  )}
-
-                  {isEditing ? (
-                    <div
-                      onClick={e => e.stopPropagation()}
-                      className="bg-white rounded-2xl shadow-2xl border-2 border-blue-600 p-3 space-y-2 w-[270px] -ml-5 z-30 relative"
-                    >
-                      <textarea
-                        rows={3}
-                        ref={input => {
-                          if (input && newNode.current === node.id) {
-                            newNode.current = null;
-                            input.focus();
-                          }
-                        }}
-                        value={node.text}
-                        maxLength={20000}
-                        placeholder="Nhập nội dung nút..."
-                        onChange={e => update(node.id, { text: e.target.value })}
-                        className="w-full text-xs border border-slate-300 rounded-lg p-2 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500"
-                      />
-                      <div className="flex items-center gap-1.5">
-                        <select
-                          aria-label={`Nối ý ${index + 1} với`}
-                          value={node.parent_id ?? ''}
-                          onChange={e => update(node.id, { parent_id: e.target.value || null })}
-                          className="flex-1 min-w-0 text-[11px] border border-slate-300 rounded-md py-1 px-2 bg-white"
-                        >
-                          <option value="">Nút gốc (không nối)</option>
-                          {nodes.map((target, tIdx) => (
-                            canLink(node, target) && (
-                              <option key={target.id} value={target.id}>
-                                ↳ {parseNodeContent(target).title.slice(0, 42) || `Ý ${tIdx + 1}`}
-                              </option>
-                            )
-                          ))}
-                        </select>
-                        <button
-                          type="button"
-                          onClick={() => setEditingId(null)}
-                          className="px-2.5 py-1 text-xs font-semibold bg-blue-600 text-white rounded-md shrink-0"
-                        >
-                          Xong
-                        </button>
-                      </div>
-                    </div>
-                  ) : isRoot ? (
-                    <div
-                      style={{ backgroundColor: swatch.bg, color: swatch.text }}
-                      className="mindmap-node w-full h-full rounded-full shadow-md flex flex-col items-center justify-center text-center px-4 cursor-grab active:cursor-grabbing border border-white/60 hover:scale-[1.02]"
-                    >
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/65 text-slate-800 mb-1">
-                        Ngày {day}
-                      </span>
-                      <div className="text-[13px] font-bold leading-snug line-clamp-3">
-                        {parsed.title.replace(/^Ngày\s+\d+:\s*/i, '')}
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      style={{ backgroundColor: swatch.bg, color: swatch.text }}
-                      className="mindmap-node w-full min-h-[64px] rounded-full shadow-sm hover:shadow-md px-5 py-2.5 flex items-center justify-center text-center cursor-grab active:cursor-grabbing border border-white/50 hover:scale-[1.02] relative group"
-                    >
-                      <span className="text-[12.5px] font-semibold leading-snug line-clamp-2">
-                        {parsed.title}
-                      </span>
-                      {node.verification_status === 'verified' && (
-                        <span
-                          className="absolute -top-1.5 -right-1 w-5 h-5 rounded-full bg-white text-emerald-600 border border-slate-200 shadow-sm text-[10px] font-bold grid place-items-center"
-                          title="Nguồn đã kiểm chứng"
-                        >
-                          ✓
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
+                  <span className="truncate">{node.text}</span>
+                </button>
               );
             })}
+
+            {/* Inline Editor Popover */}
+            {editingNode && editingAnchor && (
+              <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                  position: 'absolute',
+                  left: Math.max(16, Math.min(layout.canvasW - 300, editingAnchor.x)),
+                  top: Math.max(16, editingAnchor.y + editingAnchor.height + 8),
+                }}
+                className="bg-white rounded-2xl shadow-2xl border-2 border-blue-600 p-3 space-y-2 w-[280px] z-40"
+              >
+                <textarea
+                  rows={3}
+                  ref={input => {
+                    if (input && newNode.current === editingNode.id) {
+                      newNode.current = null;
+                      input.focus();
+                    }
+                  }}
+                  value={editingNode.text}
+                  maxLength={20000}
+                  placeholder="Nhập nội dung nút..."
+                  onChange={e => update(editingNode.id, { text: e.target.value })}
+                  className="w-full text-xs border border-slate-300 rounded-lg p-2 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500"
+                />
+                <div className="flex items-center gap-1.5">
+                  <select
+                    aria-label="Nối ý với"
+                    value={editingNode.parent_id ?? ''}
+                    onChange={e => update(editingNode.id, { parent_id: e.target.value || null })}
+                    className="flex-1 min-w-0 text-[11px] border border-slate-300 rounded-md py-1 px-2 bg-white"
+                  >
+                    <option value="">Nút gốc (không nối)</option>
+                    {nodes.map((target, tIdx) => (
+                      canLink(editingNode, target) && (
+                        <option key={target.id} value={target.id}>
+                          ↳ {getNodeTitle(target).slice(0, 42) || `Ý ${tIdx + 1}`}
+                        </option>
+                      )
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setEditingId(null)}
+                    className="px-2.5 py-1 text-xs font-semibold bg-blue-600 text-white rounded-md shrink-0"
+                  >
+                    Xong
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -793,7 +929,7 @@ export function Mindmap({
 
         <button
           type="button"
-          onClick={() => centerView(nodes)}
+          onClick={centerView}
           className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition"
           title="Căn giữa màn hình"
         >
@@ -804,7 +940,7 @@ export function Mindmap({
 
         <button
           type="button"
-          onClick={() => fitToView(nodes)}
+          onClick={fitToView}
           className="px-2 py-1 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition font-medium whitespace-nowrap"
         >
           Vừa khung hình
@@ -816,14 +952,23 @@ export function Mindmap({
           <button
             type="button"
             onClick={() => onSwitchView?.('tree')}
-            className="px-2.5 py-1 text-[11px] rounded-md font-semibold text-slate-600 hover:text-slate-900 transition"
+            className="px-2 py-1 text-[11px] rounded-md font-semibold text-slate-600 hover:text-slate-900 transition"
           >
-            Mindmap
+            Cây khóa học
+          </button>
+          <button
+            type="button"
+            onClick={() => onSwitchTab?.('mindmaps')}
+            className={`px-2 py-1 text-[11px] rounded-md font-semibold transition ${
+              tab === 'mindmaps' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Mindmap ngày
           </button>
           <button
             type="button"
             onClick={() => onSwitchTab?.('lab')}
-            className={`px-2.5 py-1 text-[11px] rounded-md font-semibold transition ${
+            className={`px-2 py-1 text-[11px] rounded-md font-semibold transition ${
               tab === 'lab' ? 'bg-white text-purple-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -864,42 +1009,30 @@ export function Mindmap({
           </span>
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
         </div>
-        <div
-          onClick={handleMinimapClick}
-          className="w-full h-20 bg-slate-100 rounded relative overflow-hidden border border-slate-200 cursor-pointer"
-          title="Bấm để di chuyển tới vùng tương ứng"
-        >
-          {nodes.map(node => {
-            const swatch = getSwatch(node);
-            const leftPct = Math.max(0, Math.min(92, (node.x / CANVAS_W) * 100));
-            const topPct = Math.max(0, Math.min(88, (node.y / CANVAS_H) * 100));
-            return (
+        <div className="w-full h-20 bg-slate-100 rounded relative overflow-hidden border border-slate-200">
+          {layout.nodes
+            .filter(n => n.kind === 'root' || n.kind === 'l1')
+            .map(n => (
               <div
-                key={node.id}
-                className={`absolute rounded-full ${swatch.mini} ${node.node_type === 'day_root' ? 'w-4 h-4' : 'w-4 h-2'}`}
-                style={{ left: `${leftPct}%`, top: `${topPct}%` }}
+                key={n.id}
+                className={`absolute rounded ${n.kind === 'root' ? 'bg-slate-900 w-3 h-2.5' : `${n.theme?.mini || 'bg-slate-400'} w-3 h-1`}`}
+                style={{
+                  left: `${Math.max(0, Math.min(92, (n.x / layout.canvasW) * 100))}%`,
+                  top: `${Math.max(0, Math.min(90, (n.y / layout.canvasH) * 100))}%`,
+                }}
               />
-            );
-          })}
+            ))}
           <div
             className="absolute border border-blue-600 bg-blue-500/10 rounded pointer-events-none"
             style={{
-              left: `${Math.max(0, Math.min(95, (vpRect.left / CANVAS_W) * 100))}%`,
-              top: `${Math.max(0, Math.min(95, (vpRect.top / CANVAS_H) * 100))}%`,
-              width: `${Math.max(10, Math.min(100, (vpRect.width / CANVAS_W) * 100))}%`,
-              height: `${Math.max(10, Math.min(100, (vpRect.height / CANVAS_H) * 100))}%`,
+              left: `${Math.max(0, Math.min(95, (vpRect.left / layout.canvasW) * 100))}%`,
+              top: `${Math.max(0, Math.min(95, (vpRect.top / layout.canvasH) * 100))}%`,
+              width: `${Math.max(10, Math.min(100, (vpRect.width / layout.canvasW) * 100))}%`,
+              height: `${Math.max(10, Math.min(100, (vpRect.height / layout.canvasH) * 100))}%`,
             }}
           />
         </div>
       </div>
     </section>
   );
-}
-
-function makeId() {
-  const bytes = globalThis.crypto.getRandomValues(new Uint8Array(16));
-  bytes[6] = (bytes[6] & 15) | 64;
-  bytes[8] = (bytes[8] & 63) | 128;
-  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
-  return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join('-');
 }
