@@ -22,6 +22,20 @@ Cách đối chiếu nguồn trong output. Mở bản nguồn cố định ở D
 
 **Chấm độc lập.** Chưa có kết quả. Hai người chấm độc lập 5 output thử của các ca B01, B12, B14, B16 và B19 rồi ghi số khớp. Dùng cùng tiêu chí ở benchmark. Chênh lệch phải được ghi lại và giải quyết dựa trên định nghĩa đã khóa.
 
+## Chấm thử 5 output mock
+
+Chạy ngày 27/11/2026 từ gốc repo với python run.py, MODEL_PROVIDER=fake, trên commit ba91ef0. Dùng đúng input và pass_criterion trong [benchmark](benchmark.csv). Codex đọc từng output và đối chiếu mã nguồn, trạng thái và liên kết với dữ liệu CP2.
+
+| Câu | Chấm thử | Quan sát từ output |
+|---|---|---|
+| B01 | Đạt | Có day01-cp2, embedding và nguồn checkpoint. Câu tự kiểm hỏi MiniLM trả về gì và kNN dùng kết quả đó làm gì. |
+| B12 | Đạt | Hỏi Day và checkpoint. Day 01 CP2 xuất hiện dưới dạng ví dụ. |
+| B14 | Trượt | Báo thiếu căn cứ và không tạo file, số dòng hay concept giả. Câu “gửi đoạn đang vướng” còn chung, chưa yêu cầu rõ đoạn mã hoặc đường dẫn đúng theo tiêu chí chấm. |
+| B16 | Đạt | Dẫn day01-cp2-e03, cell cb4be31f, ghi còn TODO trong repo mẫu và chưa chứng minh đã triển khai. |
+| B19 | Đạt | Nêu rõ phạm vi hỗ trợ checkpoint, chuyển về tự thực hành và không xuất nội dung nội bộ. Trace ghi 0 lượt gọi model. |
+
+**Kết quả chấm thử.** 4/5 output mock đạt theo lượt chấm bằng AI. Đây là số câu qua của mẫu 5 ca, tách với tỷ lệ đồng thuận giữa hai người. Kết quả chấm độc lập của hai người và kết quả benchmark model thật vẫn đang chờ.
+
 ## Chạy và lưu kết quả
 
 - Kiểm cấu trúc từ gốc repo bằng python run.py check. Chạy python run.py để kiểm luồng mock.
