@@ -1,0 +1,3625 @@
+{
+  "schema_version": 1,
+  "course": "AI20K K5",
+  "source_status": "lab_derived_lecture_unverified",
+  "summary": {
+    "labs": 14,
+    "concepts": 65,
+    "relationships": 92,
+    "checkpoints": 77,
+    "code_guides": 34,
+    "concept_levels": {
+      "foundation": 32,
+      "advanced": 33
+    }
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "bow",
+        "label": "Bag-of-Words",
+        "level": "foundation",
+        "definition": "Biểu diễn văn bản bằng các cột ứng với từ trong một từ điển. Bản nhị phân trong Lab chỉ ghi từ có xuất hiện hay không, nên một từ lặp lại vẫn chỉ bật một cột.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L5-L11"
+          }
+        ]
+      },
+      {
+        "id": "text-classification",
+        "label": "Phân loại văn bản",
+        "level": "foundation",
+        "definition": "Gán nhãn cho văn bản dựa trên cách biểu diễn và quy tắc ra quyết định. Trong Lab Day 01, đầu vào là SMS và đầu ra là spam hoặc ham.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L13-L19"
+          },
+          {
+            "checkpoint_id": "day01-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L21-L27"
+          }
+        ]
+      },
+      {
+        "id": "logistic-regression",
+        "label": "Logistic Regression",
+        "level": "advanced",
+        "definition": "Tính điểm có trọng số từ vector đầu vào rồi dùng sigmoid để biến điểm thành giá trị từ 0 đến 1. Ngưỡng quyết định biến giá trị đó thành nhãn.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L5-L11"
+          }
+        ]
+      },
+      {
+        "id": "gradient-descent",
+        "label": "Gradient Descent",
+        "level": "advanced",
+        "definition": "Cập nhật tham số theo hướng làm giảm loss. Learning rate kiểm soát kích thước bước; gradient cho biết loss thay đổi thế nào khi tham số thay đổi.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L5-L11"
+          }
+        ]
+      },
+      {
+        "id": "classification-metrics",
+        "label": "Precision, Recall và F1",
+        "level": "foundation",
+        "definition": "Precision hỏi trong số mẫu bị gắn nhãn dương có bao nhiêu mẫu đúng. Recall hỏi mô hình bắt được bao nhiêu mẫu dương thật. F1 tổng hợp hai số bằng trung bình điều hòa.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L5-L11"
+          },
+          {
+            "checkpoint_id": "day01-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L21-L27"
+          },
+          {
+            "checkpoint_id": "day09-m2",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L7"
+          }
+        ]
+      },
+      {
+        "id": "mlp",
+        "label": "Mạng MLP",
+        "level": "advanced",
+        "definition": "Các lớp tuyến tính xen với hàm phi tuyến cho phép mạng học tổ hợp đặc trưng. Đường loss trên train và validation giúp phát hiện dấu hiệu overfitting.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L13-L19"
+          }
+        ]
+      },
+      {
+        "id": "embedding",
+        "label": "Embedding",
+        "level": "foundation",
+        "definition": "Chuyển một đối tượng như câu văn thành vector số. Trong Lab Day 01, encoder MiniLM tạo vector để một bộ phân loại hoặc phép tìm gần sử dụng.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L13-L19"
+          },
+          {
+            "checkpoint_id": "day06-m04",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L11"
+          }
+        ]
+      },
+      {
+        "id": "cosine",
+        "label": "Cosine Similarity",
+        "level": "advanced",
+        "definition": "Đo mức độ cùng hướng của hai vector. Hai vector có cùng hướng có cosine bằng 1 dù độ dài khác nhau, với điều kiện cả hai có độ dài khác 0.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L13-L19"
+          }
+        ]
+      },
+      {
+        "id": "knn",
+        "label": "k-Nearest Neighbors",
+        "level": "advanced",
+        "definition": "Phân loại một điểm dựa trên nhãn của các điểm gần nhất. Trong Day 01, encoder tạo vector và kNN lấy các vector gần để bỏ phiếu.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L13-L19"
+          }
+        ]
+      },
+      {
+        "id": "llm-prompting",
+        "label": "Prompt Zero-shot và Few-shot",
+        "level": "foundation",
+        "definition": "Zero-shot giao nhiệm vụ bằng chỉ dẫn. Few-shot bổ sung ví dụ đầu vào và đầu ra để mô hình thấy mẫu hành vi mong muốn.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L21-L27"
+          },
+          {
+            "checkpoint_id": "day03-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L13-L19"
+          }
+        ]
+      },
+      {
+        "id": "product-discovery",
+        "label": "Khám phá vấn đề",
+        "level": "foundation",
+        "definition": "Quan sát ai đang làm việc gì, khi nào bị vướng và phải xử lý ra sao. Mô tả một tình huống có dấu vết để nhóm kiểm lại được.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day02-cp0",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L18-L24"
+          },
+          {
+            "checkpoint_id": "day02-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L26-L39"
+          },
+          {
+            "checkpoint_id": "day02-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L77-L91"
+          }
+        ]
+      },
+      {
+        "id": "problem-framing",
+        "label": "Định nghĩa vấn đề",
+        "level": "foundation",
+        "definition": "Biến quan sát và bằng chứng thành phát biểu về người dùng, mục tiêu, trở ngại và hậu quả. Phát biểu giúp nhóm đánh giá một giải pháp có chạm đúng vấn đề.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day02-cp0",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L18-L24"
+          },
+          {
+            "checkpoint_id": "day02-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L41-L60"
+          },
+          {
+            "checkpoint_id": "day02-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L62-L75"
+          },
+          {
+            "checkpoint_id": "day02-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L93-L113"
+          },
+          {
+            "checkpoint_id": "day02-cp6",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L115-L132"
+          }
+        ]
+      },
+      {
+        "id": "problem-validation",
+        "label": "Kiểm chứng vấn đề",
+        "level": "advanced",
+        "definition": "Kiểm tra giả định bằng quan sát, phỏng vấn hoặc nguồn phù hợp. Ghi dữ liệu phản bác cùng dữ liệu ủng hộ để biết khi nào cần đổi cách hiểu.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day02-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L62-L75"
+          },
+          {
+            "checkpoint_id": "day02-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L77-L91"
+          }
+        ]
+      },
+      {
+        "id": "process-mapping",
+        "label": "Bản đồ quy trình",
+        "level": "foundation",
+        "definition": "Vẽ bước, người làm và kết quả ở mỗi bước. Đối chiếu hiện trạng với quy trình đề xuất để chỉ rõ điểm nghẽn và chỗ can thiệp.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day02-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L41-L60"
+          },
+          {
+            "checkpoint_id": "day02-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L93-L113"
+          }
+        ]
+      },
+      {
+        "id": "intervention-choice",
+        "label": "Rule, Workflow và Agent",
+        "level": "advanced",
+        "definition": "Rule xử lý điều kiện đã biết. Workflow tổ chức các bước đã định. Agent chọn bước tiếp dựa trên đầu vào và kết quả của các bước trước.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day02-cp6",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L115-L132"
+          },
+          {
+            "checkpoint_id": "day08-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L13-L19"
+          }
+        ]
+      },
+      {
+        "id": "reflection",
+        "label": "Reflection có bằng chứng",
+        "level": "foundation",
+        "definition": "Giải thích mình đã quyết định gì, dựa vào dữ liệu nào và lần sau sẽ đổi gì. Gắn nhận xét với một ví dụ cụ thể hoặc artifact.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day02-cp7",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L134-L140"
+          },
+          {
+            "checkpoint_id": "day04-cp7",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L58-L63"
+          },
+          {
+            "checkpoint_id": "day06-m06",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L13"
+          },
+          {
+            "checkpoint_id": "day10-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L5-L11"
+          }
+        ]
+      },
+      {
+        "id": "evaluation-baseline",
+        "label": "Đường cơ sở đánh giá",
+        "level": "foundation",
+        "definition": "Giữ kết quả một cấu hình làm mốc cho các lượt sau. Dùng cùng dữ liệu và cách chấm khi cần quy thay đổi kết quả về phương án thử.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day03-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L5-L11"
+          },
+          {
+            "checkpoint_id": "day04-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L37-L42"
+          },
+          {
+            "checkpoint_id": "day08-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L5-L11"
+          },
+          {
+            "checkpoint_id": "day09-m4",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L11-L19"
+          }
+        ]
+      },
+      {
+        "id": "tool-contract",
+        "label": "Tool contract",
+        "level": "foundation",
+        "definition": "Mô tả tên, đầu vào, đầu ra và giới hạn của công cụ. Contract rõ giúp gọi công cụ nhất quán và biết nhánh nào cần kiểm tra hoặc phê duyệt.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day03-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L13-L19"
+          },
+          {
+            "checkpoint_id": "day03-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L21-L27"
+          },
+          {
+            "checkpoint_id": "day04-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L16-L21"
+          },
+          {
+            "checkpoint_id": "day08-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L5-L11"
+          }
+        ]
+      },
+      {
+        "id": "tool-routing",
+        "label": "Chọn công cụ và tham số",
+        "level": "advanced",
+        "definition": "Chọn tool dựa trên mục tiêu và dữ liệu đã có, rồi điền đối số theo schema. Nếu thiếu dữ liệu bắt buộc, hỏi lại hoặc dừng theo contract.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day03-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L5-L11"
+          },
+          {
+            "checkpoint_id": "day03-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L29-L35"
+          },
+          {
+            "checkpoint_id": "day04-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L23-L28"
+          }
+        ]
+      },
+      {
+        "id": "unit-test",
+        "label": "Unit test",
+        "level": "foundation",
+        "definition": "Kiểm tra một đơn vị hành vi bằng đầu vào và kết quả mong đợi. Có thể kiểm riêng cách một hàm nhận dữ liệu đúng, dữ liệu lỗi hoặc xử lý ngoại lệ.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day03-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L21-L27"
+          },
+          {
+            "checkpoint_id": "day10-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L5-L11"
+          }
+        ]
+      },
+      {
+        "id": "eval-cases",
+        "label": "Thiết kế ca đánh giá",
+        "level": "foundation",
+        "definition": "Mỗi ca xác định đầu vào, hành vi mong đợi và cách chấm. Các ca khác nhau giúp phát hiện lỗi ở những đường đi khác nhau.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day03-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L29-L35"
+          },
+          {
+            "checkpoint_id": "day04-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L37-L42"
+          },
+          {
+            "checkpoint_id": "day05-m1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L45-L66"
+          },
+          {
+            "checkpoint_id": "day06-m02",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L8"
+          },
+          {
+            "checkpoint_id": "day09-m0",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L3"
+          },
+          {
+            "checkpoint_id": "day11-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/README.md#L4-L6"
+          }
+        ]
+      },
+      {
+        "id": "user-testing",
+        "label": "Thử với người dùng",
+        "level": "foundation",
+        "definition": "Giao nhiệm vụ gần với tình huống thật và xem người dùng làm gì, vướng ở đâu. Trace hoặc transcript giúp phân biệt phản hồi dễ nghe với hành vi hoàn thành đúng việc.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day03-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L37-L43"
+          },
+          {
+            "checkpoint_id": "day05-m3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L135-L169"
+          }
+        ]
+      },
+      {
+        "id": "agent-loop",
+        "label": "Vòng lặp Agent",
+        "level": "advanced",
+        "definition": "Mô hình đề xuất hành động, hệ thống nhận kết quả công cụ rồi đưa vào lượt tiếp. Luồng có điểm kết thúc và giới hạn số bước để kiểm soát lỗi và chi phí.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day04-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L23-L28"
+          },
+          {
+            "checkpoint_id": "day07-m02",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L8"
+          },
+          {
+            "checkpoint_id": "day08-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L13-L19"
+          }
+        ]
+      },
+      {
+        "id": "agent-trace",
+        "label": "Trace của Agent",
+        "level": "foundation",
+        "definition": "Nhật ký có thứ tự về input, công cụ, kết quả và trạng thái cuối. Dùng nó để tìm bước đầu tiên sai và đối chiếu trả lời với nguồn.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day03-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L37-L43"
+          },
+          {
+            "checkpoint_id": "day04-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L30-L35"
+          },
+          {
+            "checkpoint_id": "day04-cp7",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L58-L63"
+          },
+          {
+            "checkpoint_id": "day06-m05",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L12"
+          },
+          {
+            "checkpoint_id": "day07-m04",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L10"
+          },
+          {
+            "checkpoint_id": "day08-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L13-L19"
+          },
+          {
+            "checkpoint_id": "day09-m1",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L5"
+          },
+          {
+            "checkpoint_id": "day09-m3",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L9"
+          },
+          {
+            "checkpoint_id": "day13-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L7-L13"
+          }
+        ]
+      },
+      {
+        "id": "step-budget",
+        "label": "Giới hạn bước và đường lui",
+        "level": "advanced",
+        "definition": "Đặt số lần xử lý tối đa và xác định trạng thái cho lỗi hoặc hết lượt. Ứng dụng có thể giải thích vì sao dừng và phần nào còn thiếu.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day04-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L30-L35"
+          },
+          {
+            "checkpoint_id": "day07-m02",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L8"
+          }
+        ]
+      },
+      {
+        "id": "grounding",
+        "label": "Trả lời có căn cứ",
+        "level": "foundation",
+        "definition": "Khẳng định trong câu trả lời cần có dữ liệu hỗ trợ. Link hoặc ID hợp lệ giúp truy về nguồn, còn nội dung nguồn cần thực sự chứng minh khẳng định.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day04-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L16-L21"
+          },
+          {
+            "checkpoint_id": "day04-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L44-L49"
+          },
+          {
+            "checkpoint_id": "day06-m05",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L12"
+          },
+          {
+            "checkpoint_id": "day07-m02",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L8"
+          },
+          {
+            "checkpoint_id": "day07-m04",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L10"
+          }
+        ]
+      },
+      {
+        "id": "controlled-comparison",
+        "label": "So sánh có kiểm soát",
+        "level": "advanced",
+        "definition": "Giữ các yếu tố khác cố định khi thử một thay đổi. Đối chiếu theo từng ca giúp thấy cả phần tốt lên và phần bị ảnh hưởng.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day03-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L13-L19"
+          },
+          {
+            "checkpoint_id": "day04-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L44-L49"
+          },
+          {
+            "checkpoint_id": "day04-cp6",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L51-L56"
+          },
+          {
+            "checkpoint_id": "day06-m06",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L13"
+          },
+          {
+            "checkpoint_id": "day07-m03",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L9"
+          },
+          {
+            "checkpoint_id": "day09-m4",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L11-L19"
+          },
+          {
+            "checkpoint_id": "day09-m6",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L26"
+          },
+          {
+            "checkpoint_id": "day10-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L29-L35"
+          },
+          {
+            "checkpoint_id": "day14-cp7",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L88-L112"
+          }
+        ]
+      },
+      {
+        "id": "failure-severity",
+        "label": "Mức độ nghiêm trọng của lỗi",
+        "level": "foundation",
+        "definition": "Xếp lỗi theo hậu quả với người dùng hoặc hệ thống. Dùng hậu quả để ưu tiên ca cần chặn, cần duyệt hoặc có thể khắc phục dễ dàng.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day05-m1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L45-L66"
+          },
+          {
+            "checkpoint_id": "day05-m2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L70-L131"
+          }
+        ]
+      },
+      {
+        "id": "graceful-failure",
+        "label": "Thiết kế đường lui",
+        "level": "foundation",
+        "definition": "Khi thiếu căn cứ hay gặp lỗi, cho người dùng biết tình trạng và việc tiếp theo có thể làm, chẳng hạn bổ sung dữ liệu, sửa kết quả hoặc chuyển người phụ trách.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day05-m2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L70-L131"
+          },
+          {
+            "checkpoint_id": "day05-m3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L135-L169"
+          }
+        ]
+      },
+      {
+        "id": "autonomy",
+        "label": "Mức tự chủ và người duyệt",
+        "level": "advanced",
+        "definition": "Quy định hành động nào hệ thống được tự làm, hành động nào phải duyệt và hành động nào vượt thẩm quyền. Mức tự chủ phụ thuộc hậu quả khi sai và khả năng khôi phục.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day03-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L37-L43"
+          },
+          {
+            "checkpoint_id": "day05-m2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L70-L131"
+          },
+          {
+            "checkpoint_id": "day08-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L29-L35"
+          }
+        ]
+      },
+      {
+        "id": "prototype",
+        "label": "Prototype và tiêu chí chấp nhận",
+        "level": "foundation",
+        "definition": "Mô phỏng hành vi người dùng có thể thử. Tiêu chí chấp nhận nêu điều có thể quan sát để xác định hành vi thực tế có đạt yêu cầu.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day05-m3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L135-L169"
+          }
+        ]
+      },
+      {
+        "id": "data-provenance",
+        "label": "Nguồn gốc dữ liệu",
+        "level": "foundation",
+        "definition": "Ghi dữ liệu lấy từ đâu, phiên bản, quyền sử dụng và cách xử lý. Khi một đoạn được đưa vào kết quả, metadata giúp truy lại tài liệu và trang.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day06-m01",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L7"
+          },
+          {
+            "checkpoint_id": "day06-m02",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L8"
+          },
+          {
+            "checkpoint_id": "day06-m03",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L9"
+          },
+          {
+            "checkpoint_id": "day06-m06",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L13"
+          },
+          {
+            "checkpoint_id": "day07-m01",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L7"
+          },
+          {
+            "checkpoint_id": "day11-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L94-L101"
+          }
+        ]
+      },
+      {
+        "id": "chunking",
+        "label": "Đọc tài liệu và chia đoạn",
+        "level": "foundation",
+        "definition": "Trích văn bản, chuẩn hóa hợp lý rồi cắt thành đoạn đủ nhỏ để truy xuất. Ranh giới đoạn làm thay đổi lượng ngữ cảnh và khả năng trích đúng nguồn.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day06-m01",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L7"
+          },
+          {
+            "checkpoint_id": "day06-m03",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L9"
+          },
+          {
+            "checkpoint_id": "day06-m04",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L11"
+          }
+        ]
+      },
+      {
+        "id": "vector-retrieval",
+        "label": "Lập chỉ mục và truy xuất vector",
+        "level": "advanced",
+        "definition": "Lưu vector cùng metadata, rồi tìm các đoạn gần với vector truy vấn. Mô hình embedding và số chiều truy vấn cần tương thích với chỉ mục đã lưu.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day06-m04",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L11"
+          },
+          {
+            "checkpoint_id": "day07-m01",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L7"
+          }
+        ]
+      },
+      {
+        "id": "dev-test",
+        "label": "Tách Dev và Test",
+        "level": "foundation",
+        "definition": "Dùng dev để chọn cấu hình. Dùng test giữ riêng để ước lượng kết quả của cấu hình đã chọn trên ca chưa dùng khi điều chỉnh.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day06-m02",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L8"
+          },
+          {
+            "checkpoint_id": "day07-m01",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L7"
+          },
+          {
+            "checkpoint_id": "day07-m03",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L9"
+          },
+          {
+            "checkpoint_id": "day07-m04",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L10"
+          }
+        ]
+      },
+      {
+        "id": "hit-at-k",
+        "label": "Hit@k và chất lượng truy xuất",
+        "level": "advanced",
+        "definition": "Đếm tỷ lệ truy vấn có bằng chứng đúng trong k kết quả đầu. Xác định trước cách so nguồn và đoạn để kết quả có thể kiểm lại.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day06-m05",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L12"
+          },
+          {
+            "checkpoint_id": "day07-m04",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L10"
+          }
+        ]
+      },
+      {
+        "id": "retrieval-context",
+        "label": "Truy xuất, đóng gói context và citation",
+        "level": "advanced",
+        "definition": "Chọn các đoạn liên quan trong giới hạn ngữ cảnh, giữ định danh và cho mô hình biết nguồn nào được phép dẫn. Hệ thống có thể báo thiếu căn cứ khi nguồn không hỗ trợ.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day07-m02",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L8"
+          },
+          {
+            "checkpoint_id": "day07-m03",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L9"
+          }
+        ]
+      },
+      {
+        "id": "durability",
+        "label": "Ledger và idempotency",
+        "level": "advanced",
+        "definition": "Ledger lưu dấu tác động đã thực hiện. Một yêu cầu phát lại cần đối chiếu cùng định danh để giữ kết quả nhất quán và tránh thực hiện tác động lần hai.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day08-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L21-L27"
+          },
+          {
+            "checkpoint_id": "day08-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L29-L35"
+          },
+          {
+            "checkpoint_id": "day09-m3",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L9"
+          },
+          {
+            "checkpoint_id": "day14-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L58-L64"
+          },
+          {
+            "checkpoint_id": "day14-cp6",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L74-L86"
+          }
+        ]
+      },
+      {
+        "id": "handoff",
+        "label": "Bàn giao giữa các agent",
+        "level": "advanced",
+        "definition": "Truyền đúng tập dữ liệu agent nhận cần dùng cho nhiệm vụ kế tiếp. Giới hạn field và quyền để tránh đưa thông tin nhạy cảm qua ranh giới.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day08-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L21-L27"
+          }
+        ]
+      },
+      {
+        "id": "architecture-decision",
+        "label": "Quyết định kiến trúc có bằng chứng",
+        "level": "advanced",
+        "definition": "Ghi phương án chọn, các phương án đã cân nhắc, số liệu đo và điều kiện khiến quyết định đổi. Benchmark nhiều seed giúp nhìn độ dao động.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day08-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L37-L43"
+          }
+        ]
+      },
+      {
+        "id": "failure-taxonomy",
+        "label": "Phân loại nguyên nhân lỗi",
+        "level": "foundation",
+        "definition": "Gom lỗi theo cơ chế và điểm sai đầu tiên, ví dụ lỗi nguồn, lỗi dữ liệu, lỗi mô hình hoặc lỗi điều phối. Nhóm lỗi cụ thể giúp chọn cách chấm và cách sửa.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day04-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L44-L49"
+          },
+          {
+            "checkpoint_id": "day09-m1",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L5"
+          },
+          {
+            "checkpoint_id": "day09-m5",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L24"
+          },
+          {
+            "checkpoint_id": "day10-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L21-L27"
+          },
+          {
+            "checkpoint_id": "day13-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L23-L29"
+          }
+        ]
+      },
+      {
+        "id": "trajectory-grading",
+        "label": "Chấm trajectory",
+        "level": "advanced",
+        "definition": "Đọc trình tự hành động và trạng thái để kiểm quy tắc xuyên nhiều bước. Chấm câu cuối có thể bỏ qua việc agent đã gọi sai công cụ hoặc vi phạm cổng trước đó.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day09-m3",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L9"
+          }
+        ]
+      },
+      {
+        "id": "judge-calibration",
+        "label": "Hiệu chuẩn judge",
+        "level": "advanced",
+        "definition": "So nhãn judge với nhãn chuẩn trên ca đã biết. Xem các điểm bất đồng, độ đồng thuận và loại lỗi đo được trước khi dùng judge làm căn cứ ra quyết định.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day04-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L37-L42"
+          },
+          {
+            "checkpoint_id": "day09-m2",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L7"
+          }
+        ]
+      },
+      {
+        "id": "eval-slices",
+        "label": "Đánh giá theo nhóm ca",
+        "level": "advanced",
+        "definition": "Xem metric cho từng nhóm có rủi ro hoặc hành vi riêng. Điểm trung bình chung có thể che sự sụt giảm ở một nhóm nhỏ nhưng quan trọng.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day09-m5",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L24"
+          }
+        ]
+      },
+      {
+        "id": "run-variance",
+        "label": "Dao động giữa các lần chạy",
+        "level": "advanced",
+        "definition": "Lặp lại cùng cấu hình ở nhiều seed để thấy mức biến động tự nhiên. Ngưỡng thay đổi cần cân nhắc dao động trước khi gọi một chênh lệch là regression.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day04-cp6",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L51-L56"
+          },
+          {
+            "checkpoint_id": "day08-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L37-L43"
+          },
+          {
+            "checkpoint_id": "day09-m6",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L26"
+          }
+        ]
+      },
+      {
+        "id": "quality-gate",
+        "label": "Cổng chất lượng",
+        "level": "advanced",
+        "definition": "Dùng chuẩn đo đã định để quyết định một bản có được đi tiếp hay cần dừng. Kiểm cả dữ liệu đầu vào và bằng chứng kết quả trước khi tin kết quả tổng hợp.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day09-m4",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L11-L19"
+          },
+          {
+            "checkpoint_id": "day09-m5",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L24"
+          },
+          {
+            "checkpoint_id": "day09-m7",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L28"
+          },
+          {
+            "checkpoint_id": "day10-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L13-L19"
+          },
+          {
+            "checkpoint_id": "day10-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L21-L27"
+          },
+          {
+            "checkpoint_id": "day11-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/README.md#L4-L6"
+          },
+          {
+            "checkpoint_id": "day11-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L573-L585"
+          },
+          {
+            "checkpoint_id": "day12-phase3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          },
+          {
+            "checkpoint_id": "day14-cp7",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L88-L112"
+          }
+        ]
+      },
+      {
+        "id": "evaluation-integrity",
+        "label": "Tính toàn vẹn của đánh giá",
+        "level": "advanced",
+        "definition": "Kiểm báo cáo, schema, tập ca, lỗi evaluator và khả năng truy lại run. Những phép kiểm này giúp phát hiện khi kết quả thiếu hoặc không so sánh được.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day09-m0",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L3"
+          },
+          {
+            "checkpoint_id": "day09-m7",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L28"
+          },
+          {
+            "checkpoint_id": "day11-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L573-L585"
+          }
+        ]
+      },
+      {
+        "id": "acceptance-threshold",
+        "label": "Tiêu chí chấp nhận",
+        "level": "foundation",
+        "definition": "Viết trước thước đo, ngưỡng, phạm vi áp dụng và hành động nếu đạt hoặc trượt. Điều này giúp quyết định dựa vào cùng một chuẩn qua các lượt.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day10-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L13-L19"
+          },
+          {
+            "checkpoint_id": "day10-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L37-L43"
+          },
+          {
+            "checkpoint_id": "day13-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L31-L37"
+          }
+        ]
+      },
+      {
+        "id": "incident-analysis",
+        "label": "Phân tích sự cố",
+        "level": "advanced",
+        "definition": "Dựng lại diễn biến từ bằng chứng, xác định tác hại và nguyên nhân, rồi kiểm biện pháp phòng ngừa còn hoạt động ở ca khác.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day10-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L29-L35"
+          },
+          {
+            "checkpoint_id": "day13-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L23-L29"
+          }
+        ]
+      },
+      {
+        "id": "guardrails",
+        "label": "Guardrails đầu vào và đầu ra",
+        "level": "foundation",
+        "definition": "Áp dụng quy tắc phòng thủ trước và sau model để giới hạn phạm vi và bảo vệ dữ liệu. Mỗi lớp cần có hành vi khi chặn và cách kiểm riêng.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day08-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L29-L35"
+          },
+          {
+            "checkpoint_id": "day10-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L21-L27"
+          },
+          {
+            "checkpoint_id": "day11-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L94-L101"
+          },
+          {
+            "checkpoint_id": "day11-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L181-L191"
+          },
+          {
+            "checkpoint_id": "day11-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L285-L297"
+          },
+          {
+            "checkpoint_id": "day11-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/README.md#L4-L6"
+          },
+          {
+            "checkpoint_id": "day14-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L50-L56"
+          }
+        ]
+      },
+      {
+        "id": "output-redaction",
+        "label": "Che dữ liệu nhạy cảm",
+        "level": "advanced",
+        "definition": "Loại bỏ hay che trường nhạy cảm trước khi dữ liệu đi tới người dùng, log hoặc đích gửi. Dùng bộ kiểm tra để xác nhận dữ liệu cần bảo vệ không xuất hiện trong đầu ra.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day11-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L181-L191"
+          }
+        ]
+      },
+      {
+        "id": "observability",
+        "label": "Khả năng quan sát hệ thống",
+        "level": "foundation",
+        "definition": "Ghi log theo sự kiện, metric theo thời gian và trace theo yêu cầu để tìm lỗi. Dùng từng loại tín hiệu cho các câu hỏi vận hành khác nhau.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day10-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L29-L35"
+          },
+          {
+            "checkpoint_id": "day11-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L285-L297"
+          },
+          {
+            "checkpoint_id": "day13-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L39-L45"
+          },
+          {
+            "checkpoint_id": "day14-cp8",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L114-L131"
+          }
+        ]
+      },
+      {
+        "id": "sdlc-contract",
+        "label": "PRD và hợp đồng kiểm thử",
+        "level": "foundation",
+        "definition": "Ghi hành vi mong muốn thành điều kiện có thể kiểm. Hợp đồng định hình cách một hệ thống nhận đầu vào và trả đầu ra để kiểm tra lặp lại được.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day12-phase1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          },
+          {
+            "checkpoint_id": "day12-phase2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          }
+        ]
+      },
+      {
+        "id": "sdlc-verification",
+        "label": "Kiểm chứng theo phase",
+        "level": "advanced",
+        "definition": "Nối yêu cầu với test, đầu ra và phiên bản cụ thể. Tag giúp đối chiếu sản phẩm đang ở phase nào và từng thay đổi có bằng chứng gì.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day12-phase1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          },
+          {
+            "checkpoint_id": "day12-phase2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          },
+          {
+            "checkpoint_id": "day12-phase3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          },
+          {
+            "checkpoint_id": "day12-phase4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          }
+        ]
+      },
+      {
+        "id": "release-retro",
+        "label": "Release và retrospective",
+        "level": "foundation",
+        "definition": "Gắn phiên bản phát hành với nội dung đã kiểm. Retro ghi cách làm hiệu quả, vấn đề còn lại và thay đổi cụ thể cho vòng sau.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day12-phase4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          }
+        ]
+      },
+      {
+        "id": "cost-per-success",
+        "label": "Chi phí mỗi việc thành công",
+        "level": "foundation",
+        "definition": "Cộng chi phí của các lần chạy kể cả lần lỗi và công người liên quan, rồi chia cho số việc thành công. Chi phí token chỉ là một phần của tử số.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L21-L27"
+          },
+          {
+            "checkpoint_id": "day04-cp6",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L51-L56"
+          },
+          {
+            "checkpoint_id": "day08-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L37-L43"
+          },
+          {
+            "checkpoint_id": "day13-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L7-L13"
+          },
+          {
+            "checkpoint_id": "day13-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L15-L21"
+          }
+        ]
+      },
+      {
+        "id": "sensitivity",
+        "label": "Phân tích độ nhạy",
+        "level": "advanced",
+        "definition": "Thay một giả định và xem kết quả đổi bao nhiêu. Xếp hạng yếu tố ảnh hưởng giúp biết thông số nào cần đo kỹ trong pilot.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day13-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L15-L21"
+          }
+        ]
+      },
+      {
+        "id": "interrater",
+        "label": "Đồng thuận khi gán nhãn",
+        "level": "advanced",
+        "definition": "Hai người gán nhãn độc lập rồi đối chiếu kết quả. Điểm bất đồng thường chỉ ra tiêu chí chưa đủ rõ hoặc một ca nằm ở ranh giới hai nhóm.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day09-m2",
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L7"
+          },
+          {
+            "checkpoint_id": "day13-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L23-L29"
+          }
+        ]
+      },
+      {
+        "id": "pilot-design",
+        "label": "Thiết kế pilot",
+        "level": "advanced",
+        "definition": "Xác định đơn vị chia, quy mô mẫu, chỉ số và luật dừng. Kế hoạch cần giúp phân biệt tác động công cụ với biến động do người dùng hoặc bối cảnh.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day10-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L37-L43"
+          },
+          {
+            "checkpoint_id": "day13-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L31-L37"
+          },
+          {
+            "checkpoint_id": "day13-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L39-L45"
+          }
+        ]
+      },
+      {
+        "id": "launch-decision",
+        "label": "Quyết định Go / No-go",
+        "level": "foundation",
+        "definition": "Tổng hợp tiêu chí chất lượng, chi phí, mức dùng và rủi ro để quyết định triển khai, triển khai có điều kiện hoặc dừng.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day10-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L37-L43"
+          },
+          {
+            "checkpoint_id": "day13-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L39-L45"
+          }
+        ]
+      },
+      {
+        "id": "deployment",
+        "label": "Từ máy cá nhân tới production",
+        "level": "foundation",
+        "definition": "Production cần cấu hình, trạng thái và quy trình vận hành phù hợp môi trường chạy thật. Kiểm đúng môi trường để biết dịch vụ đã nhận lưu lượng được hay chưa.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day14-cp0",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L27-L32"
+          },
+          {
+            "checkpoint_id": "day14-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L34-L40"
+          },
+          {
+            "checkpoint_id": "day14-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L42-L48"
+          },
+          {
+            "checkpoint_id": "day14-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L58-L64"
+          },
+          {
+            "checkpoint_id": "day14-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L66-L72"
+          },
+          {
+            "checkpoint_id": "day14-cp6",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L74-L86"
+          }
+        ]
+      },
+      {
+        "id": "containers",
+        "label": "Docker image và container",
+        "level": "foundation",
+        "definition": "Image đóng gói chương trình và phụ thuộc. Container chạy từ image với cấu hình môi trường. Tách bước build và runtime có thể giảm thứ cần mang vào image chạy.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day14-cp0",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L27-L32"
+          },
+          {
+            "checkpoint_id": "day14-cp2",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L42-L48"
+          }
+        ]
+      },
+      {
+        "id": "api-controls",
+        "label": "Kiểm soát truy cập, tần suất và ngân sách",
+        "level": "advanced",
+        "definition": "Xác thực quyết định ai có quyền gọi. Rate limit hạn chế tốc độ gọi và cost guard kiểm ngân sách. Đây là ba lớp kiểm có mục đích riêng.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day11-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L285-L297"
+          },
+          {
+            "checkpoint_id": "day14-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L50-L56"
+          },
+          {
+            "checkpoint_id": "day14-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L66-L72"
+          }
+        ]
+      },
+      {
+        "id": "reliability",
+        "label": "Độ tin cậy và readiness",
+        "level": "advanced",
+        "definition": "Liveness cho biết tiến trình còn chạy. Readiness cho biết dịch vụ sẵn sàng nhận lưu lượng và các phụ thuộc cần thiết đang dùng được.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day08-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L21-L27"
+          },
+          {
+            "checkpoint_id": "day14-cp1",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L34-L40"
+          },
+          {
+            "checkpoint_id": "day14-cp4",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L58-L64"
+          },
+          {
+            "checkpoint_id": "day14-cp5",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L66-L72"
+          },
+          {
+            "checkpoint_id": "day14-cp6",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L74-L86"
+          },
+          {
+            "checkpoint_id": "day14-cp8",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L114-L131"
+          }
+        ]
+      },
+      {
+        "id": "performance-benchmark",
+        "label": "Đo tải, độ trễ và throughput",
+        "level": "advanced",
+        "definition": "Đo thời gian xử lý và số việc làm được trong một đơn vị thời gian với điều kiện đo cố định. p95 cho thấy mức trễ phần lớn yêu cầu không vượt quá.",
+        "lecture_sources": [],
+        "lab_references": [
+          {
+            "checkpoint_id": "day01-cp3",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L21-L27"
+          },
+          {
+            "checkpoint_id": "day14-cp7",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L88-L112"
+          },
+          {
+            "checkpoint_id": "day14-cp8",
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L114-L131"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "source": "bow",
+        "target": "text-classification",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "logistic-regression",
+        "target": "text-classification",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "gradient-descent",
+        "target": "logistic-regression",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "gradient-descent",
+        "target": "mlp",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "classification-metrics",
+        "target": "text-classification",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "mlp",
+        "target": "text-classification",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "embedding",
+        "target": "vector-retrieval",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "embedding",
+        "target": "cosine",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "cosine",
+        "target": "knn",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "cosine",
+        "target": "vector-retrieval",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "knn",
+        "target": "text-classification",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "llm-prompting",
+        "target": "text-classification",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "llm-prompting",
+        "target": "tool-routing",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "product-discovery",
+        "target": "problem-framing",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "problem-framing",
+        "target": "intervention-choice",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "problem-validation",
+        "target": "problem-framing",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "process-mapping",
+        "target": "problem-framing",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "intervention-choice",
+        "target": "agent-loop",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "intervention-choice",
+        "target": "autonomy",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "reflection",
+        "target": "problem-validation",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "evaluation-baseline",
+        "target": "controlled-comparison",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "tool-contract",
+        "target": "tool-routing",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "tool-contract",
+        "target": "unit-test",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "tool-routing",
+        "target": "agent-loop",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "unit-test",
+        "target": "quality-gate",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "eval-cases",
+        "target": "evaluation-baseline",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "eval-cases",
+        "target": "eval-slices",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "user-testing",
+        "target": "prototype",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "agent-loop",
+        "target": "agent-trace",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "agent-loop",
+        "target": "step-budget",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "agent-trace",
+        "target": "failure-taxonomy",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "agent-trace",
+        "target": "observability",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "step-budget",
+        "target": "graceful-failure",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "grounding",
+        "target": "retrieval-context",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "grounding",
+        "target": "agent-trace",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "controlled-comparison",
+        "target": "quality-gate",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "failure-severity",
+        "target": "graceful-failure",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "failure-severity",
+        "target": "autonomy",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "graceful-failure",
+        "target": "prototype",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "autonomy",
+        "target": "guardrails",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "prototype",
+        "target": "sdlc-verification",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "data-provenance",
+        "target": "chunking",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "data-provenance",
+        "target": "grounding",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "chunking",
+        "target": "vector-retrieval",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "chunking",
+        "target": "retrieval-context",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "vector-retrieval",
+        "target": "retrieval-context",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "vector-retrieval",
+        "target": "hit-at-k",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "dev-test",
+        "target": "eval-cases",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "dev-test",
+        "target": "controlled-comparison",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "hit-at-k",
+        "target": "grounding",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "retrieval-context",
+        "target": "step-budget",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "durability",
+        "target": "intervention-choice",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "durability",
+        "target": "reliability",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "handoff",
+        "target": "autonomy",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "handoff",
+        "target": "guardrails",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "architecture-decision",
+        "target": "controlled-comparison",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "architecture-decision",
+        "target": "cost-per-success",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "failure-taxonomy",
+        "target": "trajectory-grading",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "failure-taxonomy",
+        "target": "incident-analysis",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "trajectory-grading",
+        "target": "agent-trace",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "trajectory-grading",
+        "target": "quality-gate",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "judge-calibration",
+        "target": "classification-metrics",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "judge-calibration",
+        "target": "quality-gate",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "eval-slices",
+        "target": "quality-gate",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "run-variance",
+        "target": "controlled-comparison",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "quality-gate",
+        "target": "acceptance-threshold",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "quality-gate",
+        "target": "evaluation-integrity",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "evaluation-integrity",
+        "target": "eval-cases",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "acceptance-threshold",
+        "target": "pilot-design",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "incident-analysis",
+        "target": "observability",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "guardrails",
+        "target": "output-redaction",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "guardrails",
+        "target": "quality-gate",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "output-redaction",
+        "target": "data-provenance",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "observability",
+        "target": "performance-benchmark",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "observability",
+        "target": "reliability",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "sdlc-contract",
+        "target": "sdlc-verification",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "sdlc-verification",
+        "target": "evaluation-integrity",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "release-retro",
+        "target": "sdlc-verification",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "release-retro",
+        "target": "reflection",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "cost-per-success",
+        "target": "sensitivity",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "cost-per-success",
+        "target": "pilot-design",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "sensitivity",
+        "target": "pilot-design",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "interrater",
+        "target": "failure-taxonomy",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "interrater",
+        "target": "judge-calibration",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "pilot-design",
+        "target": "launch-decision",
+        "type": "PREREQUISITE_OF"
+      },
+      {
+        "source": "launch-decision",
+        "target": "acceptance-threshold",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "deployment",
+        "target": "containers",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "deployment",
+        "target": "reliability",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "api-controls",
+        "target": "guardrails",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "api-controls",
+        "target": "cost-per-success",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "performance-benchmark",
+        "target": "quality-gate",
+        "type": "RELATED_TO"
+      },
+      {
+        "source": "performance-benchmark",
+        "target": "run-variance",
+        "type": "RELATED_TO"
+      }
+    ]
+  },
+  "checkpoint_views": {
+    "day01-cp1": {
+      "checkpoint_id": "day01-cp1",
+      "lab_id": "day01",
+      "label": "CP1",
+      "title": "Bag-of-Words và Logistic Regression",
+      "explanation": "Checkpoint biến từng SMS thành một hàng số rồi học trọng số để phân biệt spam và ham. Đọc theo thứ tự từ điển → vector → dự đoán → cập nhật trọng số. Kiểm tra precision và recall để xem mô hình thực sự bắt được spam đến đâu.",
+      "expected_deliverable": "Notebook đã làm và các kiểm tra phần 1, kèm giải thích bước cập nhật trọng số.",
+      "concept_ids": [
+        "bow",
+        "logistic-regression",
+        "gradient-descent",
+        "classification-metrics"
+      ],
+      "self_check": "Vì sao đoán tất cả là ham vẫn có thể cho accuracy cao?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L5-L11",
+      "code_guides": [
+        {
+          "evidence_id": "day01-cp1-e01",
+          "template_state": "todo",
+          "explanation": "Hàm vectorize là chỗ notebook yêu cầu chuyển từng tin thành một hàng số theo từ điển. Bản mẫu có chữ ký và đặc tả để đọc.",
+          "source": {
+            "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+            "locator": {
+              "type": "notebook_cell",
+              "cell_id": "54fa4ee2",
+              "symbols": [
+                "vectorize"
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+          }
+        },
+        {
+          "evidence_id": "day01-cp1-e02",
+          "template_state": "todo",
+          "explanation": "Hàm train_logreg là chỗ học trọng số và bias từ dữ liệu. Lời giải thích về cập nhật gradient chỉ thành bằng chứng triển khai khi thân hàm đã được điền.",
+          "source": {
+            "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+            "locator": {
+              "type": "notebook_cell",
+              "cell_id": "dfd682b5",
+              "symbols": [
+                "train_logreg"
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+          }
+        }
+      ],
+      "lecture_slide_hints": {
+        "numbers": [
+          4,
+          6
+        ],
+        "source_url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb",
+        "verified_against_lecture": false
+      }
+    },
+    "day01-cp2": {
+      "checkpoint_id": "day01-cp2",
+      "lab_id": "day01",
+      "label": "CP2",
+      "title": "Deep Learning và Embedding",
+      "explanation": "Checkpoint có hai nửa. MLP học cách kết hợp đặc trưng đầu vào. Ở nửa Embedding, MiniLM có sẵn tạo vector và kNN dùng nhãn của các vector gần để đoán spam hoặc ham. Lần theo đâu là bước biểu diễn và đâu là bước quyết định nhãn.",
+      "expected_deliverable": "Notebook qua kiểm tra phần 2–3, có các hàng so sánh MLP và embedding.",
+      "concept_ids": [
+        "text-classification",
+        "mlp",
+        "embedding",
+        "cosine",
+        "knn"
+      ],
+      "self_check": "MiniLM trả về gì, và kNN dùng nó để làm gì?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L13-L19",
+      "code_guides": [
+        {
+          "evidence_id": "day01-cp2-e01",
+          "template_state": "provided",
+          "explanation": "Cell nạp MiniLM rồi gọi encode trên tập train, validation và test để tạo vector. Đây là bước biểu diễn tin nhắn. Việc chọn nhãn xảy ra ở bước phân loại sau đó.",
+          "source": {
+            "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+            "locator": {
+              "type": "notebook_cell",
+              "cell_id": "6ee9d295",
+              "symbols": [
+                "emb_model.encode"
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+          }
+        },
+        {
+          "evidence_id": "day01-cp2-e02",
+          "template_state": "todo",
+          "explanation": "Cell mô tả hai thao tác: tính độ gần giữa hai vector và tìm k vector gần nhất. Bản mẫu để cả hai thân hàm ở trạng thái TODO.",
+          "source": {
+            "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+            "locator": {
+              "type": "notebook_cell",
+              "cell_id": "718508a7",
+              "symbols": [
+                "cosine_similarity",
+                "top_k_similar"
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+          }
+        },
+        {
+          "evidence_id": "day01-cp2-e03",
+          "template_state": "todo",
+          "explanation": "Hàm knn_predict là nơi checkpoint yêu cầu dùng các nhãn hàng xóm để bỏ phiếu. Trong bản mẫu, hàm vẫn báo NotImplementedError.",
+          "source": {
+            "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+            "locator": {
+              "type": "notebook_cell",
+              "cell_id": "cb4be31f",
+              "symbols": [
+                "knn_predict"
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+          }
+        },
+        {
+          "evidence_id": "day01-cp2-e04",
+          "template_state": "todo",
+          "explanation": "Hàm build_mlp xác định kiến trúc mạng dùng ở nhánh Deep Learning. Nó thuộc phần MLP, cùng checkpoint với phần Embedding.",
+          "source": {
+            "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+            "locator": {
+              "type": "notebook_cell",
+              "cell_id": "b008ac1d",
+              "symbols": [
+                "build_mlp"
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+          }
+        }
+      ],
+      "lecture_slide_hints": {
+        "numbers": [
+          6,
+          9,
+          14,
+          15
+        ],
+        "source_url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb",
+        "verified_against_lecture": false
+      }
+    },
+    "day01-cp3": {
+      "checkpoint_id": "day01-cp3",
+      "lab_id": "day01",
+      "label": "CP3",
+      "title": "LLM, so sánh và nộp",
+      "explanation": "Checkpoint dùng prompt để LLM gán nhãn rồi đặt kết quả cạnh các phương án đã làm. Xem cả F1, độ trễ và chi phí trên phạm vi đo được trước khi chọn phương án.",
+      "expected_deliverable": "Notebook, báo cáo cá nhân, JSON kết quả và ảnh tính tay theo hướng dẫn nộp.",
+      "concept_ids": [
+        "llm-prompting",
+        "text-classification",
+        "classification-metrics",
+        "performance-benchmark",
+        "cost-per-success"
+      ],
+      "self_check": "Khi hai cách có F1 gần nhau, số đo nào có thể làm bạn đổi lựa chọn?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L21-L27",
+      "code_guides": [
+        {
+          "evidence_id": "day01-cp3-e01",
+          "template_state": "todo",
+          "explanation": "Cell dành một hàm để dựng prompt với hoặc không có ví dụ và một hàm để đọc nhãn trả về. Hiện hai hàm còn khung trong template.",
+          "source": {
+            "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+            "locator": {
+              "type": "notebook_cell",
+              "cell_id": "c62adf28",
+              "symbols": [
+                "build_classification_prompt",
+                "parse_label"
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+          }
+        }
+      ],
+      "lecture_slide_hints": {
+        "numbers": [
+          16,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "source_url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb",
+        "verified_against_lecture": false
+      }
+    },
+    "day02-cp0": {
+      "checkpoint_id": "day02-cp0",
+      "lab_id": "day02",
+      "label": "CP0",
+      "title": "Đọc bài mẫu",
+      "explanation": "Đọc một bài mẫu để thấy cách người làm nối tình huống quan sát được với lựa chọn vấn đề. Lấy cấu trúc lập luận để làm mẫu cho phần khảo sát của mình.",
+      "expected_deliverable": "Ghi nhận cách nối bằng chứng với quyết định trong ví dụ.",
+      "concept_ids": [
+        "product-discovery",
+        "problem-framing"
+      ],
+      "self_check": "Chi tiết nào trong mẫu giúp người khác kiểm tra kết luận?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L18-L24",
+      "code_guides": []
+    },
+    "day02-cp1": {
+      "checkpoint_id": "day02-cp1",
+      "lab_id": "day02",
+      "label": "CP1",
+      "title": "Quét vấn đề",
+      "explanation": "Đây là bước mở rộng danh sách. Ghi lại người gặp vấn đề, lúc nào và hậu quả quan sát được để nhóm có điểm xuất phát khi chọn ứng viên.",
+      "expected_deliverable": "Mục 2 báo cáo cá nhân có danh sách vấn đề.",
+      "concept_ids": [
+        "product-discovery"
+      ],
+      "self_check": "Mỗi vấn đề của bạn có một tình huống đã xảy ra không?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L26-L39",
+      "code_guides": []
+    },
+    "day02-cp2": {
+      "checkpoint_id": "day02-cp2",
+      "lab_id": "day02",
+      "label": "CP2",
+      "title": "Ba Problem Card và quy trình nháp",
+      "explanation": "Thu hẹp còn ba vấn đề đủ rõ để so. Vẽ những bước người dùng đang làm và gắn trở ngại vào một bước cụ thể.",
+      "expected_deliverable": "Mục 3 báo cáo cá nhân có card và quy trình nháp.",
+      "concept_ids": [
+        "problem-framing",
+        "process-mapping"
+      ],
+      "self_check": "Bước nào đang làm mất thời gian, và bạn dựa vào quan sát nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L41-L60",
+      "code_guides": []
+    },
+    "day02-cp3": {
+      "checkpoint_id": "day02-cp3",
+      "lab_id": "day02",
+      "label": "CP3",
+      "title": "Hội tụ nhóm",
+      "explanation": "Ghép các ứng viên cá nhân thành một danh sách chung rồi chọn hướng có lý do rõ nhất để kiểm chứng tiếp.",
+      "expected_deliverable": "Mục 2 báo cáo nhóm ghi lựa chọn và lý do.",
+      "concept_ids": [
+        "problem-framing",
+        "problem-validation"
+      ],
+      "self_check": "Nhóm chọn ứng viên này vì thông tin nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L62-L75",
+      "code_guides": []
+    },
+    "day02-cp4": {
+      "checkpoint_id": "day02-cp4",
+      "lab_id": "day02",
+      "label": "CP4",
+      "title": "Kiểm chứng và nghiên cứu giải pháp",
+      "explanation": "Đem giả định ra đối chiếu với bằng chứng và xem người dùng đã xoay xở hoặc dùng giải pháp nào. Kết quả cho biết vấn đề còn đáng giải ở đâu.",
+      "expected_deliverable": "Mục 3 báo cáo nhóm ghi nguồn, phát hiện và khoảng trống.",
+      "concept_ids": [
+        "problem-validation",
+        "product-discovery"
+      ],
+      "self_check": "Bằng chứng nào có thể khiến nhóm bỏ ứng viên đã chọn?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L77-L91",
+      "code_guides": []
+    },
+    "day02-cp5": {
+      "checkpoint_id": "day02-cp5",
+      "lab_id": "day02",
+      "label": "CP5",
+      "title": "Quy trình trước và sau",
+      "explanation": "Vẽ quy trình trước và sau để thấy thay đổi nằm ở bước nào. Dùng chênh lệch giữa hai quy trình để viết vấn đề phiên bản đầu.",
+      "expected_deliverable": "Mục 4–5 báo cáo nhóm có quy trình và phát biểu vấn đề.",
+      "concept_ids": [
+        "process-mapping",
+        "problem-framing"
+      ],
+      "self_check": "Bước nào được rút ngắn hoặc thay đổi trong quy trình mới?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L93-L113",
+      "code_guides": []
+    },
+    "day02-cp6": {
+      "checkpoint_id": "day02-cp6",
+      "lab_id": "day02",
+      "label": "CP6",
+      "title": "Mức can thiệp và quyết định",
+      "explanation": "Chọn mức can thiệp dựa trên độ lặp lại, độ mơ hồ và hậu quả khi sai. Ghi lý do chọn cùng bằng chứng vào phát biểu vấn đề phiên bản tiếp theo.",
+      "expected_deliverable": "Mục 6–8 báo cáo nhóm có mức can thiệp, lý do và quyết định.",
+      "concept_ids": [
+        "intervention-choice",
+        "problem-framing"
+      ],
+      "self_check": "Điều kiện nào đủ rõ để một rule xử lý được?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L115-L132",
+      "code_guides": []
+    },
+    "day02-cp7": {
+      "checkpoint_id": "day02-cp7",
+      "lab_id": "day02",
+      "label": "CP7",
+      "title": "Reflection cá nhân",
+      "explanation": "Viết lại phần việc mình thực sự làm, bằng chứng đã xem và quyết định sẽ thay đổi nếu làm lại.",
+      "expected_deliverable": "Mục 4–6 báo cáo cá nhân đã điền.",
+      "concept_ids": [
+        "reflection"
+      ],
+      "self_check": "Bạn có thể chỉ đến một artifact minh họa điều mình học được không?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L134-L140",
+      "code_guides": []
+    },
+    "day03-cp1": {
+      "checkpoint_id": "day03-cp1",
+      "lab_id": "day03",
+      "label": "CP1",
+      "title": "Setup và baseline v0",
+      "explanation": "Chạy nguyên cấu hình ban đầu để biết agent đang sai ở đâu trước khi sửa. Đọc log để tách lỗi lựa chọn công cụ khỏi lỗi gọi provider.",
+      "expected_deliverable": "Run v0, version log và phần phân tích lỗi baseline.",
+      "concept_ids": [
+        "evaluation-baseline",
+        "tool-routing"
+      ],
+      "self_check": "Lỗi provider có cho biết agent chọn sai tool không?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L5-L11",
+      "code_guides": [
+        {
+          "evidence_id": "day03-cp1-e01",
+          "template_state": "provided",
+          "explanation": "Runner đọc ca kiểm thử, kiểm công cụ và tham số được mong đợi rồi tổng hợp kết quả. Cùng runner và bộ ca giúp số baseline so được với các lượt sau.",
+          "source": {
+            "path": "starter_v0/run_eval.py",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/starter_v0/run_eval.py"
+          }
+        }
+      ]
+    },
+    "day03-cp2": {
+      "checkpoint_id": "day03-cp2",
+      "lab_id": "day03",
+      "label": "CP2",
+      "title": "Cải tiến prompt và tool declaration",
+      "explanation": "Ở mỗi phiên bản, sửa đúng một giả thuyết liên quan đến prompt hoặc mô tả tool rồi chạy lại cùng bộ ca. Từ đó truy được số đo thay đổi đi cùng bản sửa nào.",
+      "expected_deliverable": "Run v1–v3 và version log gồm hash, giả thuyết và metric.",
+      "concept_ids": [
+        "llm-prompting",
+        "tool-contract",
+        "controlled-comparison"
+      ],
+      "self_check": "Nếu đổi prompt và tool declaration cùng lúc, bạn sẽ khó kết luận điều gì?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L13-L19",
+      "code_guides": []
+    },
+    "day03-cp3": {
+      "checkpoint_id": "day03-cp3",
+      "lab_id": "day03",
+      "label": "CP3",
+      "title": "Tool mới và unit test",
+      "explanation": "Thêm một tool có contract rõ, rồi kiểm hàm của tool trên đường đúng và đường lỗi. Kết quả test cho biết phần thực thi của tool có đáp ứng contract hay chưa.",
+      "expected_deliverable": "Tool, tài liệu contract và tối thiểu ba unit test.",
+      "concept_ids": [
+        "tool-contract",
+        "unit-test"
+      ],
+      "self_check": "Unit test của tool đo được chuyện model chọn đúng tool không?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L21-L27",
+      "code_guides": []
+    },
+    "day03-cp4": {
+      "checkpoint_id": "day03-cp4",
+      "lab_id": "day03",
+      "label": "CP4",
+      "title": "Eval nhóm 10 ca",
+      "explanation": "Tạo tình huống một lượt và nhiều lượt để kiểm cả chọn tool, tham số và hỏi lại khi thiếu dữ liệu.",
+      "expected_deliverable": "Bộ ca nhóm và kết quả eval.",
+      "concept_ids": [
+        "eval-cases",
+        "tool-routing"
+      ],
+      "self_check": "Một ca nhiều lượt kiểm được hành vi gì mà ca một lượt bỏ sót?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L29-L35",
+      "code_guides": []
+    },
+    "day03-cp5": {
+      "checkpoint_id": "day03-cp5",
+      "lab_id": "day03",
+      "label": "CP5",
+      "title": "UI và dùng thử",
+      "explanation": "Đưa luồng lên giao diện và quan sát hội thoại thật để thấy agent xử lý yêu cầu bình thường, thiếu dữ liệu và cần xác nhận như thế nào.",
+      "expected_deliverable": "UI, transcript, link dùng thử và báo cáo.",
+      "concept_ids": [
+        "user-testing",
+        "agent-trace",
+        "autonomy"
+      ],
+      "self_check": "Transcript nào chứng minh agent chờ người dùng xác nhận?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L37-L43",
+      "code_guides": []
+    },
+    "day04-cp1": {
+      "checkpoint_id": "day04-cp1",
+      "lab_id": "day04",
+      "label": "CP1",
+      "title": "Cài đặt và khám phá tool",
+      "explanation": "Chạy thử các công cụ trạng thái và xem từng công cụ trả loại dữ liệu gì. Để ý khác biệt giữa không tìm thấy và có bằng chứng sự cố không tồn tại.",
+      "expected_deliverable": "Repo cá nhân chạy thử tool thành công.",
+      "concept_ids": [
+        "tool-contract",
+        "grounding"
+      ],
+      "self_check": "Một kết quả tìm kiếm rỗng đủ để khẳng định điều gì?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L16-L21",
+      "code_guides": []
+    },
+    "day04-cp2": {
+      "checkpoint_id": "day04-cp2",
+      "lab_id": "day04",
+      "label": "CP2",
+      "title": "Agent loop",
+      "explanation": "Hoàn thiện vòng lặp đưa kết quả tool về đúng lượt hội thoại. Agent dùng kết quả đó để quyết định gọi tiếp hay trả lời.",
+      "expected_deliverable": "Một lượt agent hỏi dữ liệu trạng thái và trả kết quả.",
+      "concept_ids": [
+        "agent-loop",
+        "tool-routing"
+      ],
+      "self_check": "Vì sao kết quả tool phải gắn với đúng ID lời gọi?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L23-L28",
+      "code_guides": [
+        {
+          "evidence_id": "day04-cp2-e01",
+          "template_state": "todo",
+          "explanation": "run_agent là đầu mối vòng lặp. Starter giao cho học viên việc nối lời gọi công cụ, kết quả tool và lượt tiếp theo bằng đúng ID lời gọi.",
+          "source": {
+            "path": "agent.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def run_agent",
+              "lines": [
+                10
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/agent.py#L10"
+          }
+        }
+      ]
+    },
+    "day04-cp3": {
+      "checkpoint_id": "day04-cp3",
+      "lab_id": "day04",
+      "label": "CP3",
+      "title": "Xử lý lỗi và trace",
+      "explanation": "Thêm giới hạn và xử lý lỗi để mỗi lượt có trạng thái kết thúc rõ ràng. Trace cho biết agent dừng ở bước nào và vì lý do gì.",
+      "expected_deliverable": "Agent trả kết quả có kiểm soát và trace đúng cấu trúc.",
+      "concept_ids": [
+        "step-budget",
+        "agent-trace"
+      ],
+      "self_check": "Làm sao phân biệt hết giới hạn bước với hoàn thành bình thường?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L30-L35",
+      "code_guides": [
+        {
+          "evidence_id": "day04-cp3-e01",
+          "template_state": "todo",
+          "explanation": "Vẫn là run_agent nhưng checkpoint này tập trung vào đường lỗi, giới hạn số bước và trace. Xem từng nhánh dừng để biết agent đã hoàn thành hay phải dừng vì lỗi.",
+          "source": {
+            "path": "agent.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def run_agent",
+              "lines": [
+                10
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/agent.py#L10"
+          }
+        }
+      ]
+    },
+    "day04-cp4": {
+      "checkpoint_id": "day04-cp4",
+      "lab_id": "day04",
+      "label": "CP4",
+      "title": "Eval lần 1",
+      "explanation": "Tạo baseline và đọc kết quả theo từng ca. Điểm tổng cho biết mức độ, còn trace và lý do chấm giúp tìm dạng lỗi cần sửa.",
+      "expected_deliverable": "Tệp baseline và danh sách lỗi quan sát.",
+      "concept_ids": [
+        "evaluation-baseline",
+        "eval-cases",
+        "judge-calibration"
+      ],
+      "self_check": "Trạng thái completed tự nó nói được gì về độ đúng của câu trả lời?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L37-L42",
+      "code_guides": [
+        {
+          "evidence_id": "day04-cp4-e01",
+          "template_state": "provided",
+          "explanation": "Script eval là chỗ chạy bộ ca và tập hợp kết quả. File baseline phải lấy từ một lần chạy thực tế thì mới có số đo để so.",
+          "source": {
+            "path": "evals/run_evals.py",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/evals/run_evals.py"
+          }
+        }
+      ]
+    },
+    "day04-cp5": {
+      "checkpoint_id": "day04-cp5",
+      "lab_id": "day04",
+      "label": "CP5",
+      "title": "Phân tích và cải tiến",
+      "explanation": "Chọn lỗi có bằng chứng rõ, tìm nguyên nhân trong prompt, luồng hay dữ liệu rồi sửa một điểm. Kiểm nguồn nếu câu trả lời dựa vào công cụ.",
+      "expected_deliverable": "Code cải tiến và NOTES mục 1–3.",
+      "concept_ids": [
+        "failure-taxonomy",
+        "grounding",
+        "controlled-comparison"
+      ],
+      "self_check": "Bước nào trong trace là chỗ sai đầu tiên?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L44-L49",
+      "code_guides": []
+    },
+    "day04-cp6": {
+      "checkpoint_id": "day04-cp6",
+      "lab_id": "day04",
+      "label": "CP6",
+      "title": "Eval lần 2",
+      "explanation": "Chạy lại bằng cấu hình đo cũ, rồi đối chiếu cả ca được cải thiện và ca xấu đi. Số lần gọi và chi phí cho biết bản sửa có thêm đánh đổi gì.",
+      "expected_deliverable": "Hai kết quả eval và NOTES mục 4–5.",
+      "concept_ids": [
+        "controlled-comparison",
+        "run-variance",
+        "cost-per-success"
+      ],
+      "self_check": "Ca nào cải thiện, và có ca nào xấu đi dù điểm tổng tăng?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L51-L56",
+      "code_guides": []
+    },
+    "day04-cp7": {
+      "checkpoint_id": "day04-cp7",
+      "lab_id": "day04",
+      "label": "CP7",
+      "title": "Demo và nộp",
+      "explanation": "Dùng một trace nhiều bước và một lỗi để giải thích hệ thống hoạt động thế nào, bản sửa xử lý được gì và giới hạn còn lại.",
+      "expected_deliverable": "Repo và checklist nộp bài.",
+      "concept_ids": [
+        "agent-trace",
+        "reflection"
+      ],
+      "self_check": "Nếu người xem hỏi vì sao ca này trượt, bạn mở bước nào trước?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L58-L63",
+      "code_guides": []
+    },
+    "day05-m1": {
+      "checkpoint_id": "day05-m1",
+      "lab_id": "day05",
+      "label": "M1",
+      "title": "Lường trước kịch bản",
+      "explanation": "Liệt kê các tình huống AI sai và chọn ca theo hậu quả với người dùng. Dùng ca cụ thể để đội thống nhất hành vi cần thiết kế.",
+      "expected_deliverable": "Spec mục 2 có kịch bản, nguyên nhân, hành vi mong đợi và mức hại.",
+      "concept_ids": [
+        "failure-severity",
+        "eval-cases"
+      ],
+      "self_check": "Hậu quả nào khiến một ca trở thành ưu tiên cao?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L45-L66",
+      "code_guides": []
+    },
+    "day05-m2": {
+      "checkpoint_id": "day05-m2",
+      "lab_id": "day05",
+      "label": "M2",
+      "title": "Thiết kế thất bại và mức tự chủ",
+      "explanation": "Thiết kế người dùng thấy gì và làm gì tiếp khi AI gặp hai ca khó. Đặt quyền cho từng hành động dựa trên hậu quả nếu xử lý sai.",
+      "expected_deliverable": "Spec mục 3–4 có đường đi trải nghiệm và lý do phân quyền theo chi phí sai.",
+      "concept_ids": [
+        "graceful-failure",
+        "autonomy",
+        "failure-severity"
+      ],
+      "self_check": "Hành động nào cần người dùng duyệt và vì sao?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L70-L131",
+      "code_guides": []
+    },
+    "day05-m3": {
+      "checkpoint_id": "day05-m3",
+      "lab_id": "day05",
+      "label": "M3",
+      "title": "Prototype và tự kiểm",
+      "explanation": "Biến các quyết định UX thành màn hình bấm được. Chạy thử ca khó theo tiêu chí quan sát được để kiểm đường lui và quyền kiểm soát.",
+      "expected_deliverable": "Prototype, ảnh minh họa và phần tự kiểm trong spec.",
+      "concept_ids": [
+        "prototype",
+        "user-testing",
+        "graceful-failure"
+      ],
+      "self_check": "Người dùng sẽ bấm hoặc làm gì khi không tin kết quả?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L135-L169",
+      "code_guides": []
+    },
+    "day06-m01": {
+      "checkpoint_id": "day06-m01",
+      "lab_id": "day06",
+      "label": "M01",
+      "title": "Chọn dữ liệu và setup",
+      "explanation": "Chọn tài liệu có quyền dùng và xác định công cụ đọc được bao nhiêu trang nội dung. Thông tin này giúp người khác tái lập từ cùng nguồn.",
+      "expected_deliverable": "Khai báo nguồn và môi trường đã kiểm.",
+      "concept_ids": [
+        "data-provenance",
+        "chunking"
+      ],
+      "self_check": "Bạn xác định trang có nội dung bằng quy tắc nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L7",
+      "code_guides": [],
+      "original_time_label": "0:25"
+    },
+    "day06-m02": {
+      "checkpoint_id": "day06-m02",
+      "lab_id": "day06",
+      "label": "M02",
+      "title": "Xây benchmark",
+      "explanation": "Viết câu hỏi cùng trang và đoạn chứa câu trả lời trước khi chạy thử. Giữ tập test riêng để kiểm cấu hình đã chọn.",
+      "expected_deliverable": "Bộ benchmark có bằng chứng đã kiểm.",
+      "concept_ids": [
+        "eval-cases",
+        "dev-test",
+        "data-provenance"
+      ],
+      "self_check": "Vì sao cần chốt bằng chứng đúng trước khi nhìn kết quả retrieval?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L8",
+      "code_guides": [],
+      "original_time_label": "1:00"
+    },
+    "day06-m03": {
+      "checkpoint_id": "day06-m03",
+      "lab_id": "day06",
+      "label": "M03",
+      "title": "Đọc, chuẩn hóa và chunk",
+      "explanation": "Chuyển tài liệu thành các đoạn có liên kết về trang gốc. So hai cách cắt để nhìn chỗ một câu trả lời bị chia qua nhiều đoạn.",
+      "expected_deliverable": "Log ingest và dữ liệu chunk của ít nhất hai cấu hình.",
+      "concept_ids": [
+        "chunking",
+        "data-provenance"
+      ],
+      "self_check": "Nếu câu trả lời nằm qua ranh giới chunk, hệ thống có thể bỏ lỡ gì?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L9",
+      "code_guides": [
+        {
+          "evidence_id": "day06-m03-e01",
+          "template_state": "todo",
+          "explanation": "load_pdf là điểm nhận tài liệu và tạo dữ liệu theo trang. Phần metadata theo trang giúp truy ngược sau khi chia đoạn.",
+          "source": {
+            "path": "starter/src/ingestion.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def load_pdf",
+              "lines": [
+                6
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/starter/src/ingestion.py#L6"
+          }
+        },
+        {
+          "evidence_id": "day06-m03-e02",
+          "template_state": "todo",
+          "explanation": "fixed_size là chiến lược chia theo kích thước. Overlap là phần văn bản được lặp giữa hai chunk kề nhau để giữ ngữ cảnh ở ranh giới.",
+          "source": {
+            "path": "starter/src/chunking.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def fixed_size",
+              "lines": [
+                5
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/starter/src/chunking.py#L5"
+          }
+        }
+      ],
+      "original_time_label": "1:50"
+    },
+    "day06-m04": {
+      "checkpoint_id": "day06-m04",
+      "lab_id": "day06",
+      "label": "M04",
+      "title": "Lưu vector và chạy ba chiến lược",
+      "explanation": "Tạo vector, lưu từng chiến lược vào chỉ mục và thử nạp lại để tìm top-3. Giữ metadata để biết kết quả gần nhất đến từ đâu.",
+      "expected_deliverable": "Vector store có ba chiến lược cùng chi phí và thời gian đo.",
+      "concept_ids": [
+        "embedding",
+        "vector-retrieval",
+        "chunking"
+      ],
+      "self_check": "Điều gì phải khớp giữa vector truy vấn và vector đã lập chỉ mục?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L11",
+      "code_guides": [
+        {
+          "evidence_id": "day06-m04-e02",
+          "template_state": "todo",
+          "explanation": "upsert là vị trí đưa các chunk và vector của một chiến lược vào kho. Starter để phần ghi dữ liệu cho học viên hoàn thiện.",
+          "source": {
+            "path": "starter/src/store.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def upsert",
+              "lines": [
+                15
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/starter/src/store.py#L15"
+          }
+        }
+      ],
+      "original_time_label": "2:40"
+    },
+    "day06-m05": {
+      "checkpoint_id": "day06-m05",
+      "lab_id": "day06",
+      "label": "M05",
+      "title": "Benchmark và audit",
+      "explanation": "Đọc kết quả truy xuất theo từng câu và kiểm tỷ lệ tìm đúng trong top-k. Mở đoạn được trả để xem có đủ căn cứ và truy lại được trang hay không.",
+      "expected_deliverable": "Trace truy xuất và bảng audit.",
+      "concept_ids": [
+        "hit-at-k",
+        "grounding",
+        "agent-trace"
+      ],
+      "self_check": "Hit@3 tốt có đảm bảo câu trả lời cuối có căn cứ không?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L12",
+      "code_guides": [
+        {
+          "evidence_id": "day06-m05-e01",
+          "template_state": "todo",
+          "explanation": "evaluate_query là vị trí so kết quả tìm với nguồn và bằng chứng chuẩn. Đây là chỗ tạo tín hiệu Hit@k ở cấp truy vấn.",
+          "source": {
+            "path": "starter/src/evaluation.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def evaluate_query",
+              "lines": [
+                5
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/starter/src/evaluation.py#L5"
+          }
+        }
+      ],
+      "original_time_label": "3:30"
+    },
+    "day06-m06": {
+      "checkpoint_id": "day06-m06",
+      "lab_id": "day06",
+      "label": "M06",
+      "title": "Tổng hợp và nộp",
+      "explanation": "Nối số đo, ví dụ thành công và lỗi cụ thể thành kết luận về cách chia đoạn phù hợp với tài liệu mình đã chọn.",
+      "expected_deliverable": "Báo cáo cá nhân với số đo và kết luận.",
+      "concept_ids": [
+        "controlled-comparison",
+        "data-provenance",
+        "reflection"
+      ],
+      "self_check": "Kết luận của bạn phụ thuộc giả định nào về bộ tài liệu?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L13",
+      "code_guides": [],
+      "original_time_label": "4:00"
+    },
+    "day07-m01": {
+      "checkpoint_id": "day07-m01",
+      "lab_id": "day07",
+      "label": "M01",
+      "title": "Kết nối dữ liệu Day 06",
+      "explanation": "Chuyển dữ liệu Day 06 thành cấu trúc có thể tìm và chấm. Kiểm ID chunk, nguồn và nhãn dev/test vẫn giữ đúng khi chuyển đổi.",
+      "expected_deliverable": "Corpus, vector store và benchmark có dev/test.",
+      "concept_ids": [
+        "data-provenance",
+        "vector-retrieval",
+        "dev-test"
+      ],
+      "self_check": "Bạn sẽ phát hiện một chunk mất thông tin trang như thế nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L7",
+      "code_guides": [
+        {
+          "evidence_id": "day07-m01-e01",
+          "template_state": "provided",
+          "explanation": "convert_day6.py đổi cấu trúc chunk và câu hỏi để thành dữ liệu Day 07. Sau bước đổi, kiểm lại ID, nguồn và bằng chứng trước khi chạy retrieval.",
+          "source": {
+            "path": "starter/convert_day6.py",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/starter/convert_day6.py"
+          }
+        }
+      ],
+      "original_time_label": "0:00–1:00"
+    },
+    "day07-m02": {
+      "checkpoint_id": "day07-m02",
+      "lab_id": "day07",
+      "label": "M02",
+      "title": "Retrieval và agent ban đầu",
+      "explanation": "Dựng luồng tìm nguồn, đóng gói context vừa ngân sách và trả lời kèm ID trích dẫn. Nếu tìm không đủ căn cứ, luồng cần kết thúc rõ ràng.",
+      "expected_deliverable": "Trace công cụ, context và câu trả lời có nguồn.",
+      "concept_ids": [
+        "retrieval-context",
+        "agent-loop",
+        "grounding",
+        "step-budget"
+      ],
+      "self_check": "ID nguồn hợp lệ chứng minh điều gì, và bạn còn phải kiểm gì?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L8",
+      "code_guides": [
+        {
+          "evidence_id": "day07-m02-e01",
+          "template_state": "example",
+          "explanation": "run_agent điều phối controller và retriever, áp dụng giới hạn tìm kiếm và kiểm các ID trích dẫn có trong context. Adapter kết nối model và kho dữ liệu cần được tích hợp riêng.",
+          "source": {
+            "path": "starter/agentic.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def run_agent",
+              "lines": [
+                31
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/starter/agentic.py#L31"
+          }
+        },
+        {
+          "evidence_id": "day07-m02-e02",
+          "template_state": "provided",
+          "explanation": "pack_context chọn nội dung đưa vào prompt trong một giới hạn và trả ID của các đoạn đã dùng. ID giúp kiểm trích dẫn có xuất phát từ context đã cấp hay không.",
+          "source": {
+            "path": "starter/baseline.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def pack_context",
+              "lines": [
+                77
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/starter/baseline.py#L77"
+          }
+        }
+      ],
+      "original_time_label": "1:00–2:00"
+    },
+    "day07-m03": {
+      "checkpoint_id": "day07-m03",
+      "lab_id": "day07",
+      "label": "M03",
+      "title": "Thử ít nhất ba phương pháp",
+      "explanation": "Thử các chiến lược truy xuất trên dev, phân tích lúc nào lấy thiếu hoặc thừa context, rồi khóa một cấu hình để chấm test.",
+      "expected_deliverable": "Bảng kết quả dev, lỗi và cấu hình được chọn.",
+      "concept_ids": [
+        "controlled-comparison",
+        "dev-test",
+        "retrieval-context"
+      ],
+      "self_check": "Bạn đã dùng tiêu chí gì để chọn cấu hình?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L9",
+      "code_guides": [],
+      "original_time_label": "2:00–3:30"
+    },
+    "day07-m04": {
+      "checkpoint_id": "day07-m04",
+      "lab_id": "day07",
+      "label": "M04",
+      "title": "Đánh giá trên test",
+      "explanation": "Chạy cấu hình đã chọn trên test, rồi xem trace để tách lỗi tìm nguồn khỏi lỗi dùng nguồn. Báo cáo cả độ đúng và giới hạn.",
+      "expected_deliverable": "Metric, trace và báo cáo.",
+      "concept_ids": [
+        "dev-test",
+        "hit-at-k",
+        "grounding",
+        "agent-trace"
+      ],
+      "self_check": "Làm sao biết agent đã tìm đúng đoạn nhưng vẫn trả lời sai?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L10",
+      "code_guides": [],
+      "original_time_label": "3:30–4:00"
+    },
+    "day08-cp1": {
+      "checkpoint_id": "day08-cp1",
+      "lab_id": "day08",
+      "label": "CP1",
+      "title": "Cài đặt và đọc contract",
+      "explanation": "Chạy starter để biết môi trường ổn và đọc hợp đồng xử lý khiếu nại. Cả nhóm cần hiểu kết quả và trace phải có gì trước khi cài các kiến trúc.",
+      "expected_deliverable": "Smoke test và bảng vai trò nhóm.",
+      "concept_ids": [
+        "tool-contract",
+        "evaluation-baseline"
+      ],
+      "self_check": "Phần nào là luật nghiệp vụ và phần nào do mô hình quyết định?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L5-L11",
+      "code_guides": []
+    },
+    "day08-cp2": {
+      "checkpoint_id": "day08-cp2",
+      "lab_id": "day08",
+      "label": "CP2",
+      "title": "Ba kiến trúc cho cùng một luồng",
+      "explanation": "Cho cùng một nhiệm vụ chạy qua workflow, single agent và orchestrator. Giữ hợp đồng kết quả chung để kiểm khác biệt đến từ cách điều phối.",
+      "expected_deliverable": "Ba shape trả kết quả và trace đúng contract, qua bộ kiểm tra tương ứng.",
+      "concept_ids": [
+        "intervention-choice",
+        "agent-loop",
+        "agent-trace"
+      ],
+      "self_check": "Ba kiến trúc dùng chung đầu vào và đầu ra nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L13-L19",
+      "code_guides": []
+    },
+    "day08-cp3": {
+      "checkpoint_id": "day08-cp3",
+      "lab_id": "day08",
+      "label": "CP3",
+      "title": "Handoff, ledger và phục hồi",
+      "explanation": "Kiểm trường hợp một yêu cầu được gọi lại hoặc phải tiếp tục sau lỗi. Ledger giữ kết quả nhất quán và handoff giới hạn thông tin sang bước tiếp.",
+      "expected_deliverable": "Hai kiểm tra gọi lại và phục hồi, cùng trace handoff đã lọc.",
+      "concept_ids": [
+        "durability",
+        "handoff",
+        "reliability"
+      ],
+      "self_check": "Vì sao cần ledger để tránh thực hiện cùng một tác động hai lần?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L21-L27",
+      "code_guides": [
+        {
+          "evidence_id": "day08-cp3-e01",
+          "template_state": "provided",
+          "explanation": "issue_refund là điểm ghi tác động vào hệ thống mẫu. Đọc cùng ledger và đường phục hồi để hiểu yêu cầu gọi lại an toàn.",
+          "source": {
+            "path": "src/lab8/durability.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def issue_refund",
+              "lines": [
+                66
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/src/lab8/durability.py#L66"
+          }
+        },
+        {
+          "evidence_id": "day08-cp3-e02",
+          "template_state": "provided",
+          "explanation": "make_handoff tạo payload cho bước bàn giao. Phần cần xem là những dữ liệu hợp lệ được truyền và các ranh giới cần giữ.",
+          "source": {
+            "path": "src/lab8/handoff.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def make_handoff",
+              "lines": [
+                42
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/src/lab8/handoff.py#L42"
+          }
+        }
+      ]
+    },
+    "day08-cp4": {
+      "checkpoint_id": "day08-cp4",
+      "lab_id": "day08",
+      "label": "CP4",
+      "title": "Crash, phê duyệt và bảo mật",
+      "explanation": "Kiểm khôi phục và quyền phê duyệt dưới nhiều điểm dừng. Đối chiếu trace để xem cổng đã giữ được đúng ranh giới dữ liệu.",
+      "expected_deliverable": "Báo cáo crash suite và các tiêu chí must-pass.",
+      "concept_ids": [
+        "durability",
+        "autonomy",
+        "guardrails"
+      ],
+      "self_check": "Dấu vết nào chứng minh hành động chưa được duyệt đã bị chặn?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L29-L35",
+      "code_guides": []
+    },
+    "day08-cp5": {
+      "checkpoint_id": "day08-cp5",
+      "lab_id": "day08",
+      "label": "CP5",
+      "title": "Benchmark và quyết định kiến trúc",
+      "explanation": "So bốn kiến trúc trên cùng ca đo, rồi chọn phương án bằng cả chất lượng và chi phí. ADR giữ lại số đo và lý do có thể kiểm lại.",
+      "expected_deliverable": "Benchmark, ADR, research card và báo cáo.",
+      "concept_ids": [
+        "architecture-decision",
+        "run-variance",
+        "cost-per-success"
+      ],
+      "self_check": "Khi đổi giới hạn chi phí, quyết định kiến trúc có thể thay đổi ra sao?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L37-L43",
+      "code_guides": []
+    },
+    "day09-m0": {
+      "checkpoint_id": "day09-m0",
+      "lab_id": "day09",
+      "label": "M0",
+      "title": "Môi trường và bộ eval",
+      "explanation": "Kiểm bộ công cụ chạy được và tạo ca đánh giá với dữ liệu đầu vào và nhãn chấm lưu riêng. Điều này giữ giao diện cho hệ thống giống với lúc sử dụng.",
+      "expected_deliverable": "Smoke pass và bộ eval tạo được.",
+      "concept_ids": [
+        "eval-cases",
+        "evaluation-integrity"
+      ],
+      "self_check": "Nhãn chuẩn được dùng ở bước nào của luồng đánh giá?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L3",
+      "code_guides": []
+    },
+    "day09-m1": {
+      "checkpoint_id": "day09-m1",
+      "lab_id": "day09",
+      "label": "M1",
+      "title": "Taxonomy lỗi",
+      "explanation": "Đọc trace và chia lỗi theo nơi và nguyên nhân phát sinh. Mỗi nhãn cần dấu hiệu đủ rõ để người khác áp dụng giống nhau.",
+      "expected_deliverable": "Taxonomy và bộ dữ liệu qua kiểm tra.",
+      "concept_ids": [
+        "failure-taxonomy",
+        "agent-trace"
+      ],
+      "self_check": "Hai lỗi nhìn giống nhau ở đầu ra có thể bắt đầu ở hai tầng nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L5",
+      "code_guides": []
+    },
+    "day09-m2": {
+      "checkpoint_id": "day09-m2",
+      "lab_id": "day09",
+      "label": "M2",
+      "title": "Hiệu chuẩn judge",
+      "explanation": "So phán quyết của judge với nhãn đã biết rồi xem các điểm bất đồng. Dùng kết quả để quyết định metric nào đủ tin cậy cho cổng chất lượng.",
+      "expected_deliverable": "Bảng audit và chỉ số đồng thuận.",
+      "concept_ids": [
+        "judge-calibration",
+        "interrater",
+        "classification-metrics"
+      ],
+      "self_check": "Judge chấm giống người ở ca dễ nhưng sai nhiều ở ca khó sẽ ảnh hưởng gate thế nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L7",
+      "code_guides": []
+    },
+    "day09-m3": {
+      "checkpoint_id": "day09-m3",
+      "lab_id": "day09",
+      "label": "M3",
+      "title": "Chấm trajectory",
+      "explanation": "Chấm cả trình tự hành động và trạng thái nghiệp vụ. Một câu trả lời có vẻ hợp lý vẫn có thể mâu thuẫn với dữ liệu đã ghi vào ledger.",
+      "expected_deliverable": "Grader qua kiểm tra, có số đo phát hiện lỗi và báo nhầm.",
+      "concept_ids": [
+        "trajectory-grading",
+        "agent-trace",
+        "durability"
+      ],
+      "self_check": "Cần đọc những tín hiệu nào để phát hiện lời đáp lệch với ledger?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L9",
+      "code_guides": [
+        {
+          "evidence_id": "day09-m3-e01",
+          "template_state": "template",
+          "explanation": "Các grader đọc kết quả và diễn biến của ca. Ở checkpoint này học viên hoàn thiện phần kiểm để phát hiện lỗi xuyên nhiều bước.",
+          "source": {
+            "path": "src/lab9/graders.py",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/lab9/graders.py"
+          }
+        }
+      ]
+    },
+    "day09-m4": {
+      "checkpoint_id": "day09-m4",
+      "lab_id": "day09",
+      "label": "M4",
+      "title": "Cổng regression",
+      "explanation": "So hai phiên bản với cùng chuẩn và baseline. Gate phải có lý do theo metric khi cho qua một bản hoặc dừng một regression.",
+      "expected_deliverable": "Gate cho qua ca hợp lệ và chặn ca regression, có lý do từ metric.",
+      "concept_ids": [
+        "quality-gate",
+        "controlled-comparison",
+        "evaluation-baseline"
+      ],
+      "self_check": "Dữ liệu nào giúp biết mức giảm điểm đã đủ đáng kể để gate dừng?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L11-L19",
+      "code_guides": []
+    },
+    "day09-m5": {
+      "checkpoint_id": "day09-m5",
+      "lab_id": "day09",
+      "label": "M5",
+      "title": "Eval set v2 và phân lát",
+      "explanation": "Tách kết quả theo nhóm ca để xem lỗi có dồn vào một nhóm nhỏ quan trọng. Gate theo slice có thể bắt vấn đề khi điểm trung bình vẫn tốt.",
+      "expected_deliverable": "Ánh xạ nhóm lỗi đầy đủ và báo cáo metric theo slice.",
+      "concept_ids": [
+        "eval-slices",
+        "failure-taxonomy",
+        "quality-gate"
+      ],
+      "self_check": "Một slice nào có thể giảm mạnh mà tổng điểm chỉ thay đổi nhẹ?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L24",
+      "code_guides": []
+    },
+    "day09-m6": {
+      "checkpoint_id": "day09-m6",
+      "lab_id": "day09",
+      "label": "M6",
+      "title": "Nhiễu và độ ổn định",
+      "explanation": "Chạy cùng cấu hình để ước lượng nhiễu rồi xem nhiều seed. Dùng dải dao động làm căn cứ chọn ngưỡng khi so hai phiên bản.",
+      "expected_deliverable": "Ngưỡng và lý do chọn metric ổn định.",
+      "concept_ids": [
+        "run-variance",
+        "controlled-comparison"
+      ],
+      "self_check": "Nếu hai lượt y hệt cấu hình vẫn lệch điểm, bạn diễn giải chênh lệch đó thế nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L26",
+      "code_guides": []
+    },
+    "day09-m7": {
+      "checkpoint_id": "day09-m7",
+      "lab_id": "day09",
+      "label": "M7",
+      "title": "Tính toàn vẹn của eval",
+      "explanation": "Kiểm dữ liệu đi vào gate cùng với điểm cuối. Báo cáo thiếu ca hoặc có lỗi evaluator cần được phát hiện trước khi ra quyết định.",
+      "expected_deliverable": "Kết quả kiểm tra integrity và biến thể đối chứng.",
+      "concept_ids": [
+        "evaluation-integrity",
+        "quality-gate"
+      ],
+      "self_check": "Một báo cáo có điểm cao nhưng thiếu dữ liệu nào thì chưa đủ tin cậy?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L28",
+      "code_guides": []
+    },
+    "day10-cp1": {
+      "checkpoint_id": "day10-cp1",
+      "lab_id": "day10",
+      "label": "CP1",
+      "title": "Cài đặt và chia vai",
+      "explanation": "Chia trách nhiệm và chạy bộ kiểm tra công khai. Mục tiêu là biết mốc ban đầu chạy được và ai giữ bằng chứng ở các bước sau.",
+      "expected_deliverable": "Repo và bài kiểm tra môi trường.",
+      "concept_ids": [
+        "unit-test",
+        "reflection"
+      ],
+      "self_check": "Bạn có thể chỉ ra ai phụ trách ghi và kiểm từng phần bằng chứng không?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L5-L11",
+      "code_guides": []
+    },
+    "day10-cp2": {
+      "checkpoint_id": "day10-cp2",
+      "lab_id": "day10",
+      "label": "CP2",
+      "title": "Ký tiêu chí trước khi đo",
+      "explanation": "Chốt ngưỡng quyết định trước khi nhìn điểm của trợ lý. Phiếu và commit giúp đối chiếu mọi quyết định sau theo cùng một chuẩn.",
+      "expected_deliverable": "Phiếu A và tiêu chí đã khóa tại commit.",
+      "concept_ids": [
+        "acceptance-threshold",
+        "quality-gate"
+      ],
+      "self_check": "Ngưỡng nào khiến nhóm phải đổi từ tiếp tục sang dừng?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L13-L19",
+      "code_guides": []
+    },
+    "day10-cp3": {
+      "checkpoint_id": "day10-cp3",
+      "lab_id": "day10",
+      "label": "CP3",
+      "title": "Đo baseline và cổng vòng 1",
+      "explanation": "Dùng baseline tìm rủi ro, đặt cổng ở chỗ có thể ngăn hậu quả và ghi quyết định vòng một. Cần cả logic và tiêu chí để kiểm cổng.",
+      "expected_deliverable": "Phiếu B, baseline và bản chốt cổng vòng 1.",
+      "concept_ids": [
+        "failure-taxonomy",
+        "guardrails",
+        "quality-gate"
+      ],
+      "self_check": "Cổng nhóm chọn chặn lúc nào trong luồng, và dựa vào dữ liệu gì?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L21-L27",
+      "code_guides": [
+        {
+          "evidence_id": "day10-cp3-e01",
+          "template_state": "template",
+          "explanation": "pre_guard là hook trước xử lý. Template chỉ trả allow mặc định, nên cần tìm logic được bổ sung và kết quả kiểm để xác nhận cổng phòng ngừa hoạt động.",
+          "source": {
+            "path": "lab10/guards.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def pre_guard",
+              "lines": [
+                36
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/lab10/guards.py#L36"
+          }
+        }
+      ]
+    },
+    "day10-cp4": {
+      "checkpoint_id": "day10-cp4",
+      "lab_id": "day10",
+      "label": "CP4",
+      "title": "Ứng phó sự cố",
+      "explanation": "Đọc diễn biến sự cố và so trước phòng ngừa, sau phòng ngừa, sau sửa. Bổ sung monitor để lỗi tương tự có dấu hiệu phát hiện được.",
+      "expected_deliverable": "Phiếu C, kết quả so sánh và monitor.",
+      "concept_ids": [
+        "incident-analysis",
+        "observability",
+        "controlled-comparison"
+      ],
+      "self_check": "Bạn sẽ đo tín hiệu nào để phân biệt giảm tác hại với ngăn sự cố?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L29-L35",
+      "code_guides": [
+        {
+          "evidence_id": "day10-cp4-e02",
+          "template_state": "template",
+          "explanation": "Tệp monitors là nơi tập hợp chỉ số đo từ các trial. Khi thêm monitor, xác định sự kiện hoặc tín hiệu nó phản ánh.",
+          "source": {
+            "path": "lab10/monitors.py",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/lab10/monitors.py"
+          }
+        }
+      ]
+    },
+    "day10-cp5": {
+      "checkpoint_id": "day10-cp5",
+      "lab_id": "day10",
+      "label": "CP5",
+      "title": "Quyết định v2 và nộp",
+      "explanation": "Dùng tiêu chí đã ký và bằng chứng vòng sau để quyết định phạm vi pilot. Ghi phần chưa đạt để người đọc biết điều kiện quyết định thay đổi.",
+      "expected_deliverable": "Bộ hồ sơ nộp và quyết định Gate 1.",
+      "concept_ids": [
+        "launch-decision",
+        "acceptance-threshold",
+        "pilot-design"
+      ],
+      "self_check": "Tiêu chí nào chi phối quyết định cuối cùng?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L37-L43",
+      "code_guides": []
+    },
+    "day11-cp1": {
+      "checkpoint_id": "day11-cp1",
+      "lab_id": "day11",
+      "label": "CP1",
+      "title": "Cài đặt và xác nhận môi trường",
+      "explanation": "Kiểm mô hình, môi trường và cấu hình cần thiết để các bài kiểm tra phòng thủ chạy được. Đây là mốc xác nhận setup.",
+      "expected_deliverable": "Môi trường chạy kiểm tra ban đầu.",
+      "concept_ids": [
+        "guardrails",
+        "data-provenance"
+      ],
+      "self_check": "Dấu hiệu nào chứng minh môi trường đã sẵn sàng cho ca phòng thủ?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L94-L101",
+      "code_guides": []
+    },
+    "day11-cp2": {
+      "checkpoint_id": "day11-cp2",
+      "lab_id": "day11",
+      "label": "CP2",
+      "title": "Bộ lọc đầu vào và đầu ra",
+      "explanation": "Đặt lớp kiểm trước model để kiểm phạm vi yêu cầu và lớp kiểm sau model để bảo vệ dữ liệu trong câu trả lời. Quan sát từng lớp theo đầu vào và đầu ra.",
+      "expected_deliverable": "Code input/output guardrails và log kiểm tra phòng thủ.",
+      "concept_ids": [
+        "guardrails",
+        "output-redaction"
+      ],
+      "self_check": "Lớp lọc đầu vào và lớp che đầu ra bảo vệ hai điểm nào trong luồng?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L181-L191",
+      "code_guides": [
+        {
+          "evidence_id": "day11-cp2-e01",
+          "template_state": "template",
+          "explanation": "Đây là lớp phòng thủ đọc đầu vào trước khi chuyển đến model. Tra điều kiện phạm vi và quan sát hành vi khi đầu vào bị chặn.",
+          "source": {
+            "path": "src/guardrails/input_guardrails.py",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/src/guardrails/input_guardrails.py"
+          }
+        },
+        {
+          "evidence_id": "day11-cp2-e02",
+          "template_state": "template",
+          "explanation": "Đây là lớp phòng thủ xử lý đầu ra. Điểm cần kiểm là văn bản tới người dùng đã được xử lý dữ liệu nhạy cảm theo yêu cầu hay chưa.",
+          "source": {
+            "path": "src/guardrails/output_guardrails.py",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/src/guardrails/output_guardrails.py"
+          }
+        }
+      ]
+    },
+    "day11-cp3": {
+      "checkpoint_id": "day11-cp3",
+      "lab_id": "day11",
+      "label": "CP3",
+      "title": "Pipeline phòng thủ và quan sát",
+      "explanation": "Ghép các lớp kiểm thành pipeline, rồi thêm giới hạn tần suất, audit và metric. Kết quả phòng thủ giúp nhìn nơi yêu cầu bị chặn hoặc cần kiểm tiếp.",
+      "expected_deliverable": "Báo cáo phòng thủ và log kiểm tra.",
+      "concept_ids": [
+        "guardrails",
+        "observability",
+        "api-controls"
+      ],
+      "self_check": "Log nào cho biết một yêu cầu đã bị chặn ở lớp nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L285-L297",
+      "code_guides": [
+        {
+          "evidence_id": "day11-cp3-e01",
+          "template_state": "template",
+          "explanation": "build_production_plugins là nơi lắp các lớp bảo vệ. Thứ tự xử lý ảnh hưởng lúc nào yêu cầu bị chặn và sự kiện nào được ghi.",
+          "source": {
+            "path": "src/assignment/pipeline.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def build_production_plugins",
+              "lines": [
+                25
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/src/assignment/pipeline.py#L25"
+          }
+        }
+      ]
+    },
+    "day11-cp4": {
+      "checkpoint_id": "day11-cp4",
+      "lab_id": "day11",
+      "label": "CP4",
+      "title": "Đánh giá an toàn",
+      "explanation": "Dùng kết quả đánh giá để mô tả phạm vi các lớp bảo vệ đã được kiểm và phần cần củng cố. Ghi rõ bằng chứng hỗ trợ kết luận.",
+      "expected_deliverable": "Hồ sơ đánh giá và nhận xét về lớp bảo vệ.",
+      "concept_ids": [
+        "guardrails",
+        "quality-gate",
+        "eval-cases"
+      ],
+      "self_check": "Những lớp bảo vệ nào đã có kết quả xác minh?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/README.md#L4-L6",
+      "code_guides": [],
+      "detail_status": "defensive_summary"
+    },
+    "day11-cp5": {
+      "checkpoint_id": "day11-cp5",
+      "lab_id": "day11",
+      "label": "CP5",
+      "title": "Tự kiểm và nộp",
+      "explanation": "Đối chiếu tệp đầu ra với schema và danh sách thành phần bài nộp. Đủ file giúp kiểm lại quá trình, còn nội dung kết quả dùng để đánh giá chất lượng.",
+      "expected_deliverable": "Các artifact cần nộp có trạng thái xác minh.",
+      "concept_ids": [
+        "evaluation-integrity",
+        "quality-gate"
+      ],
+      "self_check": "Bạn dùng trường nào để nối một kết quả với lần chạy tương ứng?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L573-L585",
+      "code_guides": []
+    },
+    "day12-phase1": {
+      "checkpoint_id": "day12-phase1",
+      "lab_id": "day12",
+      "label": "PHASE1",
+      "title": "Phase 1 · PRD-0",
+      "explanation": "Ở phase đầu, dùng PRD-0 và hợp đồng kiểm thử để dựng mốc kiểm chứng chung. Tag và ma trận kiểm chứng lưu lại phiên bản và kết quả.",
+      "expected_deliverable": "Tag phase-1, khung kế hoạch và ma trận kiểm chứng.",
+      "concept_ids": [
+        "sdlc-contract",
+        "sdlc-verification"
+      ],
+      "self_check": "Một điều kiện chấp nhận được nối với test và phiên bản bằng cách nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39",
+      "code_guides": [],
+      "detail_status": "public_schedule_only"
+    },
+    "day12-phase2": {
+      "checkpoint_id": "day12-phase2",
+      "lab_id": "day12",
+      "label": "PHASE2",
+      "title": "Phase 2",
+      "explanation": "Chốt phần công việc của phase bằng tag phase-2 và hồ sơ kiểm chứng ở đúng phiên bản. Yêu cầu chức năng cụ thể cần xem Lab Board.",
+      "expected_deliverable": "Tag phase-2 và hồ sơ kiểm chứng phase 2.",
+      "concept_ids": [
+        "sdlc-verification",
+        "sdlc-contract"
+      ],
+      "self_check": "Bạn dùng bằng chứng nào để chỉ ra thay đổi đã được kiểm ở phase-2?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39",
+      "code_guides": [],
+      "detail_status": "public_schedule_only"
+    },
+    "day12-phase3": {
+      "checkpoint_id": "day12-phase3",
+      "lab_id": "day12",
+      "label": "PHASE3",
+      "title": "Phase 3",
+      "explanation": "Ghi bằng chứng đáp ứng các yêu cầu của phase và các kiểm tra cần lặp lại sau thay đổi. Dùng tag phase-3 để người khác tái kiểm cùng phiên bản.",
+      "expected_deliverable": "Tag phase-3 và hồ sơ kiểm chứng phase 3.",
+      "concept_ids": [
+        "sdlc-verification",
+        "quality-gate"
+      ],
+      "self_check": "Test nào nên chạy lại sau khi yêu cầu đổi?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39",
+      "code_guides": [],
+      "detail_status": "public_schedule_only"
+    },
+    "day12-phase4": {
+      "checkpoint_id": "day12-phase4",
+      "lab_id": "day12",
+      "label": "PHASE4",
+      "title": "Phase 4 và release",
+      "explanation": "Ghim phiên bản cuối, tổng hợp bằng chứng và phản ánh cách đội làm việc qua các phase. Tiêu chí chức năng chi tiết cần đối chiếu Lab Board.",
+      "expected_deliverable": "Tag phase-4, release v1.0.0 và tài liệu kiểm chứng.",
+      "concept_ids": [
+        "release-retro",
+        "sdlc-verification"
+      ],
+      "self_check": "Release cuối trỏ về tag và bằng chứng nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39",
+      "code_guides": [],
+      "detail_status": "public_schedule_only"
+    },
+    "day13-cp1": {
+      "checkpoint_id": "day13-cp1",
+      "lab_id": "day13",
+      "label": "CP1",
+      "title": "Chi phí mỗi việc thành công",
+      "explanation": "Cộng chi phí cả lần thành công và lần lỗi, gồm model, tool và công người. Chia cho số việc thành công để tính chi phí hoàn thành thực tế.",
+      "expected_deliverable": "Code qua ba phép thử và bảng chi phí A2–A3.",
+      "concept_ids": [
+        "cost-per-success",
+        "agent-trace"
+      ],
+      "self_check": "Chi phí mỗi việc thành công đổi thế nào nếu chi phí mỗi lần giữ nguyên nhưng tỷ lệ thành công giảm?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L7-L13",
+      "code_guides": [
+        {
+          "evidence_id": "day13-cp1-e01",
+          "template_state": "todo",
+          "explanation": "mo_hinh là điểm tính tổng chi phí từ các lượt chạy và yêu cầu. Trong starter đây là TODO, nên chỉ có thể diễn giải mục đích và dữ liệu hàm nhận.",
+          "source": {
+            "path": "src/lab13.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "def mo_hinh",
+              "lines": [
+                45
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/src/lab13.py#L45"
+          }
+        }
+      ]
+    },
+    "day13-cp2": {
+      "checkpoint_id": "day13-cp2",
+      "lab_id": "day13",
+      "label": "CP2",
+      "title": "Phân tích độ nhạy",
+      "explanation": "Đổi giá hoặc giả định sử dụng rồi xem chi phí nhạy với yếu tố nào nhất. Kết quả giúp chọn dữ liệu cần đo khi pilot.",
+      "expected_deliverable": "Bảng kịch bản và xếp hạng yếu tố ảnh hưởng.",
+      "concept_ids": [
+        "sensitivity",
+        "cost-per-success"
+      ],
+      "self_check": "Giả định nào làm chi phí đổi nhiều nhất trong bảng của bạn?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L15-L21",
+      "code_guides": []
+    },
+    "day13-cp3": {
+      "checkpoint_id": "day13-cp3",
+      "lab_id": "day13",
+      "label": "CP3",
+      "title": "Taxonomy và gán nhãn lỗi",
+      "explanation": "Hai người gán nhãn độc lập, đo đồng thuận rồi tìm nguyên nhân cho ca bất đồng. Biện pháp sửa cần gắn với nguyên nhân và tín hiệu phát hiện.",
+      "expected_deliverable": "Bảng lỗi, tỷ lệ đồng thuận và biện pháp có tín hiệu phát hiện.",
+      "concept_ids": [
+        "interrater",
+        "failure-taxonomy",
+        "incident-analysis"
+      ],
+      "self_check": "Hai người bất đồng vì mô tả nhãn chưa rõ hay vì thiếu bằng chứng?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L23-L29",
+      "code_guides": []
+    },
+    "day13-cp4": {
+      "checkpoint_id": "day13-cp4",
+      "lab_id": "day13",
+      "label": "CP4",
+      "title": "Thiết kế pilot",
+      "explanation": "Chọn đơn vị chia thử nghiệm, tính cỡ mẫu và ghi luật dừng trước. Đây là kế hoạch để đo tác động trong điều kiện có thể kiểm.",
+      "expected_deliverable": "Kế hoạch pilot với ít nhất ba luật dừng.",
+      "concept_ids": [
+        "pilot-design",
+        "acceptance-threshold"
+      ],
+      "self_check": "Vì sao số cụm và số yêu cầu là hai con số cần xem riêng?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L31-L37",
+      "code_guides": []
+    },
+    "day13-cp5": {
+      "checkpoint_id": "day13-cp5",
+      "lab_id": "day13",
+      "label": "CP5",
+      "title": "Chỉ số, hồ sơ launch và duyệt chéo",
+      "explanation": "Đặt chỉ số, nối chỉ số với event và tổng hợp rủi ro vào hồ sơ launch. Nhóm khác dùng chính hồ sơ để duyệt quyết định.",
+      "expected_deliverable": "Bảng chỉ số, hồ sơ launch một trang và phiếu duyệt chéo.",
+      "concept_ids": [
+        "observability",
+        "launch-decision",
+        "pilot-design"
+      ],
+      "self_check": "Một chỉ số quan trọng cần event và định danh nào để tính?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L39-L45",
+      "code_guides": []
+    },
+    "day14-cp0": {
+      "checkpoint_id": "day14-cp0",
+      "lab_id": "day14",
+      "label": "CP0",
+      "title": "Cài đặt",
+      "explanation": "Chuẩn bị môi trường để các lần build, chạy và đo diễn ra theo cùng hướng dẫn. Kiểm repo và Docker trước khi làm từng phần.",
+      "expected_deliverable": "Môi trường và repo nộp sẵn sàng.",
+      "concept_ids": [
+        "deployment",
+        "containers"
+      ],
+      "self_check": "Bạn xác nhận công cụ cài đúng bằng một lần kiểm nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L27-L32",
+      "code_guides": []
+    },
+    "day14-cp1": {
+      "checkpoint_id": "day14-cp1",
+      "lab_id": "day14",
+      "label": "CP1",
+      "title": "Localhost và production",
+      "explanation": "Đối chiếu app phát triển với app trên môi trường chạy thật. Xem khác biệt về cấu hình, vòng đời và kiểm tra trạng thái.",
+      "expected_deliverable": "Mục Part 1 trong bài trả lời và minh chứng chạy thử.",
+      "concept_ids": [
+        "deployment",
+        "reliability"
+      ],
+      "self_check": "Thông tin nào biết được ở máy dev nhưng cần kiểm lại khi deploy?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L34-L40",
+      "code_guides": []
+    },
+    "day14-cp2": {
+      "checkpoint_id": "day14-cp2",
+      "lab_id": "day14",
+      "label": "CP2",
+      "title": "Docker",
+      "explanation": "Thử các cách đóng gói và quan sát layer để hiểu thời gian build và kích thước image thay đổi ở bước nào.",
+      "expected_deliverable": "Mục Part 2 và minh chứng các khác biệt Docker.",
+      "concept_ids": [
+        "containers",
+        "deployment"
+      ],
+      "self_check": "Tại sao thay thứ tự các bước build có thể ảnh hưởng khả năng tận dụng cache?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L42-L48",
+      "code_guides": []
+    },
+    "day14-cp3": {
+      "checkpoint_id": "day14-cp3",
+      "lab_id": "day14",
+      "label": "CP3",
+      "title": "API security",
+      "explanation": "Kiểm ba lớp ở API: xác thực, giới hạn lượt gọi và giới hạn chi phí. Mỗi lớp có minh chứng từ hành vi phản hồi khác nhau.",
+      "expected_deliverable": "Mục Part 4 có minh chứng HTTP đã che token.",
+      "concept_ids": [
+        "api-controls",
+        "guardrails"
+      ],
+      "self_check": "Xác thực thành công rồi, vì sao yêu cầu vẫn có thể bị chặn?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L50-L56",
+      "code_guides": [
+        {
+          "evidence_id": "day14-cp3-e01",
+          "template_state": "example",
+          "explanation": "Tệp auth đặt kiểm tra quyền truy cập ở phía API. Bằng chứng của bài làm nên cho thấy dịch vụ phân biệt yêu cầu có quyền và yêu cầu thiếu quyền.",
+          "source": {
+            "path": "04-api-gateway/production/auth.py",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/04-api-gateway/production/auth.py"
+          }
+        },
+        {
+          "evidence_id": "day14-cp3-e02",
+          "template_state": "example",
+          "explanation": "Cost guard theo dõi ngân sách sử dụng. Nó kiểm một điều kiện khác với giới hạn số lượt gọi và cần được kiểm bằng hành vi chi phí.",
+          "source": {
+            "path": "04-api-gateway/production/cost_guard.py",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/04-api-gateway/production/cost_guard.py"
+          }
+        }
+      ]
+    },
+    "day14-cp4": {
+      "checkpoint_id": "day14-cp4",
+      "lab_id": "day14",
+      "label": "CP4",
+      "title": "Scaling và reliability",
+      "explanation": "Xem trạng thái lưu ở đâu khi có nhiều bản chạy. Kiểm khả năng chia sẻ trạng thái và giữ hành vi ổn định giữa các instance.",
+      "expected_deliverable": "Mục Part 5 có kết quả kiểm tra và giải thích.",
+      "concept_ids": [
+        "reliability",
+        "durability",
+        "deployment"
+      ],
+      "self_check": "Điều gì xảy ra nếu hai instance chỉ giữ trạng thái trong bộ nhớ riêng?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L58-L64",
+      "code_guides": []
+    },
+    "day14-cp5": {
+      "checkpoint_id": "day14-cp5",
+      "lab_id": "day14",
+      "label": "CP5",
+      "title": "Final Project",
+      "explanation": "Ghép cấu hình, kiểm readiness và các lớp bảo vệ thành agent phục vụ được. Dùng checklist production để kiểm từng điều kiện.",
+      "expected_deliverable": "Bằng chứng production readiness 12/12 trong báo cáo.",
+      "concept_ids": [
+        "deployment",
+        "reliability",
+        "api-controls"
+      ],
+      "self_check": "Liveness và readiness có thể cho kết quả khác nhau khi nào?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L66-L72",
+      "code_guides": [
+        {
+          "evidence_id": "day14-cp5-e01",
+          "template_state": "todo",
+          "explanation": "main.py là chỗ nối endpoint, cấu hình và vòng đời ứng dụng. Các chỗ TODO nêu những hành vi production cần hoàn thiện, gồm kiểm trạng thái và ghi log.",
+          "source": {
+            "path": "06-lab-complete/app/main.py",
+            "locator": {
+              "type": "text_anchor",
+              "text": "TODO",
+              "lines": [
+                4,
+                16,
+                30,
+                32,
+                37,
+                38,
+                39,
+                44
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/app/main.py#L4"
+          }
+        }
+      ]
+    },
+    "day14-cp6": {
+      "checkpoint_id": "day14-cp6",
+      "lab_id": "day14",
+      "label": "CP6",
+      "title": "Cloud deployment",
+      "explanation": "Đưa agent lên cloud cùng dịch vụ lưu trạng thái rồi xác minh readiness ở URL triển khai. Ghi bằng chứng đúng môi trường đã deploy.",
+      "expected_deliverable": "DEPLOYMENT.md, URL và bằng chứng readiness.",
+      "concept_ids": [
+        "deployment",
+        "reliability",
+        "durability"
+      ],
+      "self_check": "Tại sao cần kiểm URL production sau khi container đã chạy ở máy mình?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L74-L86",
+      "code_guides": []
+    },
+    "day14-cp7": {
+      "checkpoint_id": "day14-cp7",
+      "lab_id": "day14",
+      "label": "CP7",
+      "title": "Benchmark local",
+      "explanation": "Đo tải và chạy eval trên phiên bản ban đầu và phiên bản sửa. Đọc độ trễ cùng kết quả gate để xem bản sửa cải thiện chất lượng trong điều kiện nào.",
+      "expected_deliverable": "Báo cáo benchmark, run JSON và kết quả quality gate.",
+      "concept_ids": [
+        "performance-benchmark",
+        "quality-gate",
+        "controlled-comparison"
+      ],
+      "self_check": "p95 giúp thấy điểm nào của độ trễ mà trung bình có thể che?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L88-L112",
+      "code_guides": [
+        {
+          "evidence_id": "day14-cp7-e01",
+          "template_state": "provided",
+          "explanation": "Script load test tạo nhiều yêu cầu để đo hiệu năng. Kết quả phản ánh tải và cấu hình của lần chạy cụ thể.",
+          "source": {
+            "path": "06-lab-complete/benchmark-observability/develop/load_test.py",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/benchmark-observability/develop/load_test.py"
+          }
+        },
+        {
+          "evidence_id": "day14-cp7-e02",
+          "template_state": "provided",
+          "explanation": "Script eval chấm kết quả và có phần so với baseline. Dùng kết quả này để giải thích quyết định của quality gate.",
+          "source": {
+            "path": "06-lab-complete/benchmark-observability/develop/eval/run_eval.py",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/benchmark-observability/develop/eval/run_eval.py"
+          }
+        }
+      ]
+    },
+    "day14-cp8": {
+      "checkpoint_id": "day14-cp8",
+      "lab_id": "day14",
+      "label": "CP8",
+      "title": "Observability và nộp",
+      "explanation": "Kết nối metric và dashboard rồi xem hệ thống phản ứng thế nào dưới bài đo. Báo cáo liên kết số đo với môi trường và phiên bản đã chạy.",
+      "expected_deliverable": "Dashboard, minh chứng quan sát và các báo cáo nộp.",
+      "concept_ids": [
+        "observability",
+        "performance-benchmark",
+        "reliability"
+      ],
+      "self_check": "Bạn mở biểu đồ nào để giải thích tải tăng đã tác động đến dịch vụ ra sao?",
+      "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L114-L131",
+      "code_guides": [
+        {
+          "evidence_id": "day14-cp8-e01",
+          "template_state": "provided",
+          "explanation": "Docker Compose mô tả các dịch vụ trong môi trường quan sát. Cấu hình giúp thấy những thành phần nào cần cùng chạy trước khi mở dashboard.",
+          "source": {
+            "path": "06-lab-complete/benchmark-observability/production/docker-compose.yml",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/benchmark-observability/production/docker-compose.yml"
+          }
+        },
+        {
+          "evidence_id": "day14-cp8-e02",
+          "template_state": "provided",
+          "explanation": "Cấu hình Prometheus chỉ chỗ lấy metric. Dashboard dùng chuỗi số đo này để hiển thị thay đổi theo thời gian.",
+          "source": {
+            "path": "06-lab-complete/benchmark-observability/production/prometheus/prometheus.yml",
+            "locator": {
+              "type": "file"
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/benchmark-observability/production/prometheus/prometheus.yml"
+          }
+        }
+      ]
+    }
+  }
+}

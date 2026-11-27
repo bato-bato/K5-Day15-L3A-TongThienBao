@@ -4,6 +4,21 @@ Bộ xuất gồm 14 Lab, 77 checkpoint hoặc phase và 165 mục bằng chứn
 
 [Dữ liệu JSON để backend nạp](labs.json)
 
+## Mind map kiến thức và hướng dẫn checkpoint
+
+[Knowledge Graph và phần giải thích soạn sẵn](knowledge-graph.json) có 65 khái niệm cơ bản và chuyên sâu. Các cạnh trong `graph.edges` nối hai khái niệm theo quan hệ kiến thức. Nguồn từ Lab nằm trong `lab_references`. Dùng `lecture_sources` để gắn bài giảng thật sau khi đối chiếu.
+
+Khi học viên chọn một checkpoint, tra ID trong `checkpoint_views` để hiện mục tiêu, cách làm tổng quát, đầu ra và câu tự kiểm. Dùng `concept_ids` để lấy các node cần hiện và các cạnh nối chúng. `code_guides` chứa lời giải thích đã soạn cho các vị trí được chọn trong repo mẫu. Mỗi mục có nguồn và trạng thái của template.
+
+Ví dụ ở `day01-cp2`, màn hình giải thích ngay hai cách biểu diễn và phân loại. Khi mở phần Embedding, học viên có thể lần từ vector sang độ tương đồng và kNN. Nếu học viên nhập repo bài làm, phần đọc repo lấy thêm bằng chứng từ chính commit đó để giải thích họ đã triển khai đến đâu.
+
+```mermaid
+flowchart LR
+    A[Embedding] ---|Liên quan| B[Cosine Similarity]
+    B ---|Liên quan| C[k-Nearest Neighbors]
+    C ---|Liên quan| D[Phân loại văn bản]
+```
+
 ## Cách dùng với GraphRAG
 
 1. Dùng ID Lab và checkpoint để lấy yêu cầu, đầu ra dự kiến và vị trí cần đọc.
