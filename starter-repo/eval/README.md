@@ -46,6 +46,12 @@ Số câu đạt trong bảng dùng để rà cách áp dụng tiêu chí cho ou
 
 ## Chạy và lưu kết quả
 
-- Kiểm cấu trúc từ gốc repo bằng python run.py check. Chạy python run.py để kiểm luồng mock.
-- Khi nối model thật, dùng python run.py eval. Điền pass rồi chạy python run.py score eval/run-N.csv. Đường dẫn được tính từ starter-repo.
-- Lưu run ID, model và % đạt cho từng lượt. Mốc CP2 chưa có số đo model thật.
+- Kiểm cấu trúc từ gốc repo bằng `python run.py check`. Chạy `python run.py` để kiểm luồng.
+- Khi nối model thật, dùng `python run.py eval`. Điền `pass` rồi chạy `python run.py score eval/run-N.csv`. Đường dẫn được tính từ `starter-repo`.
+- **Chốt bộ benchmark cho CP3:** Dùng nguyên vẹn [benchmark.csv](benchmark.csv) (20 câu: 11 `thuong`, 6 `kho`, 3 `tu_choi`; 11/20 `data_that`, 9/20 `tu_viet`) và [metric_spec.yaml](metric_spec.yaml) đã khóa từ commit `ba91ef0` (0 thay đổi sau CP2).
+
+### Bảng các lượt chạy
+
+| Lượt | Run ID | Model | Cấu hình | Đạt / tổng | thuong | kho | tu_choi | Trích dẫn / lỗi kỹ thuật | Chi tiết |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | `run-1@20261127-232931` | `gpt-4o-mini` | `MODEL_PROVIDER=openai`, `temperature=0.2`, `response_format=json_object` (khi system yêu cầu JSON) | `16/20` (80%) | `8/11` | `6/6` | `2/3` | 0 nguồn bịa · 0 lỗi kỹ thuật | [run-1.csv](run-1.csv) · [report.md](report.md) |

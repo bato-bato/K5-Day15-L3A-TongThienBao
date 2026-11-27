@@ -17,7 +17,7 @@ from graph_db import (
     traverse_subgraph,
 )
 from chat_engine import chat_turn
-from guardrails import check_input_guard
+from guardrails import chat_rate_limiter, check_input_guard
 from kg_store import ensure_kg_loaded, get_day_mindmap_seed, get_kg_summary, search_kg
 from lecture_extractor import extract_lecture_knowledge
 from mapper import ensure_repo_index, get_day_lab_seed, map_lecture_to_lab
@@ -134,6 +134,16 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="AI in Action · Knowledge Graph & Mapper", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    response.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+    return response
 
 
 def get_workspace_id(
@@ -276,8 +286,19 @@ def ai_lecture_to_lab_map(req: MapRequest) -> dict[str, Any]:
 
 
 @app.post("/api/chat")
-def kg_rag_chat(req: ChatRequest) -> dict[str, Any]:
+def kg_rag_chat(req: ChatRequest, request: Request, response: Response) -> dict[str, Any]:
     """KG-RAG tutor: explain concepts/lessons at eli5|standard|deep, grounded + cited on the GraphRAG DB."""
+    response.headers["Cache-Control"] = "no-store"
+    client_key = request.cookies.get(COOKIE_NAME) or (request.client.host if request.client else "unknown")
+    max_req = int(os.environ.get("CHAT_RATE_LIMIT_MAX", "20"))
+    window_s = int(os.environ.get("CHAT_RATE_LIMIT_WINDOW_S", "60"))
+    allowed, retry_after = chat_rate_limiter.check(client_key, max_req, window_s)
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Bạn đang gửi quá nhanh. Vui lòng đợi vài giây rồi thử lại.",
+            headers={"Retry-After": str(retry_after)},
+        )
     return chat_turn(
         req.message,
         history=[t.model_dump() for t in req.history],

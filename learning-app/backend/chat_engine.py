@@ -23,7 +23,14 @@ from typing import Any
 import httpx
 
 from graph_db import get_all_graph_nodes, traverse_subgraph
-from guardrails import check_input_guard, spotlight
+from guardrails import (
+    check_input_guard,
+    check_output_guard,
+    redact_sensitive_data,
+    sanitize_chat_history,
+    sanitize_text,
+    spotlight,
+)
 from kg_builder import nfc
 from semantic_engine import hybrid_search, tokenize_text
 
@@ -334,22 +341,58 @@ def call_llm(messages: list[dict[str, str]], intent: str) -> tuple[str | None, d
         return None, {"llm_used": False, "model": model, "reason": f"llm_error:{type(exc).__name__}"}
 
 
+def _format_summary_blocks(summary: str, simplify: bool = False) -> list[str]:
+    """Break dense KG summaries into clean intro + markdown bullet points."""
+    text = re.sub(r"\s+", " ", (summary or "").strip())
+    if not text:
+        return []
+
+    if len(re.findall(r"\(\d+(?:\.\d+)?\)\s", text)) >= 2:
+        chunks = re.split(r"(?=\(\d+(?:\.\d+)?\)\s)", text)
+        lines: list[str] = []
+        idx = 0
+        if chunks and not chunks[0].lstrip().startswith("("):
+            intro = chunks[0].strip().rstrip(",;")
+            if intro:
+                lines.append(intro)
+            idx = 1
+
+        numbered = chunks[idx:]
+        if simplify:
+            numbered = numbered[:2]
+        for chunk in numbered:
+            item = chunk.strip().rstrip(",;. ")
+            m = re.match(r"^\((\d+(?:\.\d+)?)\)\s*(.+)$", item)
+            if not m:
+                continue
+            num, rest = m.group(1), m.group(2).strip()
+            paren_match = re.match(r"^([^(:]+?)\s*\((.+)\)$", rest)
+            colon_match = re.match(r"^([^:]{2,50}):\s*(.+)$", rest)
+            if paren_match:
+                lines.append(f"- **{num} {paren_match.group(1).strip()}:** {paren_match.group(2).strip()}")
+            elif colon_match:
+                lines.append(f"- **{num} {colon_match.group(1).strip()}:** {colon_match.group(2).strip()}")
+            else:
+                lines.append(f"- **{num}** {rest}")
+        if lines:
+            return lines
+
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+    if simplify:
+        return [sentences[0]]
+    if len(sentences) >= 2:
+        return [sentences[0], "", *[f"- {s}" for s in sentences[1:]]]
+    return [text]
+
+
 def extractive_answer(intent: str, citable: list[dict[str, Any]], relations: dict[str, list[dict[str, Any]]]) -> str:
-    """Deterministic answer when no LLM is available: still grounded + cited, just less fluent."""
+    """Deterministic answer when no LLM is available: still grounded + cited, formatted cleanly."""
     main = citable[0]
-    first_sentence = re.split(r"(?<=[.!?])\s+", main["summary"])[0]
-    parts = [f"**{main['label']}** [{main['id']}]", "", f"👉 Ý chính: {first_sentence}"]
-    if intent != "simplify" and len(main["summary"]) > len(first_sentence):
-        parts.append(f"\nChi tiết: {main['summary']}")
+    parts = [f"### {main['label']} [{main['id']}]", ""]
+    parts.extend(_format_summary_blocks(main["summary"], simplify=(intent == "simplify")))
     quote = main.get("provenance", {}).get("key_quote")
     if quote:
-        parts.append(f'\n> "{quote}"')
-    if relations["prerequisites"]:
-        parts.append("\n**Nên nắm trước:** " + ", ".join(f"{n['label']} [{n['id']}]" for n in relations["prerequisites"][:3]))
-    others = [n for n in citable[1:4]]
-    if others:
-        parts.append("\n**Liên quan:** " + "; ".join(f"{n['label']} [{n['id']}]" for n in others))
-    parts.append("\n_(Chế độ offline: câu trả lời trích từ Knowledge Graph, chưa qua LLM diễn giải.)_")
+        parts.extend(["", f'> "{quote}"'])
     return "\n".join(parts)
 
 
@@ -397,16 +440,27 @@ def chat_turn(
     prev_citation_ids: list[str] | None = None,
 ) -> dict[str, Any]:
     t0 = time.perf_counter()
-    msg = nfc(message or "")
+    msg = sanitize_text(message or "")
     level = level if level in LEVELS else "standard"
     guard = check_input_guard(msg)
     if guard["blocked"]:
+        logger.warning(json.dumps({"event": "chat_blocked", "rules": len(guard["matched_rules"])}, ensure_ascii=False))
         return {
             "answer": f"⚠️ Mình không thể xử lý yêu cầu này: {guard['reason']}",
             "blocked": True, "abstained": True, "intent": None, "level": level,
             "citations": [], "prerequisites": [], "suggestions": [],
+            "security": {
+                "input_guard": "blocked",
+                "output_guard": "skipped",
+                "redacted_types": [],
+                "history_sanitized": 0,
+            },
+            "sanitized_message": None,
             "trace": {"guard": guard["matched_rules"], "latency_ms": round((time.perf_counter() - t0) * 1000)},
         }
+
+    msg, input_redacted = redact_sensitive_data(msg)
+    clean_history, history_dropped = sanitize_chat_history(history or [], MAX_HISTORY_TURNS)
 
     intent = detect_intent(msg)
     if intent == "simplify":
@@ -423,16 +477,23 @@ def chat_turn(
         meta: dict[str, Any] = {"llm_used": False, "reason": "no_grounding"}
         valid, rejected = [], []
         abstained = True
+        out_guard: dict[str, Any] = {"blocked": False, "text": answer, "redacted_types": [], "flags": []}
     else:
-        messages = build_messages(msg, history or [], intent, level, context, relations)
+        messages = build_messages(msg, clean_history, intent, level, context, relations)
         answer, meta = call_llm(messages, intent)
         if not answer:
             answer = extractive_answer(intent, citable, relations)
-        answer, valid, rejected = verify_citations(answer, {n["id"] for n in citable})
-        abstained = False
+        out_guard = check_output_guard(answer)
+        answer = out_guard["text"]
+        if out_guard["blocked"]:
+            valid, rejected = [], []
+            abstained = True
+        else:
+            answer, valid, rejected = verify_citations(answer, {n["id"] for n in citable})
+            abstained = False
 
     by_id = {n["id"]: n for n in citable}
-    cite_ids = valid or [n["id"] for n in citable[:2]]
+    cite_ids = [] if out_guard["blocked"] else (valid or [n["id"] for n in citable[:2]])
     citations = [
         {
             "id": cid,
@@ -444,23 +505,35 @@ def chat_turn(
         }
         for cid in cite_ids if cid in by_id
     ]
+    all_redacted = sorted(set(input_redacted + out_guard["redacted_types"]))
+    security = {
+        "input_guard": "redacted" if input_redacted else "passed",
+        "output_guard": "blocked" if out_guard["blocked"] else ("redacted" if out_guard["redacted_types"] else "passed"),
+        "redacted_types": all_redacted,
+        "history_sanitized": history_dropped,
+    }
     trace = {
         **meta,
         "cleaned_query": r["cleaned_query"],
         "seeds": [{"id": s, "reason": r["seed_reason"].get(s)} for s in r["seeds"]],
         "context_chars": len(context),
         "rejected_citations": rejected,
+        "input_redacted": input_redacted,
+        "history_dropped": history_dropped,
+        "output_flags": out_guard["flags"],
         "latency_ms": round((time.perf_counter() - t0) * 1000),
     }
     logger.info(json.dumps({"event": "chat_turn", "intent": intent, "level": level, "msg_len": len(msg), **{k: v for k, v in trace.items() if k != "cleaned_query"}}, ensure_ascii=False))
     return {
         "answer": answer,
-        "blocked": False,
+        "blocked": out_guard["blocked"],
         "abstained": abstained,
         "intent": intent,
         "level": level,
         "citations": citations,
-        "prerequisites": [{"id": n["id"], "label": n["label"], "day": n["day"]} for n in relations["prerequisites"][:3]],
-        "suggestions": suggest_followups(intent, level, citable, relations),
+        "prerequisites": [] if out_guard["blocked"] else [{"id": n["id"], "label": n["label"], "day": n["day"]} for n in relations["prerequisites"][:3]],
+        "suggestions": [] if out_guard["blocked"] else suggest_followups(intent, level, citable, relations),
+        "security": security,
+        "sanitized_message": msg if input_redacted else None,
         "trace": trace,
     }
