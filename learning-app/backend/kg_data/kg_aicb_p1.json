@@ -1,0 +1,2341 @@
+{
+  "version": "2026.1.0",
+  "nodes": [
+    {
+      "id": "DAY_01",
+      "type": "DayModule",
+      "label": "Ngày 1: AI & LLM Foundation",
+      "day": 1,
+      "tier": 1,
+      "summary": "Nền tảng AI 2026 từ Machine Learning đến Agentic AI, kiến trúc Transformer, Token Economy, API Call và Vibe Coding.",
+      "keywords": [
+        "AI",
+        "LLM",
+        "Transformer",
+        "Token Economy",
+        "Vibe Coding",
+        "API"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "section_ref": "NGÀY 1 — AI & LLM Foundation (trang 2–6)",
+        "key_quote": "Bạn đang dùng AI mỗi ngày nhưng thực sự bên trong nó làm gì?"
+      },
+      "sha256": "83cc088047f1f8118c79fb7d1537aa4a4b633503c6bf905963a9846c4e2c1f66"
+    },
+    {
+      "id": "CON_D1_TAXONOMY",
+      "type": "CoreConcept",
+      "label": "Phân tầng AI & 3 nhóm AI chính",
+      "day": 1,
+      "tier": 3,
+      "summary": "AI > ML > Deep Learning > Generative AI > LLM. Ba nhóm: Discriminative (Input->Label), Generative (Prompt->Content), Agentic (Goal->Plan->Action). Bốn cấp độ lên Agent (Level 0-3); Agent = Goal + Reasoning + Tools + Memory + Action.",
+      "keywords": [
+        "Taxonomy",
+        "Discriminative",
+        "Generative",
+        "Agentic",
+        "Level 0-3"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          2
+        ],
+        "section_ref": "Ngày 1 · Mục 1 (trang 2)",
+        "key_quote": "Trọng tâm doanh nghiệp chuyển từ AI trả lời hay sang AI biết hành động, kết nối công cụ và tạo ROI thực tế."
+      },
+      "sha256": "2d751f43432eea1e4853d22bf9c053dc8c735365bd23f9069f399d19c532c12c"
+    },
+    {
+      "id": "CON_D1_TRANSFORMER",
+      "type": "CoreConcept",
+      "label": "Kiến trúc Transformer & Self-Attention",
+      "day": 1,
+      "tier": 3,
+      "summary": "Decoder-only (GPT, Claude, Gemini) thắng thế nhờ khả năng scale tốt. X = E + P (Input Embedding + Positional Encoding). Scaled Dot-Product Attention: softmax((Q x K^T)/sqrt(d_k)) x V; Causal Mask ngăn nhìn trộm token tương lai; 3 giai đoạn: Pre-training -> SFT -> RLHF/DPO.",
+      "keywords": [
+        "Transformer",
+        "Self-Attention",
+        "Q K V",
+        "Causal Mask",
+        "Pre-training",
+        "SFT",
+        "RLHF",
+        "DPO"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          2,
+          3,
+          6
+        ],
+        "section_ref": "Ngày 1 · Mục 2 (trang 2–3, 6)",
+        "key_quote": "Attention(Q, K, V) = softmax((Q x K^T) / sqrt(d_k)) x V"
+      },
+      "sha256": "b17829ec7523361c61b0052d911ded0ab1b3aa4e9a80b94a8748f7658a226355"
+    },
+    {
+      "id": "MET_D1_TOKEN_ECONOMY",
+      "type": "MetricOrFormula",
+      "label": "Token Economy & Tam giác Quality-Latency-Cost",
+      "day": 1,
+      "tier": 4,
+      "summary": "Tổng chi phí = Input tokens + Output tokens (tính theo 1M tokens). Output đắt gấp 3–5 lần Input. Tiếng Việt/Unicode (~0.5 từ/token), code, JSON tốn nhiều token hơn tiếng Anh (~0.75 từ/token). Bắt đầu từ model đủ tốt và đủ rẻ (Haiku/Flash) trước khi nâng cấp.",
+      "keywords": [
+        "Token",
+        "Cost",
+        "Latency",
+        "Quality",
+        "temperature",
+        "top_p",
+        "Streaming"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          3,
+          4,
+          5
+        ],
+        "section_ref": "Ngày 1 · Mục 3–4 (trang 3–5)",
+        "key_quote": "Output tokens thường đắt gấp 3 đến 5 lần Input tokens."
+      },
+      "sha256": "cb820a87ab6e2281748b78a646c3954c05ee54d97e9f13deee4c42416a79289e"
+    },
+    {
+      "id": "PAT_D1_VIBE_CODING",
+      "type": "ArchitecturePattern",
+      "label": "Vibe Coding & Mẫu triển khai API",
+      "day": 1,
+      "tier": 3,
+      "summary": "Quy trình Vibe Coding (Idea -> Prompt -> Code -> Test -> Refine) dựa trên 3 nguyên tắc vàng: Intent-driven, Context-first, Human review. API Call ghi nhận token usage, finish_reason, dùng Streaming và temperature=0 cho code/phân tích.",
+      "keywords": [
+        "Vibe Coding",
+        "Intent-driven",
+        "Context-first",
+        "Human review",
+        "API wrapper"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          5
+        ],
+        "section_ref": "Ngày 1 · Mục 4–5 (trang 5)",
+        "key_quote": "Viết phần mềm nhanh hơn, không phải viết code nhiều hơn."
+      },
+      "sha256": "5629b2954dcf19382c5c7e8b707a537a5f41e59271252fd8ad37760f7856ae27"
+    },
+    {
+      "id": "ERR_D1_LLM_LIMITS",
+      "type": "FailureOrTrap",
+      "label": "3 giới hạn bẩm sinh của LLM",
+      "day": 1,
+      "tier": 3,
+      "summary": "(1) Knowledge cutoff: không biết thông tin sau thời điểm train; (2) Hallucination: tối ưu xác suất token chứ không phải tính đúng-sai; (3) Context window hữu hạn và hiệu ứng quên thông tin ở giữa (Lost in the Middle).",
+      "keywords": [
+        "Knowledge cutoff",
+        "Hallucination",
+        "Lost in the Middle",
+        "ảo giác"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          3
+        ],
+        "section_ref": "Ngày 1 · Mục 2 (trang 3)",
+        "key_quote": "Trả lời tự tin nhưng sai sự thật vì mô hình tối ưu xác suất token chứ không phải tính đúng-sai."
+      },
+      "sha256": "d6c75a9b096ec05464c61299706398dce0675ea0570e1bbda6aa078910d1a27f"
+    },
+    {
+      "id": "LAB_D1_API_BENCHMARK",
+      "type": "LabDeliverable",
+      "label": "Lab #1: Streaming Chatbot & Bảng so sánh Latency-Cost-Quality",
+      "day": 1,
+      "tier": 4,
+      "summary": "Viết script Python gọi GPT-4o và GPT-4o-mini, xây dựng chatbot streaming và lập bảng so sánh latency, cost, quality với 3 prompt khác nhau.",
+      "keywords": [
+        "Lab 1",
+        "GPT-4o",
+        "streaming",
+        "benchmark"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          6
+        ],
+        "section_ref": "Ngày 1 · Mục 6 (trang 6)",
+        "key_quote": "Viết script Python gọi GPT-4o và GPT-4o-mini, xây dựng chatbot streaming."
+      },
+      "sha256": "b989f327809db9138aa67e157e6022a96cdd6be7c6fbc6e2ece7adae838a3b19"
+    },
+    {
+      "id": "DAY_02",
+      "type": "DayModule",
+      "label": "Ngày 2: Xác định bài toán cho AI & Problem Statement",
+      "day": 2,
+      "tier": 1,
+      "summary": "Biến yêu cầu mơ hồ thành Problem Statement rõ ràng, định lượng được, chọn đúng cấp độ Rule / Workflow / Agent và ra quyết định Go / Not Yet / No-Go.",
+      "keywords": [
+        "Problem Statement",
+        "Double Diamond",
+        "Rule",
+        "Workflow",
+        "Agent",
+        "Go/No-Go"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "section_ref": "NGÀY 2 — Xác định bài toán cho AI (trang 7–12)",
+        "key_quote": "Never solve the problem I am asked to solve (Don Norman)."
+      },
+      "sha256": "1d959f5a458a451119bfbd3e43cb5b4988e3551359565b33362bcd23472d1abf"
+    },
+    {
+      "id": "CON_D2_PROBLEM_DISCOVERY",
+      "type": "CoreConcept",
+      "label": "3 Trụ cột AI Product & Double Diamond",
+      "day": 2,
+      "tier": 3,
+      "summary": "AI Product = AI Engineering (Chip Huyen) + Product Thinking (Marty Cagan) + Design Thinking (Don Norman). Lộ trình chuẩn: Bài toán -> Quy trình vận hành -> Chỉ số đo lường -> Giải pháp AI. Đánh giá qua 4 lăng kính: Repetitive, Time-consuming, AI Advantage, User Pain Points.",
+      "keywords": [
+        "Double Diamond",
+        "4 Lenses",
+        "Product Thinking",
+        "Design Thinking",
+        "HCD"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          7,
+          8
+        ],
+        "section_ref": "Ngày 2 · Mục 1–2 (trang 7–8)",
+        "key_quote": "Bài toán -> Quy trình vận hành -> Chỉ số đo lường -> Giải pháp AI."
+      },
+      "sha256": "6bff0d3852ba9cff2c6a3031daa020dcabe831bc03fc308f2460a86700d258f0"
+    },
+    {
+      "id": "CON_D2_PROBLEM_CARD",
+      "type": "CoreConcept",
+      "label": "Problem Statement 9 trường & Nguyên tắc định lượng",
+      "day": 2,
+      "tier": 3,
+      "summary": "6 yếu tố bài toán (Actor, Workflow, Bottleneck, Impact, Success Metric, Boundary) + 3 yếu tố quyết định AI (Entry, Solution Level, Risk & HITL). Bắt buộc xác định Baseline -> Target -> Measurement và phân biệt Output Metric vs Input Metrics.",
+      "keywords": [
+        "Quick Problem Card",
+        "Baseline",
+        "Target",
+        "Output Metric",
+        "Input Metric",
+        "Eval Plan"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          8,
+          9,
+          11
+        ],
+        "section_ref": "Ngày 2 · Mục 3 & 6 (trang 8–9, 11)",
+        "key_quote": "Điểm đau chưa đo được bằng số thì không thể chứng minh giá trị của AI."
+      },
+      "sha256": "5b9c67d47351cf15d2e3667e4c26992cc6faf797d3189d368ceb9222a0d46e46"
+    },
+    {
+      "id": "PAT_D2_BUILD_BOOST_BUY",
+      "type": "ArchitecturePattern",
+      "label": "Chiến lược Build / Boost / Buy & 3 Cấp độ Giải pháp",
+      "day": 2,
+      "tier": 3,
+      "summary": "Build/Boost/Buy (Chip Huyen & MIT CISR 2025): Boost (dùng model sẵn + RAG/fine-tune) phổ biến nhất. Luôn ưu tiên từ cấp đơn giản nhất: Rule/Script (100% deterministic) -> LLM Workflow (Prompt Chaining, Routing, Parallelization, Orchestrator-Workers, Evaluator-Optimizer) -> Agent (tự lập kế hoạch, bắt buộc HITL & rollback).",
+      "keywords": [
+        "Build Boost Buy",
+        "Rule",
+        "Workflow",
+        "Agent",
+        "Prompt Chaining",
+        "Routing"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          9,
+          10,
+          11
+        ],
+        "section_ref": "Ngày 2 · Mục 4–5 (trang 9–11)",
+        "key_quote": "Luôn bắt đầu từ cấp độ đơn giản nhất (Rule -> Workflow -> Agent)."
+      },
+      "sha256": "6776c19340293d4380d456046714871dd572b988f8dc2099d9eb692a69da2023"
+    },
+    {
+      "id": "MET_D2_GO_NOGO",
+      "type": "MetricOrFormula",
+      "label": "Khung quyết định Go / Not Yet / No-Go & 4 Trụ cột Production",
+      "day": 2,
+      "tier": 4,
+      "summary": "Production đòi hỏi Baseline, Evaluation, Controls, Operations. Ra quyết định Go / Not Yet (thiếu data hoặc chưa chuẩn hóa quy trình) / No-Go dựa trên 3 nhóm chỉ số: Tác động kinh doanh, CSAT/NPS, Ngưỡng hữu dụng (Accuracy, TTFT, TPOT, Cost).",
+      "keywords": [
+        "Go",
+        "Not Yet",
+        "No-Go",
+        "TTFT",
+        "TPOT",
+        "Usefulness Thresholds"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          9,
+          10,
+          12
+        ],
+        "section_ref": "Ngày 2 · Mục 4 & 6 (trang 9–10, 12)",
+        "key_quote": "Not Yet thể hiện sự chín chắn trong tư duy sản phẩm, không phải thất bại."
+      },
+      "sha256": "63ff2eaa3ae6329096163e808c47dd47168b033332dea433a40f7fdc2d9314a4"
+    },
+    {
+      "id": "ERR_D2_ANTIPATTERNS",
+      "type": "FailureOrTrap",
+      "label": "4 Anti-patterns khi khởi nguồn dự án AI",
+      "day": 2,
+      "tier": 3,
+      "summary": "Solution-first (làm chatbot/agent trước khi hiểu nút thắt), No baseline (không lượng hóa hiện trạng), No evaluation (thiếu test & đối chứng), No boundary (mập mờ phạm vi tự chủ và HITL).",
+      "keywords": [
+        "Solution-first",
+        "No baseline",
+        "No evaluation",
+        "No boundary"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          8
+        ],
+        "section_ref": "Ngày 2 · Mục 2 (trang 8)",
+        "key_quote": "Một giải pháp xuất sắc cho sai vấn đề có thể còn tệ hơn không có giải pháp."
+      },
+      "sha256": "7e10d02aacf97bf825580a52fe6b8d0b5f2a57c4a3a4e50a5b430db8ac99b1b0"
+    },
+    {
+      "id": "DAY_03",
+      "type": "DayModule",
+      "label": "Ngày 3: Từ Chatbot đến Agentic Agent (ReAct Pattern)",
+      "day": 3,
+      "tier": 1,
+      "summary": "Phân biệt Bot/Chatbot/Agent, khung đánh giá Agentic Fit 15 điểm, kiến trúc 4 khối, thiết kế Tool Definition 5 phần, vòng lặp ReAct và phòng thủ 3 lớp.",
+      "keywords": [
+        "ReAct",
+        "Agentic Fit",
+        "Tool Definition",
+        "Hybrid Pattern",
+        "Indirect Prompt Injection"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "section_ref": "NGÀY 3 — Từ Chatbot Đến Agentic Agent (trang 13–19)",
+        "key_quote": "Không phải hệ thống nào dùng LLM cũng là Agent."
+      },
+      "sha256": "f8ee307468d35ba91837ecb4a79c9b1352717c4a38498785a1fd58549db07a78"
+    },
+    {
+      "id": "MET_D3_AGENTIC_FIT",
+      "type": "MetricOrFormula",
+      "label": "Agentic Fit Framework (Thang 15 điểm) & Chi phí Agent vs Chatbot",
+      "day": 3,
+      "tier": 4,
+      "summary": "4 tiêu chí (1–5): Multi-step Reasoning, Tool Interaction, Dynamic Decision, Long Horizon. Tổng 3 tiêu chí đầu: 0–5 (Chatbot/Rule), 6–10 (Augmented Chatbot), 11–15 (Agent). Agent đắt hơn ~4.5x ($0.0009 vs $0.0002) và chậm hơn ~4x (4–6s vs 1s).",
+      "keywords": [
+        "Agentic Fit",
+        "4.5x cost",
+        "4x latency",
+        "Multi-step Reasoning"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          13,
+          17
+        ],
+        "section_ref": "Ngày 3 · Mục 2 & 7 (trang 13, 17)",
+        "key_quote": "Agent thường đắt hơn ~4.5 lần, chậm hơn ~4 lần và khó debug hơn."
+      },
+      "sha256": "ba87b7e317230eb9062873a24f060f0b8236bfe3f07cbbdc000972ac2cbae25c"
+    },
+    {
+      "id": "PAT_D3_REACT_HYBRID",
+      "type": "ArchitecturePattern",
+      "label": "ReAct Loop, 5 Phần Tool Definition & Hybrid Production Pattern",
+      "day": 3,
+      "tier": 3,
+      "summary": "Vòng lặp Thought -> Action -> Observation. Tool Definition chuẩn 5 phần: Name (verb_noun), Description (làm gì & khi nào dùng), Parameters (type + constraints), Return format, Error modes. Triển khai Hybrid (Native Function Calling JSON + Prompt Reasoning trace) là chuẩn Production; Triage Router phân luồng Simple Chatbot / Agent / Human.",
+      "keywords": [
+        "ReAct",
+        "Tool Definition",
+        "Function Calling",
+        "Hybrid",
+        "Triage Router"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          14,
+          15,
+          16,
+          18
+        ],
+        "section_ref": "Ngày 3 · Mục 3–5, 9 (trang 14–16, 18)",
+        "key_quote": "Hybrid: kết hợp Function Calling JSON và prompt reasoning, chuẩn production."
+      },
+      "sha256": "c5b90b0874a07d973e9362c1b1ba6bef6e4b5d7591930e32291a792c1b3d12cd"
+    },
+    {
+      "id": "CON_D3_SYSTEM_PROMPT_SAFEGUARDS",
+      "type": "CoreConcept",
+      "label": "System Prompt 5 phần & Safeguards chống Loop",
+      "day": 3,
+      "tier": 3,
+      "summary": "System Prompt gồm: Identity, Capabilities, Instructions, Constraints (tối đa 5 lần gọi tool, cấm bịa), Output format. Safeguards: MAX_ITERATIONS, timeout + try/except, is_duplicate_call, trần chi phí/token, fallback. 5 tiêu chí chấm trace: Reasoning quality, Tool selection, Argument correctness, Stopping optimality, Answer grounding.",
+      "keywords": [
+        "MAX_ITERATIONS",
+        "is_duplicate_call",
+        "Trace eval",
+        "Answer grounding"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          16,
+          17,
+          18
+        ],
+        "section_ref": "Ngày 3 · Mục 6 & 8 (trang 16–18)",
+        "key_quote": "Luôn đọc trace trước khi tin vào Final Answer."
+      },
+      "sha256": "754c7d0cc072f5bce720b1aca20db4bc5d8dbc92c173d812069d8c5861281c1c"
+    },
+    {
+      "id": "ERR_D3_INDIRECT_INJECTION",
+      "type": "FailureOrTrap",
+      "label": "Indirect Prompt Injection qua Tool Output & Phòng thủ 3 lớp",
+      "day": 3,
+      "tier": 3,
+      "summary": "Kẻ tấn công nhúng lệnh độc ẩn trong web/dữ liệu tool trả về (Slack AI 08/2024, Salesforce Agentforce 09/2025). Chặn bằng 3 lớp: Input Guard (lọc PII/injection) -> Tool Guard (sanitize, whitelist, rate limit) -> Output Guard (grounding, HITL).",
+      "keywords": [
+        "Indirect Prompt Injection",
+        "Input Guard",
+        "Tool Guard",
+        "Output Guard"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          17
+        ],
+        "section_ref": "Ngày 3 · Mục 7 (trang 17)",
+        "key_quote": "Agent không chỉ nhận input từ user mà còn đọc kết quả từ nguồn ngoài không đáng tin cậy."
+      },
+      "sha256": "b71f5ed9cc9fe9de560a675f6f3c98cb19250327e123d261a57d9eff0893b384"
+    },
+    {
+      "id": "LAB_D3_REACT_RUBRIC",
+      "type": "LabDeliverable",
+      "label": "Lab #3: Chatbot Baseline vs ReAct Agent & 5 Test Cases",
+      "day": 3,
+      "tier": 4,
+      "summary": "Nộp 1 Chatbot baseline + 1 ReAct Agent (1–2 tools), 5 test cases (2 Chatbot thắng, 2 Agent thắng, 1 edge case lỗi), 1 trace đầy đủ và 1 flowchart (Rubric 100 + 10 bonus).",
+      "keywords": [
+        "Lab 3",
+        "Chatbot baseline",
+        "ReAct Agent",
+        "5 test cases"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          18
+        ],
+        "section_ref": "Ngày 3 · Mục 10 (trang 18)",
+        "key_quote": "1 Chatbot baseline + 1 ReAct Agent cho cùng một bài toán."
+      },
+      "sha256": "7c2dc096dfbfb8026b41052365cb2ed98b4559a488452ccb926b531e61ced119"
+    },
+    {
+      "id": "DAY_04",
+      "type": "DayModule",
+      "label": "Ngày 4: Prompt Engineering, Tool Calling & LangGraph",
+      "day": 4,
+      "tier": 1,
+      "summary": "Prompts as Code, cấu trúc XML chống Context Bleed, xử lý Long Context/Lost in the Middle, vòng lặp Tool Calling 4 bước và điều phối đồ thị có chu trình bằng LangGraph.",
+      "keywords": [
+        "Prompts as Code",
+        "XML",
+        "Context Bleed",
+        "Recency Bias",
+        "Tool Calling",
+        "LangGraph"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ],
+        "section_ref": "NGÀY 4 — Prompt Engineering & Tool Calling (trang 20–25)",
+        "key_quote": "Prompt là giao diện giữa ý định con người và hành vi mô hình; Tool Calling là giao diện với thế giới bên ngoài."
+      },
+      "sha256": "f5ecd3bf6ac6a78bbe7051460ea5c29fe0255e06dc4cea7edadbf17da46ec5d0"
+    },
+    {
+      "id": "PAT_D4_XML_DETERMINISM",
+      "type": "ArchitecturePattern",
+      "label": "Prompts as Code, XML Delimiters & Phòng chống Context Bleed",
+      "day": 4,
+      "tier": 3,
+      "summary": "Specificity beats cleverness; Prompt Determinism ép JSON Schema chuẩn. Dùng thẻ XML (<system_role>, <instructions>, <examples>, <documents>, <user_input>, <thinking>, <result>) để cô lập payload ngoài, phòng Context Bleed. Dùng cặp <bad_example>/<good_example> thay vì lệnh phủ định suông; tận dụng Recency Bias đặt câu hỏi ở cuối prompt.",
+      "keywords": [
+        "XML",
+        "Context Bleed",
+        "Prompt Determinism",
+        "Recency Bias",
+        "Context Compression"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          20,
+          21,
+          22
+        ],
+        "section_ref": "Ngày 4 · Mục 1–2 (trang 20–22)",
+        "key_quote": "Context Bleed xảy ra khi LLM nhầm lẫn giữa Lệnh (Instructions) và Dữ liệu (Payload)."
+      },
+      "sha256": "15279aabcd1b936f11351fe1e67304f0cee88ae2da6fb7f642634398bc463c09"
+    },
+    {
+      "id": "CON_D4_SYSTEM_CONTRACT",
+      "type": "CoreConcept",
+      "label": "System Prompt 4 phần & Dynamic System Prompt",
+      "day": 4,
+      "tier": 3,
+      "summary": "Chat API là Stateless (gửi lại mảng messages mỗi lượt, System ở Index=0). Hợp đồng System Prompt gồm: Persona, Core Directives (MUST/NEVER), Capabilities, Output Contract. Dùng Python f-string/Jinja2 bơm ngữ cảnh thời gian thực; thiết kế escalation JSON (status: needs_human); tránh viết >2000 tokens.",
+      "keywords": [
+        "Stateless",
+        "System Prompt",
+        "Jinja2",
+        "Sycophancy",
+        "Escalation"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          22,
+          23
+        ],
+        "section_ref": "Ngày 4 · Mục 3 (trang 22–23)",
+        "key_quote": "System Prompt chỉ phục vụ Logic nghiệp vụ và UX, KHÔNG phải là tường lửa bảo mật."
+      },
+      "sha256": "2869af772d34ba2b611958427e7a3305d920db27c56b73a0385b9deaae5251be"
+    },
+    {
+      "id": "PAT_D4_TOOL_LOOP_LANGGRAPH",
+      "type": "ArchitecturePattern",
+      "label": "Vòng lặp Tool Calling 4 bước & LangGraph (State, Nodes, Edges)",
+      "day": 4,
+      "tier": 3,
+      "summary": "Model KHÔNG tự chạy code mà chỉ sinh JSON tool_calls; app thực thi cục bộ rồi append message role='tool' kèm tool_call_id. LangGraph xây Cyclic Directed Graph gồm State (TypedDict + Reducer add_messages append-only), Nodes (Agent Node, ToolNode), Edges (Normal & Conditional should_continue), hỗ trợ Checkpointer (SQLite/Postgres) cho HITL.",
+      "keywords": [
+        "Tool Calling",
+        "LangGraph",
+        "StateGraph",
+        "add_messages",
+        "ToolNode",
+        "Conditional Edge"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          23,
+          24,
+          25
+        ],
+        "section_ref": "Ngày 4 · Mục 4–5 (trang 23–25)",
+        "key_quote": "Model KHÔNG tự chạy code; model chỉ sinh JSON yêu cầu, còn ứng dụng của bạn mới là nơi thực thi."
+      },
+      "sha256": "ee6999819bf4c639f0a1382c0ba5a8f0adbcff2205113c2f967254ccb4286e18"
+    },
+    {
+      "id": "ERR_D4_PARALLEL_AND_ORDER_BIAS",
+      "type": "FailureOrTrap",
+      "label": "Bẫy Parallel Tool Calling, Order Bias & Self-Correction",
+      "day": 4,
+      "tier": 3,
+      "summary": "Parallel Calling tăng tốc nhưng dễ gây Rate Limits và Race Conditions (Tool A xóa khi Tool B đọc). Few-shot dễ bị Order Bias ở ví dụ cuối. Luôn bọc try-except + Pydantic và trả Raw Error Message để LLM tự sửa (retry 2–3 lần).",
+      "keywords": [
+        "Parallel Calling",
+        "Race Conditions",
+        "Order Bias",
+        "Pydantic",
+        "Self-Correction"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          21,
+          24
+        ],
+        "section_ref": "Ngày 4 · Mục 2.4 & 4.3–4.4 (trang 21, 24)",
+        "key_quote": "Đừng giấu lỗi: gửi thẳng Raw Error Message vào tool_outputs kèm chỉ thị thử lại."
+      },
+      "sha256": "b7cdf907482bd12bf896847b9c66148006aaf1017535e479bd0f6df8e36c7a9f"
+    },
+    {
+      "id": "DAY_05",
+      "type": "DayModule",
+      "label": "Ngày 5: Thiết kế Sản phẩm AI cho Sự Không Chắc Chắn",
+      "day": 5,
+      "tier": 1,
+      "summary": "Quản trị 3 lớp bất định và 4 dạng trôi hành vi, quyết định Augment vs Automate theo chi phí lỗi False Positive / False Negative, thiết kế UX Safety Net và 4-Path User Stories.",
+      "keywords": [
+        "Uncertainty",
+        "Augmentation",
+        "Precision",
+        "Recall",
+        "Graceful Failure",
+        "Build Slice"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "section_ref": "NGÀY 5 — Thiết kế sản phẩm AI cho sự không chắc chắn (trang 26–30)",
+        "key_quote": "Prototype chỉ có happy path chưa phải là sản phẩm AI."
+      },
+      "sha256": "849c15abc19ded1e4498bc8a72b1fdcae684ac8e9f60f59ed8e493ad48c5871e"
+    },
+    {
+      "id": "CON_D5_UNCERTAINTY_DRIFT",
+      "type": "CoreConcept",
+      "label": "3 Lớp Bất định, 4 Dạng Drift & Error Routing",
+      "day": 5,
+      "tier": 3,
+      "summary": "3 lớp bất định: Input, Output, Process Uncertainty. 4 dạng Production Gap xảy ra dù không đổi code: Model Update, Context Drift, User Drift, Prompt Drift. Quy trình Error Routing 4 bước: Detect -> Route -> Recover (undo/sửa trực tiếp) -> Learn (lưu edit distance, approve/reject).",
+      "keywords": [
+        "Production Gap",
+        "Context Drift",
+        "Error Routing",
+        "Edit Distance",
+        "Learning Signal"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          27
+        ],
+        "section_ref": "Ngày 5 · Mục 3 (trang 27)",
+        "key_quote": "Cần eval, version log và fallback ngay từ prototype đầu tiên."
+      },
+      "sha256": "c68569e9a88c418d0d34af36c49c987749b06d48c87d12601b5f050645c9ac1d"
+    },
+    {
+      "id": "MET_D5_FP_FN_COST",
+      "type": "MetricOrFormula",
+      "label": "Chi phí lỗi: Precision (Báo nhầm FP) vs Recall (Bỏ sót FN)",
+      "day": 5,
+      "tier": 4,
+      "summary": "Hỏi 'Lỗi nào đắt hơn?' trước khi tối ưu model: Báo nhầm đắt (duyệt vay, lọc email) -> ưu tiên Precision + confirmation/human review; Bỏ sót đắt (lọc nội dung trẻ em, X-quang) -> ưu tiên Recall + cảnh báo sớm; Cả hai đều đắt -> dùng Augmentation.",
+      "keywords": [
+        "Precision",
+        "Recall",
+        "False Positive",
+        "False Negative",
+        "Automation Ladder"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          28,
+          29
+        ],
+        "section_ref": "Ngày 5 · Mục 5 Trụ 2 (trang 28–29)",
+        "key_quote": "Không có mốc accuracy chung: 60% hữu dụng ở mức Copilot, 99.5% vẫn nguy hiểm nếu full-auto ở tác vụ rủi ro cao."
+      },
+      "sha256": "78041cac76a0565a206c8d8911cf5b0c51f9efd03548f007e8cc8d796e395482"
+    },
+    {
+      "id": "PAT_D5_UX_4PATHS",
+      "type": "ArchitecturePattern",
+      "label": "4 Vai trò HITL, 4-Path User Stories & Build Slice",
+      "day": 5,
+      "tier": 3,
+      "summary": "4 vai trò HITL: Reviewer, Decider, Trainer, Rescuer. Chuỗi Find -> Synthesize -> Decide: Evidence -> Insight -> Opportunity -> Build Slice (1 user, 1 task, 1 AI decision, 1 failure path). User Story đủ 4 nhánh: Happy, Low-confidence, Failure, Correction Path. Failure Taxonomy 5 tầng: Promise -> Intent -> Data/Tool -> Safety -> UX Recovery.",
+      "keywords": [
+        "Human Role Audit",
+        "4-Path User Stories",
+        "Build Slice",
+        "Graceful Failure",
+        "AI Product Canvas"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          28,
+          29,
+          30
+        ],
+        "section_ref": "Ngày 5 · Mục 4–6 (trang 28–30)",
+        "key_quote": "AI Product Canvas giữ sản phẩm không trôi về demo: Value, Trust, Feasibility."
+      },
+      "sha256": "7fb5206ad54f281af83cac7b4c8780399b31daa4d6feafd3b4bbd3599108e039"
+    },
+    {
+      "id": "CASE_D5_REAL_FAILURES",
+      "type": "CaseStudy",
+      "label": "Bài học thất bại: Google Bard, Slide AI & Air Canada",
+      "day": 5,
+      "tier": 4,
+      "summary": "Google Bard mất niềm tin/cổ phiếu vì 1 lỗi factual error; Gamma/Slide AI mất khách nếu 20% cuối khó sửa; Air Canada phải chịu trách nhiệm pháp lý khi chatbot bịa chính sách hoàn tiền.",
+      "keywords": [
+        "Google Bard",
+        "Gamma",
+        "Air Canada",
+        "Factual error"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          26
+        ],
+        "section_ref": "Ngày 5 · Mục 2 (trang 26)",
+        "key_quote": "Bot trên website là một phần của hệ thống chịu trách nhiệm pháp lý."
+      },
+      "sha256": "1b686e813c80f8f519c857bf1a2c1074f34b1bdce7f8995e6c56cf3948bb3a84"
+    },
+    {
+      "id": "DAY_06",
+      "type": "DayModule",
+      "label": "Ngày 6: Data Engineering cho Agent (Ingestion, Storage, Management)",
+      "day": 6,
+      "tier": 1,
+      "summary": "Chống Silent Data Failures & Data Cascades bằng Medallion 3 tầng, SCD Type 2, chuẩn hóa NFC Unicode tiếng Việt, Fact Ledger đo Parser, Data Contract Gate, Storage Pyramid, FTS5/RRF và Gold Set Cohen's Kappa.",
+      "keywords": [
+        "Silent Data Failure",
+        "Data Cascade",
+        "Medallion",
+        "SCD Type 2",
+        "NFC",
+        "FTS5",
+        "RRF",
+        "Cohen Kappa"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37
+        ],
+        "section_ref": "NGÀY 6 — Data Engineering cho Agent (trang 31–37)",
+        "key_quote": "Từ tài liệu khó đến một corpus có gate, có version, truy vết được đến từng điều khoản."
+      },
+      "sha256": "24529bb2ca0df2a3297947076c518bcc8535caa36db0b8afda09ebe582f71bc9"
+    },
+    {
+      "id": "CON_D6_4PRINCIPLES_MEDALLION",
+      "type": "CoreConcept",
+      "label": "4 Nguyên tắc Bất biến, Medallion 3 tầng & SCD Type 2",
+      "day": 6,
+      "tier": 3,
+      "summary": "Identity (doc_id + version + effective_date + sha256; không dùng source_path làm khóa), Quality Gate (Data Contract ODCS v3), Lineage (truy vết 6 bước về byte gốc), Access Pattern. Pipeline Raw (Bronze, append-only) -> Clean (Silver, Merge/Upsert lũy đẳng) -> Serve (Gold, is_current=True); đóng bản cũ bằng SCD Type 2 (effective_from, effective_to, is_current).",
+      "keywords": [
+        "Identity",
+        "Medallion",
+        "Idempotency",
+        "SCD Type 2",
+        "Lineage",
+        "Dedup"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          31,
+          32,
+          35
+        ],
+        "section_ref": "Ngày 6 · Mục 1, 3, 7 (trang 31–32, 35)",
+        "key_quote": "Ít mà đúng luôn tốt hơn nhiều mà lẫn lộn; thêm bản sao cũ làm retriever chọn nhầm."
+      },
+      "sha256": "4c01a3dafcd0dcf1d3c8e83551794ff72acd4678def57f3153c17d6783a4f009"
+    },
+    {
+      "id": "ERR_D6_HOSTILE_DOCS_UNICODE",
+      "type": "FailureOrTrap",
+      "label": "6 Bẫy Hostile Documents, Unicode NFC & Lỗi FTS5 tiếng Việt",
+      "day": 6,
+      "tier": 3,
+      "summary": "PDF scan thiếu text layer (needs_ocr), bố cục nhiều cột, bảng Word gộp/lồng, nội dung ẩn, vỏ bọc MIME/.zip, và mã hóa tiếng Việt (NFD 12 code points vs NFC 9 code points gây so khớp False). Bắt buộc gọi unicodedata.normalize('NFC', text) ngay sau decode. SQLite FTS5 mặc định remove_diacritics=1 làm 'hoàn' khớp 'hoạn' -> bắt buộc đặt tokenize='unicode61 remove_diacritics 0'.",
+      "keywords": [
+        "Hostile Document",
+        "NFC",
+        "NFD",
+        "Fact Ledger",
+        "remove_diacritics 0",
+        "OCR"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          33,
+          34,
+          37
+        ],
+        "section_ref": "Ngày 6 · Mục 4 & 6 (trang 33–34, 37)",
+        "key_quote": "Text trích từ PDF chưa phải là dữ liệu; phải đo chất lượng parser bằng Fact Ledger."
+      },
+      "sha256": "eaae082f14ff5c35dd408c6351d319926d174607cc20d2c4f3186cf0cbff4176"
+    },
+    {
+      "id": "PAT_D6_STORAGE_HYBRID_RRF",
+      "type": "ArchitecturePattern",
+      "label": "Storage Pyramid 4 bậc, Semantic Layer & Hybrid Search RRF",
+      "day": 6,
+      "tier": 3,
+      "summary": "Bậc 1 File+Index -> Bậc 2 SQLite/DuckDB (truy vấn có cấu trúc & version) -> Bậc 3 FTS/BM25 -> Bậc 4 Vector Index. Semantic Layer 4KB tăng Text-to-SQL ~20 điểm. Hybrid FTS + Vector gộp bằng RRF = sum(1/(60+rank)); bắt buộc tách Index Serve chỉ chứa is_current=True trước ANN để tránh bẫy Post-filtering.",
+      "keywords": [
+        "Storage Pyramid",
+        "Semantic Layer",
+        "RRF",
+        "Post-filtering",
+        "Hybrid Search"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          34,
+          35
+        ],
+        "section_ref": "Ngày 6 · Mục 6 (trang 34–35)",
+        "key_quote": "Bắt buộc phải lọc is_current = True trước khi tìm kiếm ANN và xếp hạng RRF."
+      },
+      "sha256": "6575e62e3767c2f948b64386b898154d0c84fa7022afde43c103ef6a67a8a80e"
+    },
+    {
+      "id": "MET_D6_DAMA_KAPPA",
+      "type": "MetricOrFormula",
+      "label": "6 Chiều DAMA, Data Gate & Gold Set Cohen's Kappa",
+      "day": 6,
+      "tier": 4,
+      "summary": "6 chiều DAMA UK: Accuracy, Completeness, Consistency, Timeliness, Validity, Uniqueness. Gate chặn 100% lỗi Critical (như mô hình dbt tests). Đo đồng thuận Gold Set bằng Cohen's Kappa = (p_o - p_e)/(1 - p_e), bắt buộc báo cáo kèm bảng Counts + Bootstrap 95% CI để tránh bẫy Prevalence Paradox.",
+      "keywords": [
+        "DAMA",
+        "Data Contract",
+        "Quality Gate",
+        "Cohen Kappa",
+        "Prevalence Paradox",
+        "Gold Set"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          33,
+          34,
+          36,
+          37
+        ],
+        "section_ref": "Ngày 6 · Mục 5 & 8 (trang 33–34, 36–37)",
+        "key_quote": "Không báo cáo một con số kappa đơn độc; bắt buộc kèm Counts và Bootstrap 95%."
+      },
+      "sha256": "3a77ac639d6a9da554905b76e71e2fee853bcd2bd855d1e6eef534534cffa215"
+    },
+    {
+      "id": "ERR_D6_QUASI_IDENTIFIER",
+      "type": "FailureOrTrap",
+      "label": "Bẫy Ẩn danh hóa & Quasi-identifiers (87% tái định danh)",
+      "day": 6,
+      "tier": 3,
+      "summary": "Xóa tên không phải là ẩn danh hóa: bộ (ZIP + Giới tính + Ngày sinh) đủ tái định danh 87% dân số Mỹ; 15 thuộc tính đạt 99.98%. LLM tái định danh rẻ hơn 100x và nhanh hơn 240x con người (85% Top-1). Cần Role DB SELECT tối thiểu trên tầng Serve.",
+      "keywords": [
+        "Quasi-identifier",
+        "Least Privilege",
+        "Anonymization",
+        "RLS"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          36,
+          37
+        ],
+        "section_ref": "Ngày 6 · Mục 7 & 10 (trang 36–37)",
+        "key_quote": "Xóa tên KHÔNG phải là ẩn danh hóa."
+      },
+      "sha256": "286fef6900c942f1ce5f3ced6bb9256b442aac35ea46cdaea3f1d39313f746a1"
+    },
+    {
+      "id": "DAY_07",
+      "type": "DayModule",
+      "label": "Ngày 7: Toàn cảnh Kỹ thuật RAG Pipeline (6 Giai đoạn)",
+      "day": 7,
+      "tier": 1,
+      "summary": "Hệ thống hóa 120 kỹ thuật RAG qua 6 giai đoạn từ Pre-Retrieval, Retrieval, Post-Retrieval, Augmentation, Generation đến Post-Generation, đảm bảo đầu ra chính xác, an toàn, rõ nguồn.",
+      "keywords": [
+        "RAG",
+        "Pre-Retrieval",
+        "Retrieval",
+        "Post-Retrieval",
+        "Augmentation",
+        "Generation",
+        "Post-Generation"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48
+        ],
+        "section_ref": "NGÀY 7 — Các kỹ thuật chính trong RAG Pipeline (trang 38–48)",
+        "key_quote": "Pipeline RAG — mỗi giai đoạn có một đầu ra kiểm tra được."
+      },
+      "sha256": "5b5b9ea369355bfc43888b2d18c7ba0e8b08537d6a7a6928dafbfba853aeab66"
+    },
+    {
+      "id": "PAT_D7_PRE_RETRIEVAL",
+      "type": "ArchitecturePattern",
+      "label": "Giai đoạn 1: Pre-Retrieval (26 kỹ thuật chuẩn bị & biến đổi truy vấn)",
+      "day": 7,
+      "tier": 3,
+      "summary": "5 nhóm: (1.1) Query Normalization (chính tả, đồng nghĩa, viết tắt), (1.2) Query Understanding (intent, entity, temporal, ambiguity detection), (1.3) Query Transformation (rewriting, expansion, decomposition, multi-query, HyDE/Query2Doc), (1.4) Retrieval Planning (routing, source/method selection, filter, top-k), (1.5) Input Safety.",
+      "keywords": [
+        "HyDE",
+        "Query2Doc",
+        "Decomposition",
+        "Request routing",
+        "Ambiguity detection"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          38,
+          39,
+          40,
+          41
+        ],
+        "section_ref": "Ngày 7 · Giai đoạn 1 (trang 38–41)",
+        "key_quote": "Truy vấn thô -> Truy vấn đã tối ưu."
+      },
+      "sha256": "7540e1f3675ca653c066c2ef1bae56e2d95cb0ff0a38b584427952218009e9e4"
+    },
+    {
+      "id": "PAT_D7_RETRIEVAL",
+      "type": "ArchitecturePattern",
+      "label": "Giai đoạn 2: Retrieval (16 kỹ thuật tìm kiếm lai, cấu trúc & đa nguồn)",
+      "day": 7,
+      "tier": 3,
+      "summary": "3 nhóm: (2.1) Hybrid Retrieval (Lexical BM25, Semantic Vector, HNSW TOC vectorless, Knowledge-graph retrieval, Graph traversal, Parent-child small-to-big), (2.2) Structured Retrieval (Text-to-SQL, NoSQL KV, Metadata faceted, API/Warehouse), (2.3) Adaptive/Multi-source (Multi-hop, Federated, Web, Multimodal, Self-RAG/Corrective/Agentic retrieval).",
+      "keywords": [
+        "Hybrid Retrieval",
+        "Knowledge-graph retrieval",
+        "Parent-child",
+        "Self-RAG",
+        "Text-to-SQL"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          41,
+          42
+        ],
+        "section_ref": "Ngày 7 · Giai đoạn 2 (trang 41–42)",
+        "key_quote": "Knowledge-graph retrieval: truy xuất thông tin dựa trên mạng lưới các thực thể và mối quan hệ."
+      },
+      "sha256": "a972a1aad530e2ccb5c71763ea91c8e7b30be381b15c5bdcc9dd7abf47e8ca85"
+    },
+    {
+      "id": "PAT_D7_POST_RETRIEVAL_AUGMENT",
+      "type": "ArchitecturePattern",
+      "label": "Giai đoạn 3 & 4: Post-Retrieval (20 kỹ thuật) & Augmentation (16 kỹ thuật)",
+      "day": 7,
+      "tier": 3,
+      "summary": "Post-Retrieval: Reranking/RRF, Filtering (ngưỡng/freshness/trust), Dedup & MMR, Compression (LLMLingua), Long-context reordering (chống Lost in the Middle), Contradiction detection. Augmentation: Structured XML/JSON assembly, Token-budget packing, Grounding Prep (Source tagging, Evidence IDs [Doc_1], Claim-attribution).",
+      "keywords": [
+        "Reranking",
+        "MMR",
+        "LLMLingua",
+        "Long-context reordering",
+        "Evidence IDs",
+        "Contradiction detection"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          42,
+          43,
+          44,
+          45
+        ],
+        "section_ref": "Ngày 7 · Giai đoạn 3–4 (trang 42–45)",
+        "key_quote": "Cấp mã định danh duy nhất [Doc_1], [Doc_2] và sắp xếp chống trôi thông tin ở giữa."
+      },
+      "sha256": "4f227d55aa03644891588137d6371ebecb1fb5ddbe4123278d1c1249f5fa8c56"
+    },
+    {
+      "id": "PAT_D7_GEN_POSTGEN",
+      "type": "ArchitecturePattern",
+      "label": "Giai đoạn 5 & 6: Grounded Generation (23 kỹ thuật) & Post-Generation (19 kỹ thuật)",
+      "day": 7,
+      "tier": 3,
+      "summary": "Generation: Context-grounded synthesis, Cross-doc reasoning, Program-aided reasoning, JSON/Grammar constrained decoding, Inline citation & Claim-to-evidence mapping, Abstention ('Tôi không biết'). Post-Generation: Faithfulness & NLI entailment checking, Citation entailment & repair, Output Safety (PII/DLP), Critique-and-revise, LLM-as-a-judge.",
+      "keywords": [
+        "Abstention",
+        "Claim-to-evidence",
+        "NLI entailment",
+        "Citation repair",
+        "DLP",
+        "LLM-as-a-judge"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          45,
+          46,
+          47,
+          48
+        ],
+        "section_ref": "Ngày 7 · Giai đoạn 5–6 (trang 45–48)",
+        "key_quote": "Kiểm tra ảo giác (NLI/Faithfulness) & Sửa trích dẫn -> Che PII -> LLM chấm điểm."
+      },
+      "sha256": "afa3f7c4abe8dc76070c9083ec3890602307d4eaaada44d7e80d0deacbbbaea9"
+    },
+    {
+      "id": "DAY_08",
+      "type": "DayModule",
+      "label": "Ngày 8: From Workflows to Agents & Durable Execution",
+      "day": 8,
+      "tier": 1,
+      "summary": "4 mức tự chủ và cái giá token/predictability, 5 Workflow Patterns, đo độ tin cậy pass@k vs pass^k, Durable Execution với Idempotency Key, kiến trúc Multi-Agent và Autonomy in Code.",
+      "keywords": [
+        "Levels of Autonomy",
+        "Workflow Patterns",
+        "pass@k",
+        "pass^k",
+        "Durable Execution",
+        "Idempotency",
+        "Multi-Agent"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          49,
+          50,
+          51,
+          52
+        ],
+        "section_ref": "NGÀY 8 — From Workflows to Agents (trang 49–52)",
+        "key_quote": "Luôn chọn mức tự chủ thấp nhất vẫn vượt qua được cổng đo (gate)."
+      },
+      "sha256": "cb649afdd05dca28c24b8b64a65e7cf5fbab36ca6c0c425a6d10f0b033f5361e"
+    },
+    {
+      "id": "CON_D8_4LEVELS_WORKFLOWS",
+      "type": "CoreConcept",
+      "label": "4 Mức Tự chủ & 5 Pattern Workflow do Code điều khiển",
+      "day": 8,
+      "tier": 3,
+      "summary": "Điểm khác biệt là ai giữ control flow. Mức 1 (1 LLM call) -> Mức 2 (Workflow, vd Stripe Minions) -> Mức 3 (Single Agent: ~4x token, lỗi cộng dồn 0.95^10 ≈ 60%) -> Mức 4 (Multi-Agent: ~15x token, vd Claude Research). 5 Workflow Patterns: Prompt Chaining, Routing, Parallelization, Orchestrator-Workers, Evaluator-Optimizer.",
+      "keywords": [
+        "Four Levels of Autonomy",
+        "Workflow",
+        "Single Agent",
+        "Multi-Agent",
+        "Harness Tax"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          49,
+          50
+        ],
+        "section_ref": "Ngày 8 · Phần 1–2 (trang 49–50)",
+        "key_quote": "Còn viết trước được khung thì chưa cần agent; việc tất định giao cho Code."
+      },
+      "sha256": "2052934cabe5a8c7ab0dfb0bca8e9f200f7d2ae51c44f42bcb9810a8f3e1316e"
+    },
+    {
+      "id": "MET_D8_PASS_AT_POWER_K",
+      "type": "MetricOrFormula",
+      "label": "Harness Tax & Phân biệt pass@k vs pass^k",
+      "day": 8,
+      "tier": 4,
+      "summary": "Harness (vòng lặp, tool, context) làm chi phí chênh ~2x dù tỉ lệ đúng chênh ±2%. pass@k (đúng ≥1/k lần) dùng khi có bước test chọn lại; pass^k (đúng cả k lần liên tiếp: 0.9^8 ≈ 43%) bắt buộc cho tác vụ đi thẳng tới khách hàng/không đảo ngược. Cổng đo Gate gồm 3 số: tỉ lệ đúng, chi phí/ca, số lần chạy n + Decision Log.",
+      "keywords": [
+        "pass@k",
+        "pass^k",
+        "Harness Tax",
+        "Gate",
+        "Decision Log"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          50
+        ],
+        "section_ref": "Ngày 8 · Phần 3 (trang 50)",
+        "key_quote": "Với tác vụ đi thẳng tới khách hàng hoặc thay đổi thế giới thật, bắt buộc dùng pass^k."
+      },
+      "sha256": "654505b665f23883eb56fff3ebf81f6848670035b37dca909c461bbe2cad7aa0"
+    },
+    {
+      "id": "PAT_D8_DURABLE_IDEMPOTENCY",
+      "type": "ArchitecturePattern",
+      "label": "Durable Execution, Checkpoint & Idempotency Key",
+      "day": 8,
+      "tier": 3,
+      "summary": "Tách Activity (step có thể lỗi) và Workflow (hàm điều phối tất định) với Temporal / LangGraph / DBOS. Checkpoint chỉ đảm bảo at-least-once; để đạt exactly-once cho thao tác ghi (tránh sự cố Santander UK chuyển trùng 130 triệu bảng), tool bắt buộc gắn Idempotency Key cố định + Dedupe Ledger cùng transaction.",
+      "keywords": [
+        "Durable Execution",
+        "Activity",
+        "Checkpoint",
+        "at-least-once",
+        "Idempotency Key",
+        "DBOS",
+        "Temporal"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          50,
+          51
+        ],
+        "section_ref": "Ngày 8 · Phần 4 (trang 50–51)",
+        "key_quote": "Engine lo việc chạy tiếp và tự thử lại; Người viết tool lo việc không thực hiện 2 lần bằng idempotency key."
+      },
+      "sha256": "d5bfe9e790ef402c93232bbfb5ed06e665820ebbc0cd49c154220820c6f1f396"
+    },
+    {
+      "id": "PAT_D8_MULTI_AGENT_AUTONOMY_CODE",
+      "type": "ArchitecturePattern",
+      "label": "Investigator-Writer-Orchestrator & Autonomy in Code",
+      "day": 8,
+      "tier": 3,
+      "summary": "Bản chất Multi-agent là tách context; chỉ dùng khi đọc song song độc lập ('writes stay single-threaded': nhiều Investigator đọc, 1 Writer ghi, 1 Orchestrator tổng hợp). Centralized giảm khuếch đại lỗi (4.4x vs 17.2x Independent). Lời dặn trong prompt không chặn được hành động (sự cố Replit 07/2025 xóa DB prod) -> phải chặn bằng Policy Engine & Approval Event trong code.",
+      "keywords": [
+        "Investigator Writer Orchestrator",
+        "MAST",
+        "MCP",
+        "A2A",
+        "Autonomy in Code",
+        "Policy Engine"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          51,
+          52
+        ],
+        "section_ref": "Ngày 8 · Phần 5–6 (trang 51–52)",
+        "key_quote": "Nhiều agent đọc song song, chỉ 1 agent ghi; cơ chế chặn thật phải nằm ngoài model — đặt trong code."
+      },
+      "sha256": "372da69ad4b734bc14ff761dfee22bc365eaf4dc31e0f8f20186895595878187"
+    },
+    {
+      "id": "DAY_09",
+      "type": "DayModule",
+      "label": "Ngày 9: Evaluation & Failure Analysis",
+      "day": 9,
+      "tier": 1,
+      "summary": "Quy trình chuẩn Error Analysis -> Metric -> CI Gate; xây dựng Failure Taxonomy 5 tầng; phân tầng Code/Model/Human Grader; hiệu chuẩn LLM Judge (Rogan-Gladen); Paired Bootstrap CI và Ratchet CI Gate.",
+      "keywords": [
+        "Error Analysis",
+        "Failure Taxonomy",
+        "Code Grader",
+        "LLM Judge",
+        "Rogan-Gladen",
+        "Paired Bootstrap",
+        "Ratchet"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          53,
+          54,
+          55,
+          56,
+          57,
+          58
+        ],
+        "section_ref": "NGÀY 9 — Evaluation & Failure Analysis (trang 53–58)",
+        "key_quote": "Tuyệt đối không đi ngược chiều: Error Analysis -> Thiết kế Metric -> Thiết lập CI Gate."
+      },
+      "sha256": "e32a61cbe0b9cafe3640f6d721e2dbe556d732db7e65350bd13ff358ccaa2de4"
+    },
+    {
+      "id": "CON_D9_ERROR_ANALYSIS_5LAYERS",
+      "type": "CoreConcept",
+      "label": "Scenario-Trace-Outcome & Failure Taxonomy 5 Layers",
+      "day": 9,
+      "tier": 3,
+      "summary": "Phân biệt Scenario (input + world state + expected), Trace (bước thực thi), Outcome (DB/ledger cuối). Đọc ~30–100 trace thật (cả PASS & FAIL) -> Open coding (lỗi gốc đầu tiên) -> Axial coding (người đặt tên mode PASS/FAIL) -> 5 Layers: model/prompt, tool/schema, retrieval/context, orchestration/state, guardrail/approval.",
+      "keywords": [
+        "Scenario",
+        "Trace",
+        "Outcome",
+        "Open coding",
+        "Axial coding",
+        "5 Failure Layers"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          53,
+          54
+        ],
+        "section_ref": "Ngày 9 · Mục 1–2 (trang 53–54)",
+        "key_quote": "Coverage là mức rủi ro đã kiểm, không phải số lượng log; tăng scenario diversity trước khi tăng seed."
+      },
+      "sha256": "50ce105c40798751cce1a1034921621eba1c611eda91deae4266183fd9d1bd7a"
+    },
+    {
+      "id": "PAT_D9_EVAL_HARNESS_LAYERED_GRADER",
+      "type": "ArchitecturePattern",
+      "label": "Eval Harness, Metric 4 cấp & Layered Grading (Swiss Cheese)",
+      "day": 9,
+      "tier": 3,
+      "summary": "Metric 4 cấp (Step, Trajectory, Outcome, System); tuyệt đối KHÔNG bù trừ Metric An toàn (= 0 vi phạm mọi trial) với Metric Năng lực. Ưu tiên Code Grader (tiền, state, quyền) -> Calibrated LLM Judge (1 mode/judge, critique trước JSON sau, nhị phân, Order swap & Family swap khác họ model) -> Human -> Monitoring.",
+      "keywords": [
+        "Eval Harness",
+        "Swiss Cheese",
+        "Code Grader",
+        "LLM-as-a-judge",
+        "Family swap",
+        "Order swap"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          54,
+          55
+        ],
+        "section_ref": "Ngày 9 · Mục 3–4 (trang 54–55)",
+        "key_quote": "Thứ code kiểm được thì để code kiểm; model sinh synthetic và judge không được dùng chung một họ model."
+      },
+      "sha256": "ae2b26ff39a04fc502ae8d8141658f41410faefcc4f75661d578b705059427b4"
+    },
+    {
+      "id": "MET_D9_ROGAN_GLADEN_BOOTSTRAP",
+      "type": "MetricOrFormula",
+      "label": "Hiệu chỉnh Rogan-Gladen & Paired Bootstrap 95% CI",
+      "day": 9,
+      "tier": 4,
+      "summary": "Hiệu chỉnh judge (held-out kappa >= 0.6, Precision >= 0.8, Recall >= 0.7): Tỉ lệ lỗi thật = (Tỉ lệ báo FAIL + Specificity - 1) / (Recall + Specificity - 1). So sánh 2 bản bằng Paired Bootstrap: gộp trung bình theo item qua các trial trước, rút hoàn lại 1000 lần trên cùng danh sách item để lập 95% CI loại trừ 0.",
+      "keywords": [
+        "Rogan-Gladen",
+        "Paired Bootstrap",
+        "Confidence Interval",
+        "Calibration",
+        "pass^k"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          56,
+          57
+        ],
+        "section_ref": "Ngày 9 · Mục 5 & 7 (trang 56–57)",
+        "key_quote": "Judge báo 9% FAIL nhưng Recall=0.30 thì tỉ lệ lỗi thật là 30% (pass thật ~70%, không phải 91%)."
+      },
+      "sha256": "046a0ce99bca18561d89b21a81e44ee2d708d5c4ca00b4ea08f796533a0d91f4"
+    },
+    {
+      "id": "CON_D9_DATASETS_RATCHET_CI",
+      "type": "CoreConcept",
+      "label": "Golden/Synthetic Data, Capability vs Regression & Luật Ratchet",
+      "day": 9,
+      "tier": 3,
+      "summary": "Mọi item eval phải có provenance và tách riêng file nhãn viết tay. Capability suite (case khó) tốt nghiệp vào Regression suite (pass ~100% chặn merge PR). Luật Ratchet: trên cùng version eval set chỉ siết ngưỡng, thêm case khó phải tạo eval_set v2 và đo lại baseline.",
+      "keywords": [
+        "Golden data",
+        "Synthetic data",
+        "Capability suite",
+        "Regression suite",
+        "Ratchet",
+        "CI Gate"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          57,
+          58
+        ],
+        "section_ref": "Ngày 9 · Mục 8–9 (trang 57–58)",
+        "key_quote": "Nguyên tắc Ratchet (chỉ siết, không nới): không dời khung thành sau khi thấy kết quả."
+      },
+      "sha256": "23b9b23bcf02d449a2a2706a04e3aaade64a6eb7edaec3bffcb7192f15e85edf"
+    },
+    {
+      "id": "DAY_10",
+      "type": "DayModule",
+      "label": "Ngày 10: Từ PoC đến Pilot — Stage Gate & Checklist Go-Live",
+      "day": 10,
+      "tier": 1,
+      "summary": "Thu hẹp khoảng trống Demo -> Production qua Stage Gate 1 & 2, chuẩn hóa 5 thành phần Gate và rà soát trọn vẹn 9 nhóm Checklist Go-Live theo mô hình Swiss Cheese.",
+      "keywords": [
+        "Stage Gate",
+        "Go-Live",
+        "Checklist",
+        "Red Team",
+        "TCO",
+        "L1-L3",
+        "Risk Register"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          59,
+          60,
+          61,
+          62,
+          63,
+          64
+        ],
+        "section_ref": "NGÀY 10 — Từ PoC đến Pilot & Checklist Go-Live (trang 59–64)",
+        "key_quote": "PoC mất vài tuần, đưa lên Production mất nhiều tháng vì chất lượng, dữ liệu, bảo mật, chi phí và pháp lý."
+      },
+      "sha256": "2e9f26169a166e435ec4a3859fb228f2560f12740bad2aa7b8ac04af66122402"
+    },
+    {
+      "id": "CON_D10_STAGE_GATE_5ELEMENTS",
+      "type": "CoreConcept",
+      "label": "5 Khoảng trống sau PoC & 5 Thành phần Stage Gate",
+      "day": 10,
+      "tier": 3,
+      "summary": "5 khoảng trống: Bộ thử đơn giản (Taco Bell 18.000 cốc nước), chi phí thiếu, lỗ hổng bảo mật mở (Salesforce 9.4/10), thiếu PIC, thiếu điều kiện dừng (CBA Úc, Who Gives A Crap). Stage Gate bắt buộc: (1) Chỉ số trên tập cố định, (2) Ngưỡng + CI (Sponsor ký trước khi đo), (3) PIC có tên, (4) Thời hạn, (5) Điều kiện dừng & quay lui. 4 quyết định: Proceed / Descope / Iterate / Stop.",
+      "keywords": [
+        "Stage Gate",
+        "PIC",
+        "Sponsor",
+        "Descope",
+        "Stop",
+        "Taco Bell"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          59,
+          60
+        ],
+        "section_ref": "Ngày 10 · Mục 2–3 (trang 59–60)",
+        "key_quote": "Dừng dự án sớm là một kết quả tích cực giúp tiết kiệm tài chính và bảo vệ uy tín."
+      },
+      "sha256": "679364e1df238441f1609607a2b1c6a920b3ba458a6b32e83caf8e777907b7fa"
+    },
+    {
+      "id": "CON_D10_CHECKLIST_QUALITY_DATA_SEC",
+      "type": "CoreConcept",
+      "label": "Checklist Nhóm 1–4: Quality, Data, Security 8 lớp & Permissions",
+      "day": 10,
+      "tier": 3,
+      "summary": "Quality: 9 bộ dữ liệu độc lập, mỗi thử nghiệm đổi 1 biến. Data: Data Owner, re-index SLA, ACL, PII masking. Security: 8 lớp phòng thủ + Red Team 10 hạng mục (PyRIT, garak, promptfoo, DeepTeam). Permissions: Least Privilege, SSO theo user, tách Đọc/Ghi, Sandbox, Key Vault, Kill-switch.",
+      "keywords": [
+        "Red Teaming",
+        "PyRIT",
+        "garak",
+        "promptfoo",
+        "Least Privilege",
+        "Kill-switch"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          60,
+          61,
+          62
+        ],
+        "section_ref": "Ngày 10 · Mục 4 Nhóm 1–4 (trang 60–62)",
+        "key_quote": "Độ chính xác 80% nhưng bịa nguồn 10% rủi ro cao hơn 75% nhưng biết từ chối khi thiếu dữ kiện."
+      },
+      "sha256": "33b4d30406effb83c0f948b1ddd788abbd7236b5fd4f8d12c37b38cd35b479f7"
+    },
+    {
+      "id": "MET_D10_INFRA_TCO_OPS",
+      "type": "MetricOrFormula",
+      "label": "Checklist Nhóm 5–9: Infra, TCO (40/60), Ops L1–L3, Pháp lý & Risk Register",
+      "day": 10,
+      "tier": 4,
+      "summary": "Load test 2x peak, Exponential backoff 429/503, Model version lock, Multi-region fallback. TCO: API model chỉ chiếm ~40% tổng ngân sách (60% là hạ tầng, giám sát, nhân sự L1-L3, đào tạo, +10% dự phòng). Ops: Langfuse/Opik, Grafana, P1/P2/P3, L1(~15p)-L2(~1h)-L3. Báo cáo Go/No-Go tuyệt đối không làm tròn số (0.78 vs 0.80).",
+      "keywords": [
+        "TCO",
+        "40%",
+        "Load Testing",
+        "Langfuse",
+        "L1-L3",
+        "Risk Register",
+        "Shadow mode"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          62,
+          63,
+          64
+        ],
+        "section_ref": "Ngày 10 · Mục 4 Nhóm 5–9 (trang 62–64)",
+        "key_quote": "Chi phí gọi API mô hình thông thường chỉ chiếm khoảng 40% tổng ngân sách vận hành."
+      },
+      "sha256": "8df8fc5ade00323942aaceebd2d7db2598bb77e0e12088513f6c633f84f86155"
+    },
+    {
+      "id": "ERR_D10_SEVEN_MYTHS",
+      "type": "FailureOrTrap",
+      "label": "7 Hiểu lầm Go-Live & 5 Nguyên tắc Báo cáo Trung thực",
+      "day": 10,
+      "tier": 3,
+      "summary": "Tránh 7 hiểu lầm: Demo tốt = sẵn sàng Go-live; Risk Register chỉ là thủ tục; Dừng dự án là thất bại; 0.81 > 0.80 trên 1 lần chạy là Đạt; Chatbot sai là lỗi công nghệ (doanh nghiệp chịu trách nhiệm pháp lý như Air Canada); Dùng API không cần lo hạ tầng.",
+      "keywords": [
+        "Air Canada",
+        "7 hiểu lầm",
+        "Go/No-Go",
+        "Risk Register",
+        "API Tier 429"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          63,
+          64
+        ],
+        "section_ref": "Ngày 10 · Mục 5 (trang 63–64)",
+        "key_quote": "Tuyệt đối không làm tròn hoặc làm mềm số liệu: báo cáo chính xác 0.78 so với ngưỡng 0.80."
+      },
+      "sha256": "7e5943b55cf0318940c53fcb055a172e6dacd41972d39ed21dabb78a73d68e95"
+    },
+    {
+      "id": "DAY_11",
+      "type": "DayModule",
+      "label": "Ngày 11: Guardrails, HITL & Responsible AI",
+      "day": 11,
+      "tier": 1,
+      "summary": "Phòng thủ kiến trúc chống Prompt Injection (Lethal Trifecta, CaMeL), Guardrails 3 tầng Input/LLM/Output, Durable HITL trong LangGraph/Temporal, Human Factors và Luật PDPL 91/2025 + Luật AI 134/2025.",
+      "keywords": [
+        "Guardrails",
+        "HITL",
+        "Lethal Trifecta",
+        "CaMeL",
+        "interrupt",
+        "Automation Bias",
+        "PDPL",
+        "Luật AI 134"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73
+        ],
+        "section_ref": "NGÀY 11 — Guardrails, HITL & Responsible AI (trang 65–73)",
+        "key_quote": "Agent không có guardrails giống như xe không có phanh — càng nhanh càng nguy hiểm."
+      },
+      "sha256": "92bb2b349ce1b7066c0888829a66689adb1c820b8ff674f59b4a5b1debd1c9ea"
+    },
+    {
+      "id": "ERR_D11_OWASP_MISALIGNMENT",
+      "type": "FailureOrTrap",
+      "label": "OWASP Top 10, Agentic Misalignment & Attack Vectors",
+      "day": 11,
+      "tier": 3,
+      "summary": "6 rủi ro chính + OWASP LLM01–LLM10 & ASI01–ASI10; sự cố leo thang sang zero-click data exfiltration (EchoLeak CVE-2025-32711, GeminiJack, Chevrolet $1 bot, DPD). 3 dấu hiệu Misalignment: Reward Hacking, Deceptive Alignment, Instrumental Convergence. 4 kỹ thuật Jailbreak: Roleplay, Multi-turn, Encoding Bypass, Language Switch.",
+      "keywords": [
+        "OWASP",
+        "EchoLeak",
+        "GeminiJack",
+        "Reward Hacking",
+        "Jailbreak",
+        "PII Extraction"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          65,
+          66
+        ],
+        "section_ref": "Ngày 11 · Mục 1–4 (trang 65–66)",
+        "key_quote": "Không vụ nào thất bại vì model kém — tất cả thất bại vì thiếu lớp kiểm soát."
+      },
+      "sha256": "4a99dcd000afd64c55c428414a43b018ef47c8389a01cbed2e34a83edb9d20eb"
+    },
+    {
+      "id": "PAT_D11_DEFENSE_TRIFECTA_CAMEL",
+      "type": "ArchitecturePattern",
+      "label": "Defense-in-Depth 3 tầng, The Lethal Trifecta & CaMeL Dual-LLM",
+      "day": 11,
+      "tier": 3,
+      "summary": "Filter đơn lẻ bị vượt qua (emoji smuggling 100% ASR, Unicode đảo chiều 99% ASR) -> phòng thủ bằng kiến trúc: Spotlighting (Microsoft, ASR <2%), Instruction Hierarchy (system > user > model > tool), CaMeL Dual-LLM (Privileged vs Quarantined LLM). Quy tắc vàng Lethal Trifecta: tuyệt đối không cấp đủ (1) Private Data + (2) Untrusted Content + (3) External Comms cho cùng 1 agent.",
+      "keywords": [
+        "Lethal Trifecta",
+        "CaMeL",
+        "Spotlighting",
+        "Prompt Guard 2",
+        "Llama Guard",
+        "NeMo Guardrails"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          66,
+          67,
+          68
+        ],
+        "section_ref": "Ngày 11 · Mục 5–8 (trang 66–68)",
+        "key_quote": "Tuyệt đối không cấp đủ cả 3 yếu tố Lethal Trifecta cho cùng một agent."
+      },
+      "sha256": "382ab291df5be360f8cc1a3163b147e01beae22171074f7f9652da2b87417e55"
+    },
+    {
+      "id": "PAT_D11_DURABLE_HITL_ROUTING",
+      "type": "ArchitecturePattern",
+      "label": "Durable HITL (interrupt + PostgresSaver) & Ma trận Định tuyến",
+      "day": 11,
+      "tier": 3,
+      "summary": "if confidence < 0.7 không phải HITL vì mất state khi restart. LangGraph dùng interrupt() + Command(resume=...) + PostgresSaver: CẢNH BÁO node chứa interrupt() chạy lại TỪ ĐẦU khi resume -> tách side effect sang node sau; Idempotent resume & Fail-closed khi timeout. Thứ tự định tuyến: (1) Khả năng hoàn tác -> (2) Giá trị -> (3) Grounding/Tool fail -> (4) Calibrated Confidence.",
+      "keywords": [
+        "Durable HITL",
+        "interrupt",
+        "PostgresSaver",
+        "Fail-closed",
+        "Reversibility",
+        "Audit Trail"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          68,
+          69
+        ],
+        "section_ref": "Ngày 11 · Mục 11–12 (trang 68–69)",
+        "key_quote": "Confidence score xếp cuối; trục khả năng hoàn tác quan trọng hơn trục tác động."
+      },
+      "sha256": "51f129bbc08ef2e5490aec2884060dd717492059514a82f5bcacda829466d10d"
+    },
+    {
+      "id": "ERR_D11_AUTOMATION_BIAS_FATIGUE",
+      "type": "FailureOrTrap",
+      "label": "Ironies of Automation, Automation Bias & Alert Fatigue",
+      "day": 11,
+      "tier": 3,
+      "summary": "Hệ thống đúng 98% làm người duyệt mất kỹ năng ở ca sai 501; Automation Bias (Omission & Commission — thêm người duyệt 2 không cứu được); Alert Fatigue (92.9% cảnh báo bị bỏ qua); Moral Crumple Zone. Khắc phục: giảm false positive trước, hiển thị đủ 5 mục ngay tại màn duyệt, chèn ca sai cài sẵn.",
+      "keywords": [
+        "Ironies of Automation",
+        "Automation Bias",
+        "Alert Fatigue",
+        "Moral Crumple Zone"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          70
+        ],
+        "section_ref": "Ngày 11 · Mục 13 (trang 70)",
+        "key_quote": "'Có người duyệt' không đồng nghĩa với 'có giám sát'."
+      },
+      "sha256": "b565a908b50df744d8b386def41777f5d0ff4b0eed7c722df9d729b05b2f2ebc"
+    },
+    {
+      "id": "CON_D11_LEGAL_VN_EU_2026",
+      "type": "CoreConcept",
+      "label": "Responsible AI, PDPL 91/2025, Luật AI 134/2025 & EU AI Act",
+      "day": 11,
+      "tier": 3,
+      "summary": "Allocative Harm vs Representational Harm (Counterfactual test). VN: PDPL 91/2025 (hiệu lực 1/1/2026, thông báo vi phạm 72h, miễn DPIA/DPO 5 năm cho startup nhỏ không xử lý dữ liệu nhạy cảm); Luật AI 134/2025 (hiệu lực 1/3/2026, 3 mức rủi ro, watermark, biến HITL thành nghĩa vụ pháp lý). EU AI Act Điều 2 áp dụng xuyên biên giới ngay khi đầu ra được dùng tại EU.",
+      "keywords": [
+        "PDPL 91/2025",
+        "Luật AI 134/2025",
+        "EU AI Act",
+        "Fairness",
+        "Model Card",
+        "System Card"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          70,
+          71,
+          72
+        ],
+        "section_ref": "Ngày 11 · Mục 14–18 (trang 70–72)",
+        "key_quote": "Việt Nam đã có hiệu lực cả PDPL 91/2025 và Luật AI 134/2025 — biến HITL thành nghĩa vụ pháp lý."
+      },
+      "sha256": "5e5185d0c576862c3deb897d317fbe34a9ce625d59b768bd7568145987594235"
+    },
+    {
+      "id": "DAY_12",
+      "type": "DayModule",
+      "label": "Ngày 12: Deployment — Đưa Agent Lên Cloud",
+      "day": 12,
+      "tier": 1,
+      "summary": "Đóng gói Docker 2026 (uv + python:3.12-slim + Trivy), giải quyết timeout bằng SSE/Async Job, đẩy State ra Redis/Postgres, API Gateway Cost-Guard, Caching, Saga & Sandbox Fail-closed.",
+      "keywords": [
+        "Docker",
+        "uv",
+        "SSE",
+        "Cloud Run",
+        "Cost-Guard",
+        "Prompt Cache",
+        "Saga",
+        "Sandbox"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80
+        ],
+        "section_ref": "NGÀY 12 — Deployment: Đưa Agent Lên Cloud (trang 74–80)",
+        "key_quote": "Từ localhost đến production URL."
+      },
+      "sha256": "b41c0fcb825ea16938461e03fdbc34b14592cedf37245b86d7ff9b2da612bb1d"
+    },
+    {
+      "id": "PAT_D12_DOCKER_2026",
+      "type": "ArchitecturePattern",
+      "label": "3 Đặc tính phá vỡ Web & Tiêu chuẩn Docker 2026",
+      "day": 12,
+      "tier": 3,
+      "summary": "Agent Long-running (10-60s+ vượt timeout 29s API Gateway), Stateful, tốn token siêu tuyến tính (50–1000x). Pin exact Model ID & tắt auto-upgrade. Docker multi-stage + `uv --locked` (nhanh hơn pip 10x), base `python:3.12-slim` (~150MB) hoặc `distroless`, TRÁNH `alpine` (musl libc build chậm 52x), chạy `USER app`, quét Trivy, xuất SBOM. Endpoints: `/healthz`, `/chat` SSE.",
+      "keywords": [
+        "Dockerfile",
+        "uv",
+        "python:3.12-slim",
+        "alpine",
+        "Trivy",
+        "SBOM",
+        "Model pin"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          74,
+          75
+        ],
+        "section_ref": "Ngày 12 · Mục 1 (trang 74–75)",
+        "key_quote": "Tránh python:3.12-alpine vì musl libc làm thời gian build chậm hơn ~52 lần."
+      },
+      "sha256": "68716ce4883075f923344f2d331923e526b3a24c2fe793bc0721067b3c02ffd5"
+    },
+    {
+      "id": "PAT_D12_TIMEOUT_SSE_TIERS",
+      "type": "ArchitecturePattern",
+      "label": "Chiến lược SSE, Async Job, Remote MCP & 4 Tầng Cloud",
+      "day": 12,
+      "tier": 3,
+      "summary": "SSE Stream (`EventSourceResponse`, byte đầu <30s, `X-Accel-Buffering: no`, heartbeat ~15s) hoặc Submit-and-poll / Batch API (-50% giá). Đẩy state ra Redis/PostgresSaver; dùng `async def` không chặn luồng. Cloud Tiers: Tier 0 (Bedrock/Vertex), Tier 1 (Railway/Render/Fly), Tier 2 (Cloud Run 60p/ECS Fargate), Tier 3 (K8s); tránh Serverless Vercel timeout ngắn. Remote MCP dùng Streamable HTTP `/mcp` + OAuth 2.1 PKCE.",
+      "keywords": [
+        "SSE",
+        "EventSourceResponse",
+        "Async Job",
+        "Batch API",
+        "Cloud Run",
+        "Remote MCP",
+        "OAuth 2.1"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          75,
+          76,
+          77
+        ],
+        "section_ref": "Ngày 12 · Mục 2 (trang 75–77)",
+        "key_quote": "Đẩy toàn bộ state ra bộ lưu trữ ngoài; không dùng sticky session."
+      },
+      "sha256": "459ec36e5753c5bbb7911ced085b8370ae92de70c42e58877a9d733263cd20a4"
+    },
+    {
+      "id": "PAT_D12_GATEWAY_CACHE_SERVING",
+      "type": "ArchitecturePattern",
+      "label": "API Gateway Cost-Guard, Caching & Frontier Serving",
+      "day": 12,
+      "tier": 3,
+      "summary": "API Gateway: Auth (X-API-Key/JWT/OAuth) -> Rate Limiter -> Input & Budget Check (`MAX_USD_PER_REQ`, Circuit Breaker chống vòng lặp $47k/11 ngày). Scale ngang theo Concurrency/Queue (KEDA/Knative), `SIGTERM` Graceful Shutdown. Prompt Cache (đặt nội dung tĩnh lên đầu giảm ~90% Anthropic / ~50% OpenAI), Semantic Cache, Continuous batching (36.9x), PagedAttention (vLLM).",
+      "keywords": [
+        "API Gateway",
+        "Cost-Guard",
+        "Circuit Breaker",
+        "Prompt Cache",
+        "PagedAttention",
+        "CI/CD Eval Gate"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          77,
+          78,
+          79
+        ],
+        "section_ref": "Ngày 12 · Mục 3–4 (trang 77–79)",
+        "key_quote": "Monthly budget trên OpenAI chỉ cảnh báo chứ không tự ngắt — phải làm pre-call admission control."
+      },
+      "sha256": "754fa743412dbc426b11af98cf4caecc29b3b58efe7a01a3aa946db6f9f35ef0"
+    },
+    {
+      "id": "PAT_D12_SAGA_EGRESS_SANDBOX",
+      "type": "ArchitecturePattern",
+      "label": "Mô hình Saga, Egress Control & Sandbox Fail-closed",
+      "day": 12,
+      "tier": 3,
+      "summary": "Chống retry mù quáng bằng Idempotency-Key (`Redis SET_NX + TTL`) và so khớp ngữ nghĩa. Saga: có bước bù trừ (undo), đặt pivot action không đảo ngược ở cuối kèm HITL. Chặn rò rỉ bằng Egress Control + Sandbox (gVisor, Firecracker/E2B, V8 Isolates) thiết kế **Fail-closed** (lỗi là đóng truy cập, bài học CVE-2025-66479).",
+      "keywords": [
+        "Saga",
+        "Idempotency-Key",
+        "Egress Control",
+        "Sandbox",
+        "Fail-closed"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          79
+        ],
+        "section_ref": "Ngày 12 · Mục 4 (trang 79)",
+        "key_quote": "Thiết kế hệ thống theo nguyên tắc Fail-closed thay vì Fail-open."
+      },
+      "sha256": "f8c51d852c09e702ac16fa34ff4927335fcffdb8f9378ffde2220135221965e8"
+    },
+    {
+      "id": "DAY_13",
+      "type": "DayModule",
+      "label": "Ngày 13: Launch & Economics — Cost-of-Pass & Controlled Pilot",
+      "day": 13,
+      "tier": 1,
+      "summary": "Tính chi phí thật mỗi việc thành công (Cost-of-Pass), 4 đòn bẩy giảm chi phí, so sánh Build vs Buy, đánh giá thành công 3 tầng, 5 loại lỗi Google PAIR và thiết kế Pilot có đối chứng trình Gate 2a.",
+      "keywords": [
+        "Cost-of-Pass",
+        "Human Review",
+        "Rework",
+        "Build vs Buy",
+        "3-Tier Success",
+        "Google PAIR",
+        "Pilot",
+        "Peeking problem"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88
+        ],
+        "section_ref": "NGÀY 13 — Launch & Economics (trang 81–88)",
+        "key_quote": "Có xứng đáng triển khai AI Agent không?"
+      },
+      "sha256": "24affdcec68c382776e319963e18d8176e8a336ffb12c9635fb72fa53430352e"
+    },
+    {
+      "id": "MET_D13_COST_OF_PASS",
+      "type": "MetricOrFormula",
+      "label": "Công thức Cost-of-Pass (ICLR 2026) & Nghịch lý Chọn Model",
+      "day": 13,
+      "tier": 4,
+      "summary": "Cost-of-Pass = (Token + Tool + Retry + Human Review + Rework) / Số việc thành công. Tại LogiX-VN: hóa đơn API chỉ 360 đ/ca nhưng chi phí thật tới 3.940 đ/việc (gấp 11 lần, >85% nằm ở Review & Rework). 4 hướng giảm chi phí (ưu tiên 1-3 trước): (1) Ít sai hơn (model chuẩn hơn có thể RẺ hơn theo Cost-of-Pass), (2) Ít kiểm tra hơn, (3) Routing tách 85% ca dễ cho AI / 15% ca khó cho người (hạ từ 3.940 đ -> 2.220 đ), (4) Prompt cache/Batch.",
+      "keywords": [
+        "Cost-of-Pass",
+        "3.940 đ",
+        "Routing",
+        "Sensitivity Analysis",
+        "Retry"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          81,
+          82
+        ],
+        "section_ref": "Ngày 13 · Phần 1 (trang 81–82)",
+        "key_quote": "Hơn 85% chi phí nằm ở thời gian nhân viên; giảm 1 phút xem lại tiết kiệm hơn đổi model rẻ một nửa."
+      },
+      "sha256": "30567eb283e106da8efb8ef4716d929c43a2ef712e6b5744aef2e4a7e0e25be1"
+    },
+    {
+      "id": "CON_D13_BUILD_BUY_3TIERS",
+      "type": "CoreConcept",
+      "label": "Build vs Buy, Bẫy hợp đồng & 3 Tầng Đánh giá Thành công",
+      "day": 13,
+      "tier": 3,
+      "summary": "Mua SaaS giá Mỹ ($0.99/lượt ≈ 25.300đ) đắt hơn nhân viên VN (12.000đ) ~2x, trong khi Tự làm ~3.940đ + 40M cố định. Cảnh giác bẫy 'giải quyết giả định' và kịch bản giá token tăng 2x. Đo đủ 3 tầng + An toàn: Tầng 1 Adoption (tránh người dùng ảo bỏ qua 80% gợi ý như UK Copilot) -> Tầng 2 Task Performance -> Tầng 3 Business Impact (tránh Klarna cắt quá đà); chọn trước 1 Primary Metric.",
+      "keywords": [
+        "Build vs Buy",
+        "Adoption",
+        "Task Performance",
+        "Business Impact",
+        "Primary Metric",
+        "Klarna"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          83,
+          84,
+          85
+        ],
+        "section_ref": "Ngày 13 · Phần 2–3 (trang 83–85)",
+        "key_quote": "Đo đủ cả 3 tầng vì tầng dưới tốt không bảo đảm tầng trên tốt."
+      },
+      "sha256": "98a42b1746ea670ae07c45c0ddb5d67751325f9586a2f592821c7eb0f5be4da1"
+    },
+    {
+      "id": "ERR_D13_GOOGLE_PAIR_5ERRORS",
+      "type": "FailureOrTrap",
+      "label": "5 Loại lỗi Google PAIR & Lỗi ngầm (Silent Error)",
+      "day": 13,
+      "tier": 3,
+      "summary": "(1) Lỗi người dùng, (2) Lỗi hệ thống, (3) Lỗi ngữ cảnh, (4) Giới hạn hệ thống, (5) Lỗi ngầm (cả người và hệ thống không nhận ra, vd hoàn thiếu 5% đơn quốc tế nhiều tuần) — chỉ phát hiện bằng kiểm tra lấy mẫu QA định kỳ (2%/tuần). Gắn nhãn trace lỗi bởi 2 người độc lập đạt đồng thuận >= 80%.",
+      "keywords": [
+        "Google PAIR",
+        "Lỗi ngầm",
+        "Silent Error",
+        "QA sampling",
+        "Cursor Sam",
+        "NYC MyCity"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          85,
+          86
+        ],
+        "section_ref": "Ngày 13 · Phần 4 (trang 85–86)",
+        "key_quote": "Lỗi ngầm chỉ phát hiện bằng kiểm tra lấy mẫu định kỳ (vd: 2% yêu cầu/tuần)."
+      },
+      "sha256": "6007d7b6f9426fc1abbe2401705df67543ade23bcd5576eb5c5da7278ada8936"
+    },
+    {
+      "id": "PAT_D13_CONTROLLED_PILOT",
+      "type": "ArchitecturePattern",
+      "label": "Thiết kế Controlled Pilot, Chống Peeking & Hồ sơ Gate 2a",
+      "day": 13,
+      "tier": 3,
+      "summary": "3 câu hỏi Pilot: (1) Nhóm đối chứng ngẫu nhiên 50/50 cùng tệp/thời gian (không so cụm depot), (2) Cỡ mẫu (~1.500 ca/nhóm) & thời gian tối thiểu 4 tuần, (3) Ngưỡng dừng khẩn cấp trao quyền trưởng ca & chống Peeking problem (xem p<0.05 mỗi ngày đẩy dương tính giả từ 5% lên ~26%). Bộ hồ sơ Gate 2a gồm 7 hạng mục + `pilot_plan.yaml`.",
+      "keywords": [
+        "Controlled Pilot",
+        "Peeking problem",
+        "Gate 2a",
+        "pilot_plan.yaml",
+        "LogiX-VN"
+      ],
+      "provenance": {
+        "pdf_pages": [
+          86,
+          87
+        ],
+        "section_ref": "Ngày 13 · Phần 5–7 (trang 86–87)",
+        "key_quote": "Giữa chừng chỉ xem chỉ số an toàn; chỉ ra quyết định vào đúng ngày Gate 2 đã chốt."
+      },
+      "sha256": "1757a61c321a1a366243105726e97e541f531e01ad29698f71265969d13d9fea"
+    }
+  ],
+  "edges": [
+    {
+      "source": "DAY_01",
+      "target": "CON_D1_TAXONOMY",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_01",
+      "target": "CON_D1_TRANSFORMER",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_01",
+      "target": "MET_D1_TOKEN_ECONOMY",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_01",
+      "target": "PAT_D1_VIBE_CODING",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_01",
+      "target": "ERR_D1_LLM_LIMITS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_01",
+      "target": "LAB_D1_API_BENCHMARK",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_02",
+      "target": "CON_D2_PROBLEM_DISCOVERY",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_02",
+      "target": "CON_D2_PROBLEM_CARD",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_02",
+      "target": "PAT_D2_BUILD_BOOST_BUY",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_02",
+      "target": "MET_D2_GO_NOGO",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_02",
+      "target": "ERR_D2_ANTIPATTERNS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_03",
+      "target": "MET_D3_AGENTIC_FIT",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_03",
+      "target": "PAT_D3_REACT_HYBRID",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_03",
+      "target": "CON_D3_SYSTEM_PROMPT_SAFEGUARDS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_03",
+      "target": "ERR_D3_INDIRECT_INJECTION",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_03",
+      "target": "LAB_D3_REACT_RUBRIC",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_04",
+      "target": "PAT_D4_XML_DETERMINISM",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_04",
+      "target": "CON_D4_SYSTEM_CONTRACT",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_04",
+      "target": "PAT_D4_TOOL_LOOP_LANGGRAPH",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_04",
+      "target": "ERR_D4_PARALLEL_AND_ORDER_BIAS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_05",
+      "target": "CON_D5_UNCERTAINTY_DRIFT",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_05",
+      "target": "MET_D5_FP_FN_COST",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_05",
+      "target": "PAT_D5_UX_4PATHS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_05",
+      "target": "CASE_D5_REAL_FAILURES",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_06",
+      "target": "CON_D6_4PRINCIPLES_MEDALLION",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_06",
+      "target": "ERR_D6_HOSTILE_DOCS_UNICODE",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_06",
+      "target": "PAT_D6_STORAGE_HYBRID_RRF",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_06",
+      "target": "MET_D6_DAMA_KAPPA",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_06",
+      "target": "ERR_D6_QUASI_IDENTIFIER",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_07",
+      "target": "PAT_D7_PRE_RETRIEVAL",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_07",
+      "target": "PAT_D7_RETRIEVAL",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_07",
+      "target": "PAT_D7_POST_RETRIEVAL_AUGMENT",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_07",
+      "target": "PAT_D7_GEN_POSTGEN",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_08",
+      "target": "CON_D8_4LEVELS_WORKFLOWS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_08",
+      "target": "MET_D8_PASS_AT_POWER_K",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_08",
+      "target": "PAT_D8_DURABLE_IDEMPOTENCY",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_08",
+      "target": "PAT_D8_MULTI_AGENT_AUTONOMY_CODE",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_09",
+      "target": "CON_D9_ERROR_ANALYSIS_5LAYERS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_09",
+      "target": "PAT_D9_EVAL_HARNESS_LAYERED_GRADER",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_09",
+      "target": "MET_D9_ROGAN_GLADEN_BOOTSTRAP",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_09",
+      "target": "CON_D9_DATASETS_RATCHET_CI",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_10",
+      "target": "CON_D10_STAGE_GATE_5ELEMENTS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_10",
+      "target": "CON_D10_CHECKLIST_QUALITY_DATA_SEC",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_10",
+      "target": "MET_D10_INFRA_TCO_OPS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_10",
+      "target": "ERR_D10_SEVEN_MYTHS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_11",
+      "target": "ERR_D11_OWASP_MISALIGNMENT",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_11",
+      "target": "PAT_D11_DEFENSE_TRIFECTA_CAMEL",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_11",
+      "target": "PAT_D11_DURABLE_HITL_ROUTING",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_11",
+      "target": "ERR_D11_AUTOMATION_BIAS_FATIGUE",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_11",
+      "target": "CON_D11_LEGAL_VN_EU_2026",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_12",
+      "target": "PAT_D12_DOCKER_2026",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_12",
+      "target": "PAT_D12_TIMEOUT_SSE_TIERS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_12",
+      "target": "PAT_D12_GATEWAY_CACHE_SERVING",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_12",
+      "target": "PAT_D12_SAGA_EGRESS_SANDBOX",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_13",
+      "target": "MET_D13_COST_OF_PASS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_13",
+      "target": "CON_D13_BUILD_BUY_3TIERS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_13",
+      "target": "ERR_D13_GOOGLE_PAIR_5ERRORS",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "DAY_13",
+      "target": "PAT_D13_CONTROLLED_PILOT",
+      "relation": "CONTAINS",
+      "weight": 1.0
+    },
+    {
+      "source": "CON_D1_TAXONOMY",
+      "target": "PAT_D2_BUILD_BOOST_BUY",
+      "relation": "EVOLVES_INTO",
+      "weight": 0.95
+    },
+    {
+      "source": "ERR_D1_LLM_LIMITS",
+      "target": "PAT_D4_XML_DETERMINISM",
+      "relation": "MITIGATES_FAILURE",
+      "weight": 0.9
+    },
+    {
+      "source": "ERR_D1_LLM_LIMITS",
+      "target": "PAT_D7_POST_RETRIEVAL_AUGMENT",
+      "relation": "MITIGATES_FAILURE",
+      "weight": 0.95
+    },
+    {
+      "source": "MET_D1_TOKEN_ECONOMY",
+      "target": "MET_D13_COST_OF_PASS",
+      "relation": "PREREQUISITE_OF",
+      "weight": 0.9
+    },
+    {
+      "source": "CON_D2_PROBLEM_CARD",
+      "target": "PAT_D5_UX_4PATHS",
+      "relation": "PREREQUISITE_OF",
+      "weight": 0.9
+    },
+    {
+      "source": "PAT_D2_BUILD_BOOST_BUY",
+      "target": "MET_D3_AGENTIC_FIT",
+      "relation": "EVOLVES_INTO",
+      "weight": 0.95
+    },
+    {
+      "source": "PAT_D2_BUILD_BOOST_BUY",
+      "target": "CON_D8_4LEVELS_WORKFLOWS",
+      "relation": "EVOLVES_INTO",
+      "weight": 0.95
+    },
+    {
+      "source": "PAT_D3_REACT_HYBRID",
+      "target": "PAT_D4_TOOL_LOOP_LANGGRAPH",
+      "relation": "EVOLVES_INTO",
+      "weight": 0.95
+    },
+    {
+      "source": "ERR_D3_INDIRECT_INJECTION",
+      "target": "PAT_D11_DEFENSE_TRIFECTA_CAMEL",
+      "relation": "MITIGATES_FAILURE",
+      "weight": 1.0
+    },
+    {
+      "source": "PAT_D4_TOOL_LOOP_LANGGRAPH",
+      "target": "PAT_D8_DURABLE_IDEMPOTENCY",
+      "relation": "EVOLVES_INTO",
+      "weight": 0.95
+    },
+    {
+      "source": "PAT_D4_TOOL_LOOP_LANGGRAPH",
+      "target": "PAT_D11_DURABLE_HITL_ROUTING",
+      "relation": "PREREQUISITE_OF",
+      "weight": 0.95
+    },
+    {
+      "source": "CON_D5_UNCERTAINTY_DRIFT",
+      "target": "CON_D9_ERROR_ANALYSIS_5LAYERS",
+      "relation": "PREREQUISITE_OF",
+      "weight": 0.9
+    },
+    {
+      "source": "MET_D5_FP_FN_COST",
+      "target": "MET_D9_ROGAN_GLADEN_BOOTSTRAP",
+      "relation": "MEASURED_BY",
+      "weight": 0.9
+    },
+    {
+      "source": "CON_D6_4PRINCIPLES_MEDALLION",
+      "target": "PAT_D7_RETRIEVAL",
+      "relation": "PREREQUISITE_OF",
+      "weight": 0.95
+    },
+    {
+      "source": "PAT_D6_STORAGE_HYBRID_RRF",
+      "target": "PAT_D7_POST_RETRIEVAL_AUGMENT",
+      "relation": "PREREQUISITE_OF",
+      "weight": 0.95
+    },
+    {
+      "source": "ERR_D6_HOSTILE_DOCS_UNICODE",
+      "target": "PAT_D7_PRE_RETRIEVAL",
+      "relation": "MITIGATES_FAILURE",
+      "weight": 0.9
+    },
+    {
+      "source": "PAT_D7_GEN_POSTGEN",
+      "target": "PAT_D11_DEFENSE_TRIFECTA_CAMEL",
+      "relation": "PREREQUISITE_OF",
+      "weight": 0.9
+    },
+    {
+      "source": "MET_D8_PASS_AT_POWER_K",
+      "target": "MET_D9_ROGAN_GLADEN_BOOTSTRAP",
+      "relation": "MEASURED_BY",
+      "weight": 0.95
+    },
+    {
+      "source": "PAT_D8_DURABLE_IDEMPOTENCY",
+      "target": "PAT_D12_SAGA_EGRESS_SANDBOX",
+      "relation": "EVOLVES_INTO",
+      "weight": 0.95
+    },
+    {
+      "source": "CON_D9_DATASETS_RATCHET_CI",
+      "target": "CON_D10_STAGE_GATE_5ELEMENTS",
+      "relation": "PREREQUISITE_OF",
+      "weight": 0.95
+    },
+    {
+      "source": "PAT_D9_EVAL_HARNESS_LAYERED_GRADER",
+      "target": "MET_D13_COST_OF_PASS",
+      "relation": "MEASURED_BY",
+      "weight": 0.85
+    },
+    {
+      "source": "CON_D10_STAGE_GATE_5ELEMENTS",
+      "target": "PAT_D13_CONTROLLED_PILOT",
+      "relation": "PREREQUISITE_OF",
+      "weight": 0.95
+    },
+    {
+      "source": "MET_D10_INFRA_TCO_OPS",
+      "target": "PAT_D12_GATEWAY_CACHE_SERVING",
+      "relation": "PREREQUISITE_OF",
+      "weight": 0.9
+    },
+    {
+      "source": "CON_D11_LEGAL_VN_EU_2026",
+      "target": "CON_D10_CHECKLIST_QUALITY_DATA_SEC",
+      "relation": "PREREQUISITE_OF",
+      "weight": 0.9
+    },
+    {
+      "source": "CASE_D5_REAL_FAILURES",
+      "target": "CON_D11_LEGAL_VN_EU_2026",
+      "relation": "ILLUSTRATED_BY",
+      "weight": 0.85
+    },
+    {
+      "source": "ERR_D13_GOOGLE_PAIR_5ERRORS",
+      "target": "CON_D9_ERROR_ANALYSIS_5LAYERS",
+      "relation": "MITIGATES_FAILURE",
+      "weight": 0.9
+    }
+  ]
+}

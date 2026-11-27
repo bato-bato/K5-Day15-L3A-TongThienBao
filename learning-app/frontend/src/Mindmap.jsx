@@ -1,10 +1,40 @@
 import React, { useRef } from 'react';
 
 const MAX_POSITION = 4096;
-const MAX_NODES = 20;
+const MAX_NODES = 100;
 const clamp = value => Math.max(0, Math.min(MAX_POSITION, Math.round(value)));
 
-export function Mindmap({ nodes, onChange }) {
+const TYPE_LABELS = {
+  day_root: 'Ngày học',
+  concept: 'Khái niệm',
+  pattern: 'Kiến trúc',
+  metric: 'Chỉ số',
+  trap: 'Bẫy / Lỗi',
+  case_study: 'Case Study',
+  checkpoint: 'Checkpoint',
+  code_ref: 'Code Lab',
+  note: 'Ghi chú',
+};
+
+function formatBadge(node) {
+  const parts = [];
+  if (node.node_type && TYPE_LABELS[node.node_type]) {
+    parts.push(TYPE_LABELS[node.node_type]);
+  }
+  if (node.source_ref?.day) {
+    const pages = node.source_ref.pdf_pages?.join(',');
+    parts.push(pages ? `D${node.source_ref.day}·tr.${pages}` : `D${node.source_ref.day}`);
+  } else if (node.code_link?.file_path) {
+    const shortFile = node.code_link.file_path.split('/').slice(-1)[0];
+    parts.push(shortFile);
+  }
+  if (node.verification_status === 'verified') {
+    parts.push('✓');
+  }
+  return parts.join(' · ');
+}
+
+export function Mindmap({ nodes, selectedId, onSelect, onChange, onOpenMapper, onReset }) {
   const viewport = useRef(null);
   const drag = useRef(null);
   const pan = useRef(null);
@@ -25,18 +55,23 @@ export function Mindmap({ nodes, onChange }) {
       x: clamp(x),
       y: clamp(y),
       parent_id: null,
+      node_type: 'note',
+      source_ref: null,
+      code_link: null,
+      verification_status: 'user_note',
     }]);
+    onSelect?.(id);
   }
 
   function addInView() {
     const { scrollLeft, scrollTop, clientWidth } = viewport.current;
-    const columns = Math.max(1, Math.floor((clientWidth - 48) / 184));
+    const columns = Math.max(1, Math.floor((clientWidth - 48) / 280));
     const slots = Array.from({ length: MAX_NODES }, (_, index) => ({
-      x: clamp(scrollLeft + 24 + index % columns * 184),
-      y: clamp(scrollTop + 24 + Math.floor(index / columns) * 104),
+      x: clamp(scrollLeft + 24 + index % columns * 280),
+      y: clamp(scrollTop + 24 + Math.floor(index / columns) * 160),
     }));
     const { x, y } = slots.find(slot => !nodes.some(node => (
-      Math.abs(node.x - slot.x) < 164 && Math.abs(node.y - slot.y) < 98
+      Math.abs(node.x - slot.x) < 230 && Math.abs(node.y - slot.y) < 130
     ))) ?? slots[0];
     add(x, y);
   }
@@ -64,6 +99,7 @@ export function Mindmap({ nodes, onChange }) {
   }
 
   function remove(id) {
+    if (selectedId === id) onSelect?.(null);
     onChange(nodes.filter(node => node.id !== id).map(node => (
       node.parent_id === id ? { ...node, parent_id: null } : node
     )));
@@ -80,6 +116,7 @@ export function Mindmap({ nodes, onChange }) {
 
   function startDrag(event, node) {
     if (event.button !== 0) return;
+    onSelect?.(node.id);
     drag.current = {
       pointer: event.pointerId, x: node.x, y: node.y,
       startX: event.clientX, startY: event.clientY,
@@ -100,6 +137,11 @@ export function Mindmap({ nodes, onChange }) {
     <section className="map-panel" aria-label="Sơ đồ tư duy">
       <div className="map-tools">
         <button type="button" onClick={addInView} disabled={nodes.length >= MAX_NODES}>+ Thêm ý</button>
+        <button type="button" className="accent-btn" onClick={onOpenMapper}>AI Lecture-to-Lab Map</button>
+        <button type="button" onClick={onReset} title="Khôi phục bản Knowledge Graph chuẩn của ngày này">
+          Khôi phục KG chuẩn
+        </button>
+        <span className="node-count">{nodes.length}/{MAX_NODES} nút</span>
       </div>
       <div className="map-scroll" ref={viewport} tabIndex={0} aria-label="Canvas sơ đồ tư duy">
         <div className="map-board" onDoubleClick={addAtPointer} onPointerDown={startPan}
@@ -110,41 +152,56 @@ export function Mindmap({ nodes, onChange }) {
             {nodes.map(node => {
               const parent = byId.get(node.parent_id);
               return parent && (
-                <line key={node.id} x1={parent.x + 82} y1={parent.y + 44}
-                  x2={node.x + 82} y2={node.y + 44} />
+                <line key={node.id} x1={parent.x + 125} y1={parent.y + 52}
+                  x2={node.x + 125} y2={node.y + 52} />
               );
             })}
           </svg>
-          {nodes.map((node, index) => (
-            <div key={node.id} className="node" style={{ left: node.x, top: node.y }}>
-              <div className="node-top">
-                <span className="drag-handle" aria-hidden="true" onPointerDown={event => startDrag(event, node)}
-                  onPointerMove={event => moveDrag(event, node)}
-                  onLostPointerCapture={() => { drag.current = null; }}>⠿</span>
-                <textarea aria-label={`Nội dung ý ${index + 1}`} placeholder="Nhập ý tưởng"
-                  rows={node.text.length > 120 || node.text.includes('\n') ? 3 : 1}
-                  ref={input => {
-                    if (input && newNode.current === node.id) {
-                      newNode.current = null;
-                      input.focus();
-                    }
-                  }}
-                  maxLength={20000} value={node.text}
-                  onChange={event => update(node.id, { text: event.target.value })} />
-                <button type="button" className="remove" aria-label={`Xóa ý ${index + 1}`}
-                  onClick={() => remove(node.id)}>×</button>
+          {nodes.map((node, index) => {
+            const typeClass = `node-type-${node.node_type || 'note'}`;
+            const isSelected = selectedId === node.id;
+            const badge = formatBadge(node);
+            return (
+              <div
+                key={node.id}
+                className={`node ${typeClass}${isSelected ? ' is-selected' : ''}`}
+                style={{ left: node.x, top: node.y }}
+                onClick={() => onSelect?.(node.id)}
+              >
+                {badge && (
+                  <div className="node-badge">
+                    <span>{badge}</span>
+                  </div>
+                )}
+                <div className="node-top">
+                  <span className="drag-handle" aria-hidden="true" onPointerDown={event => startDrag(event, node)}
+                    onPointerMove={event => moveDrag(event, node)}
+                    onLostPointerCapture={() => { drag.current = null; }}>⠿</span>
+                  <textarea aria-label={`Nội dung ý ${index + 1}`} placeholder="Nhập ý tưởng"
+                    rows={node.text.length > 100 || node.text.includes('\n') ? 3 : 2}
+                    ref={input => {
+                      if (input && newNode.current === node.id) {
+                        newNode.current = null;
+                        input.focus();
+                      }
+                    }}
+                    maxLength={20000} value={node.text}
+                    onChange={event => update(node.id, { text: event.target.value })} />
+                  <button type="button" className="remove" aria-label={`Xóa ý ${index + 1}`}
+                    onClick={e => { e.stopPropagation(); remove(node.id); }}>×</button>
+                </div>
+                <select aria-label={`Nối ý ${index + 1} với`} value={node.parent_id ?? ''}
+                  onChange={event => update(node.id, { parent_id: event.target.value || null })}>
+                  <option value="">Nối với…</option>
+                  {nodes.map((target, targetIndex) => (
+                    canLink(node, target) && <option key={target.id} value={target.id}>
+                      {target.text.trim().slice(0, 60) || `Ý ${targetIndex + 1}`}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <select aria-label={`Nối ý ${index + 1} với`} value={node.parent_id ?? ''}
-                onChange={event => update(node.id, { parent_id: event.target.value || null })}>
-                <option value="">Nối với…</option>
-                {nodes.map((target, targetIndex) => (
-                  canLink(node, target) && <option key={target.id} value={target.id}>
-                    {target.text.trim().slice(0, 80) || `Ý ${targetIndex + 1}`}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
