@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { CourseTree } from './CourseTree.jsx';
 import { Mindmap } from './Mindmap.jsx';
 import './style.css';
 
@@ -229,59 +230,8 @@ function parseStudySections(rawText) {
   return { title, tag, blocks };
 }
 
-const NODE_TYPE_DOTS = {
-  day_root: 'bg-blue-600',
-  concept: 'bg-blue-400',
-  pattern: 'bg-purple-500',
-  checkpoint: 'bg-indigo-500',
-  metric: 'bg-emerald-500',
-  trap: 'bg-pink-500',
-  case_study: 'bg-amber-400',
-  code_ref: 'bg-teal-500',
-  note: 'bg-orange-400',
-};
-
-const COURSE_LEVELS = [
-  {
-    id: 'lv1',
-    title: 'Cấp độ 1: Nền tảng & Bài toán AI',
-    badge: 'Cơ bản',
-    badgeClass: 'bg-blue-100 text-blue-700',
-    days: [1, 2, 3],
-  },
-  {
-    id: 'lv2',
-    title: 'Cấp độ 2: Prompt, UX, Data & RAG',
-    badge: 'Trung cấp',
-    badgeClass: 'bg-purple-100 text-purple-700',
-    days: [4, 5, 6, 7],
-  },
-  {
-    id: 'lv3',
-    title: 'Cấp độ 3: Agent, Eval & Safety',
-    badge: 'Nâng cao',
-    badgeClass: 'bg-emerald-100 text-emerald-700',
-    days: [8, 9, 10, 11],
-  },
-  {
-    id: 'lv4',
-    title: 'Cấp độ 4: Deploy, Kinh tế & Lab',
-    badge: 'Production',
-    badgeClass: 'bg-amber-100 text-amber-800',
-    days: [12, 13, 14],
-  },
-];
-
-function getLevelForDay(d) {
-  return COURSE_LEVELS.find(l => l.days.includes(d))?.id || 'lv1';
-}
-
-function getNodeShortLabel(node) {
-  const line = (node?.text || '').split('\n')[0] || '';
-  return line.replace(/^\[[^\]]+\]\s*/, '').trim() || 'Ý tưởng mới';
-}
-
 function App() {
+  const [view, setView] = useState('tree');
   const [day, setDay] = useState(2);
   const [tab, setTab] = useState('mindmaps');
   const [workspace, setWorkspace] = useState(null);
@@ -290,11 +240,6 @@ function App() {
   const [saving, setSaving] = useState({});
   const [messages, setMessages] = useState({});
   const [selectedId, setSelectedId] = useState(null);
-
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [rootExpanded, setRootExpanded] = useState(true);
-  const [expandedLevels, setExpandedLevels] = useState({ lv1: true, lv2: false, lv3: false, lv4: false });
-  const [expandedDays, setExpandedDays] = useState({ 2: true });
 
   const [dayMenuOpen, setDayMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -329,9 +274,14 @@ function App() {
   function selectDay(nextDay) {
     setDay(nextDay);
     setSelectedId(null);
-    const lvl = getLevelForDay(nextDay);
-    setExpandedLevels(prev => ({ ...prev, [lvl]: true }));
-    setExpandedDays(prev => ({ ...prev, [nextDay]: true }));
+  }
+
+  function switchView(nextView) {
+    setView(nextView);
+    if (nextView === 'mindmaps' || nextView === 'lab') {
+      setTab(nextView);
+    }
+    setSelectedId(null);
   }
 
   async function load() {
@@ -532,22 +482,8 @@ function App() {
     <div className="h-full flex flex-col overflow-hidden bg-slate-50 text-slate-800">
       {/* TopNavigationBar */}
       <header className="h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between z-30 shrink-0 shadow-sm">
-        {/* Left: Sidebar Toggle, Logo, Project Name, Topic Dropdown */}
+        {/* Left: Logo, Project Name, View & Day Dropdown */}
         <div className="flex items-center space-x-3">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(o => !o)}
-            className={`p-1.5 rounded-lg border transition ${
-              sidebarOpen
-                ? 'bg-blue-50 border-blue-200 text-blue-700'
-                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
-            }`}
-            title={sidebarOpen ? 'Thu gọn cây thư mục' : 'Mở cây thư mục khóa học'}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M4 6h16M4 12h16M4 18h10" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-            </svg>
-          </button>
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-blue-500/30">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -571,9 +507,11 @@ function App() {
               onClick={() => setDayMenuOpen(o => !o)}
               className="flex items-center gap-2 px-2.5 py-1.5 rounded-md hover:bg-slate-100 text-xs font-medium text-slate-700 border border-slate-200 transition"
             >
-              <span className={`w-2 h-2 rounded-full ${tab === 'mindmaps' ? 'bg-emerald-500' : 'bg-purple-500'}`} />
+              <span className={`w-2 h-2 rounded-full ${view === 'tree' ? 'bg-blue-600' : tab === 'mindmaps' ? 'bg-emerald-500' : 'bg-purple-500'}`} />
               <span className="truncate max-w-[230px] sm:max-w-[280px]">
-                D{day} · {tab === 'lab' ? `Lab: ${activeTitle}` : activeTitle}
+                {view === 'tree'
+                  ? 'Cây khóa học · 4 Cấp độ · 14 Ngày'
+                  : `D${day} · ${tab === 'lab' ? `Lab: ${activeTitle}` : activeTitle}`}
               </span>
               <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -583,14 +521,17 @@ function App() {
             {dayMenuOpen && (
               <div className="absolute left-0 mt-1.5 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2">
                 <div className="flex gap-1 p-1 bg-slate-100 rounded-lg mb-2">
-                  {Object.entries(TABS).map(([id, label]) => (
+                  {[
+                    ['tree', 'Cây khóa học'],
+                    ['mindmaps', 'Mindmap'],
+                    ['lab', 'Lab'],
+                  ].map(([id, label]) => (
                     <button
                       key={id}
                       type="button"
-                      onClick={() => { setTab(id); setSelectedId(null); }}
-                      className={`flex-1 py-1 text-xs font-semibold rounded-md transition ${
-                        tab === id ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                      }`}
+                      onClick={() => switchView(id)}
+                      className={`flex-1 py-1 text-xs font-semibold rounded-md transition ${view === id ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                        }`}
                     >
                       {label}
                     </button>
@@ -603,15 +544,14 @@ function App() {
                       type="button"
                       onClick={() => {
                         selectDay(d);
+                        if (view === 'tree') setView('mindmaps');
                         setDayMenuOpen(false);
                       }}
-                      className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 transition ${
-                        day === d ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-50'
-                      }`}
+                      className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 transition ${day === d ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-50'
+                        }`}
                     >
-                      <span className={`w-6 text-center font-mono text-[11px] px-1 py-0.5 rounded ${
-                        day === d ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
-                      }`}>
+                      <span className={`w-6 text-center font-mono text-[11px] px-1 py-0.5 rounded ${day === d ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
+                        }`}>
                         D{d}
                       </span>
                       <span className="truncate">{getDayShortTitle(workspace, d)}</span>
@@ -667,9 +607,8 @@ function App() {
           <button
             type="button"
             onClick={() => setShowGrid(g => !g)}
-            className={`p-1.5 rounded-md transition text-xs flex items-center gap-1 ${
-              showGrid ? 'text-blue-600 bg-blue-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-            }`}
+            className={`p-1.5 rounded-md transition text-xs flex items-center gap-1 ${showGrid ? 'text-blue-600 bg-blue-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
             title="Bật/Tắt Lưới"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -734,166 +673,6 @@ function App() {
 
       {/* MainWorkspace */}
       <main className="flex-1 relative overflow-hidden flex" aria-label={`${TABS[tab]} · Ngày ${day}`}>
-        {/* Hierarchical Course Folder Tree Sidebar */}
-        {sidebarOpen && (
-          <aside
-            className="w-72 shrink-0 bg-white border-r border-slate-200 flex flex-col z-20 overflow-hidden select-none"
-            aria-label="Cây thư mục khóa học"
-          >
-            <div className="px-3 py-2.5 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between gap-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600">
-                Cây thư mục
-              </span>
-              <div className="flex items-center gap-0.5 bg-slate-200/70 p-0.5 rounded-md">
-                {Object.entries(TABS).map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => { setTab(id); setSelectedId(null); }}
-                    className={`px-2 py-0.5 text-[10.5px] font-semibold rounded transition ${
-                      tab === id ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    {id === 'mindmaps' ? 'Mindmap' : 'Lab'}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-2 text-xs space-y-1">
-              {/* Root Folder */}
-              <button
-                type="button"
-                onClick={() => setRootExpanded(o => !o)}
-                className="w-full flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-slate-100 text-left font-bold text-slate-800"
-              >
-                <span className="text-slate-400 text-[10px] w-3">{rootExpanded ? '▾' : '▸'}</span>
-                <span aria-hidden="true">📁</span>
-                <span className="truncate flex-1">Khóa học AI in Action</span>
-                <span className="text-[10px] font-mono text-slate-400">14d</span>
-              </button>
-
-              {rootExpanded && (
-                <div className="pl-3 space-y-1 border-l border-slate-200 ml-3">
-                  {COURSE_LEVELS.map(level => {
-                    const isLevelOpen = !!expandedLevels[level.id];
-                    return (
-                      <div key={level.id} className="space-y-0.5">
-                        {/* Level Folder */}
-                        <button
-                          type="button"
-                          onClick={() => setExpandedLevels(prev => ({ ...prev, [level.id]: !prev[level.id] }))}
-                          className="w-full flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-slate-100 text-left transition"
-                        >
-                          <span className="text-slate-400 text-[10px] w-3 shrink-0">
-                            {isLevelOpen ? '▾' : '▸'}
-                          </span>
-                          <span aria-hidden="true" className="shrink-0">
-                            {isLevelOpen ? '📂' : '📁'}
-                          </span>
-                          <span className="font-semibold text-slate-800 truncate flex-1 text-[11.5px]">
-                            {level.title}
-                          </span>
-                          <span className={`px-1.5 py-0.5 rounded text-[9.5px] font-semibold shrink-0 ${level.badgeClass}`}>
-                            {level.badge}
-                          </span>
-                        </button>
-
-                        {/* Day Folders inside Level */}
-                        {isLevelOpen && (
-                          <div className="pl-3 space-y-0.5 border-l border-slate-200 ml-3">
-                            {level.days.map(d => {
-                              const isActiveDay = day === d;
-                              const isDayOpen = !!expandedDays[d];
-                              const dayNodes = (edits[`${tab}/${d}`] ?? workspace?.[tab]?.[d])?.nodes || [];
-                              const childNodes = dayNodes.filter(n => n.node_type !== 'day_root');
-                              return (
-                                <div key={d} className="space-y-0.5">
-                                  <div
-                                    className={`flex items-center gap-1 px-1.5 py-1 rounded-lg transition ${
-                                      isActiveDay
-                                        ? 'bg-blue-50 text-blue-700 font-semibold'
-                                        : 'text-slate-700 hover:bg-slate-100'
-                                    }`}
-                                  >
-                                    <button
-                                      type="button"
-                                      onClick={() => setExpandedDays(prev => ({ ...prev, [d]: !prev[d] }))}
-                                      className="text-slate-400 hover:text-slate-700 text-[10px] w-3.5 shrink-0"
-                                      title="Mở/đóng các ý trong ngày"
-                                    >
-                                      {isDayOpen ? '▾' : '▸'}
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        selectDay(d);
-                                        setExpandedDays(prev => ({ ...prev, [d]: true }));
-                                      }}
-                                      className="flex-1 min-w-0 flex items-center gap-1.5 text-left"
-                                    >
-                                      <span className={`font-mono text-[10px] px-1 py-0.5 rounded shrink-0 ${
-                                        isActiveDay ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
-                                      }`}>
-                                        D{String(d).padStart(2, '0')}
-                                      </span>
-                                      <span className="truncate text-[11.5px]">
-                                        {getDayShortTitle(workspace, d)}
-                                      </span>
-                                    </button>
-                                    <span className="text-[10px] text-slate-400 font-mono shrink-0 pr-0.5">
-                                      {childNodes.length}
-                                    </span>
-                                  </div>
-
-                                  {/* Child Concept / Code Nodes inside Day */}
-                                  {isDayOpen && (
-                                    <div className="pl-4 space-y-0.5 border-l border-slate-200 ml-2.5">
-                                      {childNodes.length === 0 ? (
-                                        <div className="px-2 py-1 text-[11px] italic text-slate-400">
-                                          (Trống — tự ghi chú)
-                                        </div>
-                                      ) : (
-                                        childNodes.map(node => {
-                                          const isNodeSel = isActiveDay && selectedId === node.id;
-                                          const dotClass = NODE_TYPE_DOTS[node.node_type] || 'bg-slate-400';
-                                          return (
-                                            <button
-                                              key={node.id}
-                                              type="button"
-                                              onClick={() => {
-                                                if (day !== d) setDay(d);
-                                                setSelectedId(node.id);
-                                              }}
-                                              className={`w-full flex items-center gap-2 px-2 py-1 rounded-md text-left text-[11px] transition ${
-                                                isNodeSel
-                                                  ? 'bg-blue-600 text-white font-semibold'
-                                                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                                              }`}
-                                              title={getNodeShortLabel(node)}
-                                            >
-                                              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isNodeSel ? 'bg-white' : dotClass}`} />
-                                              <span className="truncate">{getNodeShortLabel(node)}</span>
-                                            </button>
-                                          );
-                                        })
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </aside>
-        )}
-
         {!workspace ? (
           <section className="flex-1 flex flex-col items-center justify-center gap-3 text-sm text-slate-500">
             {loadError ? (
@@ -911,6 +690,29 @@ function App() {
               <p role="status">Đang tải Knowledge Graph…</p>
             )}
           </section>
+        ) : view === 'tree' ? (
+          <CourseTree
+            workspace={workspace}
+            edits={edits}
+            contentTab={tab}
+            activeDay={day}
+            selectedNodeId={selectedId}
+            showGrid={showGrid}
+            searchQuery={searchQuery}
+            layoutTrigger={layoutTrigger}
+            onSelectConcept={(targetDay, nodeId) => {
+              setDay(targetDay);
+              setSelectedId(nodeId);
+            }}
+            onOpenDayCanvas={targetDay => {
+              setDay(targetDay);
+              setView(tab);
+              setSelectedId(null);
+            }}
+            onOpenMapper={() => setMapperOpen(open => !open)}
+            onSwitchView={switchView}
+            onSwitchContentTab={t => { setTab(t); setSelectedId(null); }}
+          />
         ) : (
           <Mindmap
             key={key}
@@ -926,7 +728,8 @@ function App() {
             day={day}
             tab={tab}
             onSwitchDay={selectDay}
-            onSwitchTab={t => { setTab(t); setSelectedId(null); }}
+            onSwitchTab={t => { setTab(t); setView(t); setSelectedId(null); }}
+            onSwitchView={switchView}
           />
         )}
 
@@ -1155,11 +958,10 @@ function App() {
                           {appliedTargets.map(t => (
                             <span
                               key={t.id}
-                              className={`px-2 py-1 rounded-lg border text-[11px] font-medium ${
-                                t.node_kind === 'checkpoint'
+                              className={`px-2 py-1 rounded-lg border text-[11px] font-medium ${t.node_kind === 'checkpoint'
                                   ? 'bg-indigo-100/80 border-indigo-200 text-indigo-900 font-semibold'
                                   : 'bg-teal-50 border-teal-200 text-teal-900 font-mono text-[10.5px]'
-                              }`}
+                                }`}
                             >
                               {t.node_kind === 'checkpoint' ? `⚑ ${t.id}` : `‹› ${t.label}`}
                             </span>
@@ -1259,7 +1061,7 @@ function App() {
         {/* AI Lecture-to-Lab GraphRAG Mapper Drawer (Left) */}
         {mapperOpen && (
           <aside
-            className={`fixed top-16 ${sidebarOpen ? 'left-[304px]' : 'left-16'} bottom-20 w-[min(430px,calc(100vw-5rem))] bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-2xl z-30 flex flex-col overflow-hidden`}
+            className="fixed top-16 left-16 bottom-20 w-[min(430px,calc(100vw-5rem))] bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-2xl z-30 flex flex-col overflow-hidden"
             aria-label="AI Lecture-to-Lab Mapper"
           >
             <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50/70">
@@ -1316,11 +1118,10 @@ function App() {
                       key={id}
                       type="button"
                       onClick={() => setMapMode(id)}
-                      className={`px-2 py-1 rounded-md text-[11px] font-medium border transition ${
-                        mapMode === id
+                      className={`px-2 py-1 rounded-md text-[11px] font-medium border transition ${mapMode === id
                           ? 'bg-blue-600 border-blue-600 text-white'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                      }`}
+                        }`}
                     >
                       {label}
                     </button>
@@ -1336,11 +1137,10 @@ function App() {
                       key={id}
                       type="button"
                       onClick={() => setMapDirection(id)}
-                      className={`px-2 py-1 rounded-md text-[11px] font-medium border transition ${
-                        mapDirection === id
+                      className={`px-2 py-1 rounded-md text-[11px] font-medium border transition ${mapDirection === id
                           ? 'bg-indigo-600 border-indigo-600 text-white'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                      }`}
+                        }`}
                     >
                       {label}
                     </button>
@@ -1360,13 +1160,12 @@ function App() {
 
               {mapResult && (
                 <div className="space-y-2.5">
-                  <div className={`px-3 py-2 rounded-lg font-semibold ${
-                    mapResult.blocked
+                  <div className={`px-3 py-2 rounded-lg font-semibold ${mapResult.blocked
                       ? 'bg-red-50 text-red-700 border border-red-200'
                       : mapResult.abstention
                         ? 'bg-amber-50 text-amber-800 border border-amber-200'
                         : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  }`}>
+                    }`}>
                     {mapResult.blocked
                       ? '🛑 Input Guardrail: Đã chặn Prompt Injection'
                       : mapResult.abstention
@@ -1500,9 +1299,8 @@ function App() {
                       {ingestLoading ? 'Đang trích xuất & nối Graph…' : 'Nạp vào GraphRAG DB'}
                     </button>
                     {ingestStatus && (
-                      <div className={`px-2.5 py-1.5 rounded-lg font-medium ${
-                        ingestStatus.ok ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
-                      }`}>
+                      <div className={`px-2.5 py-1.5 rounded-lg font-medium ${ingestStatus.ok ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
+                        }`}>
                         {ingestStatus.ok
                           ? `✅ Đã nạp ${ingestStatus.data.lecture_id}: +${ingestStatus.data.nodes_added} nút, +${ingestStatus.data.edges_added} cạnh (${ingestStatus.data.cross_links_created} liên kết chéo).`
                           : ingestStatus.message}

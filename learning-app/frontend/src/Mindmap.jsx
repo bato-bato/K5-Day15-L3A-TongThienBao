@@ -108,6 +108,7 @@ export function Mindmap({
   tab = 'mindmaps',
   onSwitchDay,
   onSwitchTab,
+  onSwitchView,
 }) {
   const viewport = useRef(null);
   const drag = useRef(null);
@@ -814,12 +815,19 @@ export function Mindmap({
         <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg shrink-0">
           <button
             type="button"
+            onClick={() => onSwitchView?.('tree')}
+            className="px-2 py-1 text-[11px] rounded-md font-semibold text-slate-600 hover:text-slate-900 transition"
+          >
+            Cây khóa học
+          </button>
+          <button
+            type="button"
             onClick={() => onSwitchTab?.('mindmaps')}
             className={`px-2 py-1 text-[11px] rounded-md font-semibold transition ${
               tab === 'mindmaps' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Mindmap
+            Mindmap ngày
           </button>
           <button
             type="button"
