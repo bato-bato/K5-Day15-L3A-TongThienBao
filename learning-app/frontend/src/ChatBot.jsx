@@ -184,7 +184,7 @@ export function ChatBot({ day, focus, onJumpToConcept }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed right-4 bottom-24 z-40 flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-xs font-semibold shadow-xl shadow-blue-500/30 hover:scale-[1.03] transition"
+        className="fixed right-4 bottom-24 md:bottom-40 z-40 flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-xs font-semibold shadow-xl shadow-blue-500/30 hover:scale-[1.03] transition"
         aria-label="Mở Gia sư AI"
       >
         <span className="text-base">🎓</span> Gia sư AI
@@ -195,7 +195,7 @@ export function ChatBot({ day, focus, onJumpToConcept }) {
 
   return (
     <aside
-      className="fixed right-4 bottom-24 z-40 w-[min(420px,calc(100vw-2rem))] h-[min(640px,calc(100vh-9rem))] bg-white border border-slate-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-xs"
+      className="fixed right-4 bottom-24 md:bottom-40 z-40 w-[min(420px,calc(100vw-2rem))] h-[min(640px,calc(100vh-9rem))] md:h-[min(640px,calc(100vh-14rem))] bg-white border border-slate-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-xs"
       aria-label="Gia sư AI KG-RAG"
     >
       <div className="bg-gradient-to-r from-indigo-700 to-blue-700 px-4 py-2.5 text-white shrink-0">

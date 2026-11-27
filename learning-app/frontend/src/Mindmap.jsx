@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   LEFT_THEMES,
   RIGHT_THEMES,
@@ -6,13 +6,11 @@ import {
   getNodeTitle,
   extractSubBranches,
 } from './CourseTree.jsx';
+import { useMindmapViewport } from './useMindmapViewport.js';
 
 const MAX_POSITION = 4096;
 const MAX_NODES = 100;
-const MIN_ZOOM = 0.45;
-const MAX_ZOOM = 1.45;
 const clamp = value => Math.max(0, Math.min(MAX_POSITION, Math.round(value)));
-const clampZoom = value => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Number(value.toFixed(2))));
 
 const XMIND_THEMES = [...LEFT_THEMES, ...RIGHT_THEMES];
 
@@ -312,15 +310,11 @@ export function Mindmap({
   onSwitchTab,
   onSwitchView,
 }) {
-  const viewport = useRef(null);
-  const pan = useRef(null);
   const newNode = useRef(null);
-  const [zoom, setZoom] = useState(0.88);
   const [editingId, setEditingId] = useState(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [nodeColors, setNodeColors] = useState({});
   const [filterType, setFilterType] = useState(null);
-  const [vpRect, setVpRect] = useState({ left: 0, top: 0, width: 1200, height: 700 });
 
   const byId = useMemo(() => new Map(nodes.map(node => [node.id, node])), [nodes]);
   const selectedNode = nodes.find(n => n.id === selectedId) || null;
@@ -332,78 +326,16 @@ export function Mindmap({
   );
   const placedById = useMemo(() => new Map(layout.nodes.map(n => [n.id, n])), [layout.nodes]);
 
-  function syncViewportRect() {
-    const vp = viewport.current;
-    if (!vp) return;
-    setVpRect({
-      left: vp.scrollLeft / zoom,
-      top: vp.scrollTop / zoom,
-      width: vp.clientWidth / zoom,
-      height: vp.clientHeight / zoom,
+  const { zoom, stepZoom, fitToView, centerView, viewportProps, layerStyle, minimapStyle } =
+    useMindmapViewport(layout, {
+      viewKey: `${day}:${tab}`,
+      layoutTrigger,
+      bottomInset: 60,
+      onBackgroundPointerDown: () => {
+        onSelect?.(null);
+        setPaletteOpen(false);
+      },
     });
-  }
-
-  function fitToView() {
-    const vp = viewport.current;
-    if (!vp || !layout.nodes.length) return;
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-    for (const n of layout.nodes) {
-      minX = Math.min(minX, n.x);
-      minY = Math.min(minY, n.y);
-      maxX = Math.max(maxX, n.x + n.width);
-      maxY = Math.max(maxY, n.y + n.height);
-    }
-    const pad = 64;
-    const contentW = Math.max(600, maxX - minX + pad * 2);
-    const contentH = Math.max(380, maxY - minY + pad * 2);
-    const fitZ = clampZoom(Math.min(1.05, (vp.clientWidth - 40) / contentW, (vp.clientHeight - 110) / contentH));
-    setZoom(fitZ);
-
-    const cx = (minX + maxX) / 2;
-    const cy = (minY + maxY) / 2;
-    requestAnimationFrame(() => {
-      vp.scrollTo({
-        left: Math.max(0, cx * fitZ - vp.clientWidth / 2),
-        top: Math.max(0, cy * fitZ - (vp.clientHeight - 60) / 2),
-        behavior: 'smooth',
-      });
-      syncViewportRect();
-    });
-  }
-
-  function centerView() {
-    const vp = viewport.current;
-    if (!vp) return;
-    const root = placedById.get('root');
-    if (!root) return;
-    const cx = root.x + root.width / 2;
-    const cy = root.y + root.height / 2;
-    vp.scrollTo({
-      left: Math.max(0, cx * zoom - vp.clientWidth / 2),
-      top: Math.max(0, cy * zoom - vp.clientHeight / 2),
-      behavior: 'smooth',
-    });
-  }
-
-  useEffect(() => {
-    fitToView();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [day, tab]);
-
-  useEffect(() => {
-    if (layoutTrigger > 0) {
-      fitToView();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [layoutTrigger]);
-
-  useEffect(() => {
-    syncViewportRect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [zoom, layout.nodes.length]);
 
   function update(id, changes) {
     onChange(nodes.map(node => (node.id === id ? { ...node, ...changes } : node)));
@@ -459,25 +391,6 @@ export function Mindmap({
       ancestor = byId.get(ancestor.parent_id);
     }
     return true;
-  }
-
-  function startPan(event) {
-    if (event.target !== event.currentTarget || event.button !== 0 || event.pointerType === 'touch') return;
-    onSelect?.(null);
-    setPaletteOpen(false);
-    const { scrollLeft, scrollTop } = viewport.current;
-    pan.current = { scrollLeft, scrollTop, x: event.clientX, y: event.clientY, pointer: event.pointerId };
-    event.currentTarget.setPointerCapture(event.pointerId);
-  }
-
-  function movePan(event) {
-    const start = pan.current;
-    if (start?.pointer !== event.pointerId) return;
-    viewport.current.scrollTo(
-      start.scrollLeft + start.x - event.clientX,
-      start.scrollTop + start.y - event.clientY,
-    );
-    syncViewportRect();
   }
 
   function buildSymmetricEdge(edge) {
@@ -676,149 +589,37 @@ export function Mindmap({
       {/* Interactive XMind Canvas */}
       <div
         id="canvas-container"
-        ref={viewport}
-        onScroll={syncViewportRect}
+        {...viewportProps}
         tabIndex={0}
         aria-label="Canvas sơ đồ tư duy XMind"
-        className={`flex-1 h-full w-full relative overflow-auto ${showGrid ? 'bg-dot-grid' : 'bg-plain-canvas'}`}
+        className={`mindmap-viewport flex-1 h-full w-full relative ${showGrid ? 'bg-dot-grid' : 'bg-plain-canvas'}`}
       >
-        <div
-          className="relative"
-          style={{ width: Math.round(layout.canvasW * zoom), height: Math.round(layout.canvasH * zoom) }}
-        >
-          <div
-            className="relative"
-            style={{
-              width: layout.canvasW,
-              height: layout.canvasH,
-              transform: `scale(${zoom})`,
-              transformOrigin: '0 0',
-            }}
-            onPointerDown={startPan}
-            onPointerMove={movePan}
-            onLostPointerCapture={event => {
-              if (event.target === event.currentTarget) pan.current = null;
-            }}
-          >
-            {/* Color-matched Smooth Bezier Branches */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
-              {layout.edges.map(edge => {
-                const d = buildSymmetricEdge(edge);
-                if (!d) return null;
-                const isSelected = edge.nodeId && edge.nodeId === selectedId;
-                return (
-                  <path
-                    key={edge.id}
-                    d={d}
-                    fill="none"
-                    stroke={edge.theme.solid}
-                    strokeWidth={isSelected ? 2.4 : 1.5}
-                    strokeLinecap="round"
-                    opacity={isSelected ? 1 : 0.72}
-                  />
-                );
-              })}
-            </svg>
+        <div className="mindmap-layer" data-mindmap-layer style={layerStyle}>
+          {/* Color-matched Smooth Bezier Branches */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
+            {layout.edges.map(edge => {
+              const d = buildSymmetricEdge(edge);
+              if (!d) return null;
+              const isSelected = edge.nodeId && edge.nodeId === selectedId;
+              return (
+                <path
+                  key={edge.id}
+                  d={d}
+                  fill="none"
+                  stroke={edge.theme.solid}
+                  strokeWidth={isSelected ? 2.4 : 1.5}
+                  strokeLinecap="round"
+                  opacity={isSelected ? 1 : 0.72}
+                />
+              );
+            })}
+          </svg>
 
-            {/* Symmetric 3-Level XMind Nodes */}
-            {layout.nodes.map(node => {
-              const isSelected = node.nodeId && node.nodeId === selectedId;
+          {/* Symmetric 3-Level XMind Nodes */}
+          {layout.nodes.map(node => {
+            const isSelected = node.nodeId && node.nodeId === selectedId;
 
-              if (node.kind === 'root') {
-                return (
-                  <button
-                    key={node.id}
-                    type="button"
-                    onClick={e => {
-                      e.stopPropagation();
-                      if (node.nodeId) onSelect?.(node.nodeId);
-                    }}
-                    onDoubleClick={e => {
-                      e.stopPropagation();
-                      if (node.nodeId) setEditingId(node.nodeId);
-                    }}
-                    style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
-                    className={`mindmap-node rounded-2xl bg-[#111E38] text-white shadow-xl hover:shadow-2xl px-4 py-3 flex flex-col items-center justify-center text-center z-10 border border-slate-700 cursor-pointer ${
-                      isSelected ? 'ring-2 ring-offset-2 ring-blue-500' : ''
-                    } ${node.dimmed ? 'opacity-25' : ''}`}
-                    title="Bấm chọn · Bấm đúp để chỉnh sửa"
-                  >
-                    <div className="text-[13.5px] font-bold tracking-tight text-white mb-1.5">
-                      {node.title}
-                    </div>
-                    {node.lines.map((line, i) => (
-                      <div key={i} className="text-[11px] text-slate-300 leading-snug truncate max-w-full">
-                        {line}
-                      </div>
-                    ))}
-                  </button>
-                );
-              }
-
-              if (node.kind === 'l1') {
-                return (
-                  <button
-                    key={node.id}
-                    type="button"
-                    onClick={e => {
-                      e.stopPropagation();
-                      if (node.nodeId) onSelect?.(node.nodeId);
-                    }}
-                    onDoubleClick={e => {
-                      e.stopPropagation();
-                      if (node.nodeId) setEditingId(node.nodeId);
-                    }}
-                    style={{
-                      position: 'absolute',
-                      left: node.x,
-                      top: node.y,
-                      width: node.width,
-                      height: node.height,
-                      backgroundColor: node.theme.solid,
-                    }}
-                    className={`mindmap-node rounded-lg px-3 flex items-center justify-center text-center text-white font-bold text-[12px] shadow-md hover:brightness-105 z-10 cursor-pointer ${
-                      isSelected ? 'ring-2 ring-offset-2 ring-slate-900' : ''
-                    } ${node.dimmed ? 'opacity-25' : ''}`}
-                    title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
-                  >
-                    <span className="truncate">{node.text}</span>
-                  </button>
-                );
-              }
-
-              if (node.kind === 'l2') {
-                return (
-                  <button
-                    key={node.id}
-                    type="button"
-                    onClick={e => {
-                      e.stopPropagation();
-                      if (node.nodeId) onSelect?.(node.nodeId);
-                    }}
-                    onDoubleClick={e => {
-                      e.stopPropagation();
-                      if (node.nodeId) setEditingId(node.nodeId);
-                    }}
-                    style={{
-                      position: 'absolute',
-                      left: node.x,
-                      top: node.y,
-                      width: node.width,
-                      height: node.height,
-                      backgroundColor: node.theme.tint,
-                      borderColor: node.theme.tintBorder,
-                      color: node.theme.tintText,
-                    }}
-                    className={`mindmap-node rounded-md border px-2.5 flex items-center justify-center text-center font-semibold text-[11.5px] shadow-2xs hover:shadow-sm z-10 cursor-pointer ${
-                      isSelected ? 'ring-2 ring-blue-500' : ''
-                    } ${node.dimmed ? 'opacity-25' : ''}`}
-                    title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
-                  >
-                    <span className="truncate">{node.text}</span>
-                  </button>
-                );
-              }
-
+            if (node.kind === 'root') {
               return (
                 <button
                   key={node.id}
@@ -832,68 +633,161 @@ export function Mindmap({
                     if (node.nodeId) setEditingId(node.nodeId);
                   }}
                   style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
-                  className={`mindmap-node rounded-md bg-white px-2.5 flex items-center justify-center text-center text-[11px] font-medium text-slate-700 border shadow-2xs hover:border-slate-400 z-10 cursor-pointer ${
-                    isSelected ? 'border-blue-600 ring-1 ring-blue-300' : 'border-slate-300/85'
+                  className={`mindmap-node rounded-2xl bg-[#111E38] text-white shadow-xl hover:shadow-2xl px-4 py-3 flex flex-col items-center justify-center text-center z-10 border border-slate-700 cursor-pointer ${
+                    isSelected ? 'ring-2 ring-offset-2 ring-blue-500' : ''
+                  } ${node.dimmed ? 'opacity-25' : ''}`}
+                  title="Bấm chọn · Bấm đúp để chỉnh sửa"
+                >
+                  <div className="text-[13.5px] font-bold tracking-tight text-white mb-1.5">
+                    {node.title}
+                  </div>
+                  {node.lines.map((line, i) => (
+                    <div key={i} className="text-[11px] text-slate-300 leading-snug truncate max-w-full">
+                      {line}
+                    </div>
+                  ))}
+                </button>
+              );
+            }
+
+            if (node.kind === 'l1') {
+              return (
+                <button
+                  key={node.id}
+                  type="button"
+                  onClick={e => {
+                    e.stopPropagation();
+                    if (node.nodeId) onSelect?.(node.nodeId);
+                  }}
+                  onDoubleClick={e => {
+                    e.stopPropagation();
+                    if (node.nodeId) setEditingId(node.nodeId);
+                  }}
+                  style={{
+                    position: 'absolute',
+                    left: node.x,
+                    top: node.y,
+                    width: node.width,
+                    height: node.height,
+                    backgroundColor: node.theme.solid,
+                  }}
+                  className={`mindmap-node rounded-lg px-3 flex items-center justify-center text-center text-white font-bold text-[12px] shadow-md hover:brightness-105 z-10 cursor-pointer ${
+                    isSelected ? 'ring-2 ring-offset-2 ring-slate-900' : ''
                   } ${node.dimmed ? 'opacity-25' : ''}`}
                   title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
                 >
                   <span className="truncate">{node.text}</span>
                 </button>
               );
-            })}
+            }
 
-            {/* Inline Editor Popover */}
-            {editingNode && editingAnchor && (
-              <div
-                onClick={e => e.stopPropagation()}
-                style={{
-                  position: 'absolute',
-                  left: Math.max(16, Math.min(layout.canvasW - 300, editingAnchor.x)),
-                  top: Math.max(16, editingAnchor.y + editingAnchor.height + 8),
-                }}
-                className="bg-white rounded-2xl shadow-2xl border-2 border-blue-600 p-3 space-y-2 w-[280px] z-40"
-              >
-                <textarea
-                  rows={3}
-                  ref={input => {
-                    if (input && newNode.current === editingNode.id) {
-                      newNode.current = null;
-                      input.focus();
-                    }
+            if (node.kind === 'l2') {
+              return (
+                <button
+                  key={node.id}
+                  type="button"
+                  onClick={e => {
+                    e.stopPropagation();
+                    if (node.nodeId) onSelect?.(node.nodeId);
                   }}
-                  value={editingNode.text}
-                  maxLength={20000}
-                  placeholder="Nhập nội dung nút..."
-                  onChange={e => update(editingNode.id, { text: e.target.value })}
-                  className="w-full text-xs border border-slate-300 rounded-lg p-2 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500"
-                />
-                <div className="flex items-center gap-1.5">
-                  <select
-                    aria-label="Nối ý với"
-                    value={editingNode.parent_id ?? ''}
-                    onChange={e => update(editingNode.id, { parent_id: e.target.value || null })}
-                    className="flex-1 min-w-0 text-[11px] border border-slate-300 rounded-md py-1 px-2 bg-white"
-                  >
-                    <option value="">Nút gốc (không nối)</option>
-                    {nodes.map((target, tIdx) => (
-                      canLink(editingNode, target) && (
-                        <option key={target.id} value={target.id}>
-                          ↳ {getNodeTitle(target).slice(0, 42) || `Ý ${tIdx + 1}`}
-                        </option>
-                      )
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={() => setEditingId(null)}
-                    className="px-2.5 py-1 text-xs font-semibold bg-blue-600 text-white rounded-md shrink-0"
-                  >
-                    Xong
-                  </button>
-                </div>
+                  onDoubleClick={e => {
+                    e.stopPropagation();
+                    if (node.nodeId) setEditingId(node.nodeId);
+                  }}
+                  style={{
+                    position: 'absolute',
+                    left: node.x,
+                    top: node.y,
+                    width: node.width,
+                    height: node.height,
+                    backgroundColor: node.theme.tint,
+                    borderColor: node.theme.tintBorder,
+                    color: node.theme.tintText,
+                  }}
+                  className={`mindmap-node rounded-md border px-2.5 flex items-center justify-center text-center font-semibold text-[11.5px] shadow-2xs hover:shadow-sm z-10 cursor-pointer ${
+                    isSelected ? 'ring-2 ring-blue-500' : ''
+                  } ${node.dimmed ? 'opacity-25' : ''}`}
+                  title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
+                >
+                  <span className="truncate">{node.text}</span>
+                </button>
+              );
+            }
+
+            return (
+              <button
+                key={node.id}
+                type="button"
+                onClick={e => {
+                  e.stopPropagation();
+                  if (node.nodeId) onSelect?.(node.nodeId);
+                }}
+                onDoubleClick={e => {
+                  e.stopPropagation();
+                  if (node.nodeId) setEditingId(node.nodeId);
+                }}
+                style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
+                className={`mindmap-node rounded-md bg-white px-2.5 flex items-center justify-center text-center text-[11px] font-medium text-slate-700 border shadow-2xs hover:border-slate-400 z-10 cursor-pointer ${
+                  isSelected ? 'border-blue-600 ring-1 ring-blue-300' : 'border-slate-300/85'
+                } ${node.dimmed ? 'opacity-25' : ''}`}
+                title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
+              >
+                <span className="truncate">{node.text}</span>
+              </button>
+            );
+          })}
+
+          {/* Inline Editor Popover */}
+          {editingNode && editingAnchor && (
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                position: 'absolute',
+                left: Math.max(16, Math.min(layout.canvasW - 300, editingAnchor.x)),
+                top: Math.max(16, editingAnchor.y + editingAnchor.height + 8),
+              }}
+              className="bg-white rounded-2xl shadow-2xl border-2 border-blue-600 p-3 space-y-2 w-[280px] z-40"
+            >
+              <textarea
+                rows={3}
+                ref={input => {
+                  if (input && newNode.current === editingNode.id) {
+                    newNode.current = null;
+                    input.focus();
+                  }
+                }}
+                value={editingNode.text}
+                maxLength={20000}
+                placeholder="Nhập nội dung nút..."
+                onChange={e => update(editingNode.id, { text: e.target.value })}
+                className="w-full text-xs border border-slate-300 rounded-lg p-2 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500"
+              />
+              <div className="flex items-center gap-1.5">
+                <select
+                  aria-label="Nối ý với"
+                  value={editingNode.parent_id ?? ''}
+                  onChange={e => update(editingNode.id, { parent_id: e.target.value || null })}
+                  className="flex-1 min-w-0 text-[11px] border border-slate-300 rounded-md py-1 px-2 bg-white"
+                >
+                  <option value="">Nút gốc (không nối)</option>
+                  {nodes.map((target, tIdx) => (
+                    canLink(editingNode, target) && (
+                      <option key={target.id} value={target.id}>
+                        ↳ {getNodeTitle(target).slice(0, 42) || `Ý ${tIdx + 1}`}
+                      </option>
+                    )
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setEditingId(null)}
+                  className="px-2.5 py-1 text-xs font-semibold bg-blue-600 text-white rounded-md shrink-0"
+                >
+                  Xong
+                </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -901,7 +795,7 @@ export function Mindmap({
       <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 bg-white/95 backdrop-blur-sm border border-slate-200 shadow-xl rounded-xl px-3 py-1.5 flex items-center space-x-2 max-w-[calc(100vw-2rem)] overflow-x-auto">
         <button
           type="button"
-          onClick={() => setZoom(z => clampZoom(z - 0.1))}
+          onClick={() => stepZoom(-1)}
           className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
           title="Thu nhỏ"
         >
@@ -916,7 +810,7 @@ export function Mindmap({
 
         <button
           type="button"
-          onClick={() => setZoom(z => clampZoom(z + 0.1))}
+          onClick={() => stepZoom(1)}
           className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
           title="Phóng to"
         >
@@ -929,7 +823,7 @@ export function Mindmap({
 
         <button
           type="button"
-          onClick={centerView}
+          onClick={() => centerView(placedById.get('root'))}
           className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition"
           title="Căn giữa màn hình"
         >
@@ -1024,12 +918,7 @@ export function Mindmap({
             ))}
           <div
             className="absolute border border-blue-600 bg-blue-500/10 rounded pointer-events-none"
-            style={{
-              left: `${Math.max(0, Math.min(95, (vpRect.left / layout.canvasW) * 100))}%`,
-              top: `${Math.max(0, Math.min(95, (vpRect.top / layout.canvasH) * 100))}%`,
-              width: `${Math.max(10, Math.min(100, (vpRect.width / layout.canvasW) * 100))}%`,
-              height: `${Math.max(10, Math.min(100, (vpRect.height / layout.canvasH) * 100))}%`,
-            }}
+            style={minimapStyle}
           />
         </div>
       </div>

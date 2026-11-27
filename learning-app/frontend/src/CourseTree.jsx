@@ -1,8 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-
-const MIN_ZOOM = 0.45;
-const MAX_ZOOM = 1.45;
-const clampZoom = value => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Number(value.toFixed(2))));
+import { useMindmapViewport } from './useMindmapViewport.js';
 
 export const COURSE_LEVELS = [
   { id: 'lv1', title: 'Cấp độ 1: Nền tảng & Bài toán AI', badge: 'Cơ bản', days: [1, 2, 3] },
@@ -611,13 +608,9 @@ export function getNodeTitle(node) {
         onSwitchView,
         onSwitchContentTab,
       }) {
-        const viewport = useRef(null);
-        const pan = useRef(null);
         const clickTimer = useRef(null);
-        const [zoom, setZoom] = useState(0.88);
         const [page, setPage] = useState('all');
         const [expandedIds, setExpandedIds] = useState(() => new Set());
-        const [vpRect, setVpRect] = useState({ left: 0, top: 0, width: 1200, height: 700 });
 
         useEffect(() => () => {
           if (clickTimer.current) clearTimeout(clickTimer.current);
@@ -628,6 +621,8 @@ export function getNodeTitle(node) {
           [workspace, edits, contentTab, page, searchQuery, expandedIds],
         );
         const byId = useMemo(() => new Map(tree.nodes.map(n => [n.id, n])), [tree.nodes]);
+        const { zoom, stepZoom, fitToView, centerView, viewportProps, layerStyle, minimapStyle } =
+          useMindmapViewport(tree, { viewKey: `${page}:${contentTab}`, layoutTrigger, bottomInset: 70 });
 
         function toggleExpand(nodeId) {
           setExpandedIds(prev => {
@@ -674,72 +669,6 @@ export function getNodeTitle(node) {
           setExpandedIds(new Set(tree.allExpandableIds));
         }
 
-        function syncViewportRect() {
-          const vp = viewport.current;
-          if (!vp) return;
-          setVpRect({
-            left: vp.scrollLeft / zoom,
-            top: vp.scrollTop / zoom,
-            width: vp.clientWidth / zoom,
-            height: vp.clientHeight / zoom,
-          });
-        }
-
-        function fitToView() {
-          const vp = viewport.current;
-          if (!vp || !tree.nodes.length) return;
-          let minX = Infinity;
-          let minY = Infinity;
-          let maxX = -Infinity;
-          let maxY = -Infinity;
-          for (const n of tree.nodes) {
-            minX = Math.min(minX, n.x);
-            minY = Math.min(minY, n.y);
-            maxX = Math.max(maxX, n.x + n.width);
-            maxY = Math.max(maxY, n.y + n.height);
-          }
-          const pad = 64;
-          const contentW = Math.max(600, maxX - minX + pad * 2);
-          const contentH = Math.max(380, maxY - minY + pad * 2);
-          const fitZ = clampZoom(Math.min(1.05, (vp.clientWidth - 40) / contentW, (vp.clientHeight - 110) / contentH));
-          setZoom(fitZ);
-
-          const cx = (minX + maxX) / 2;
-          const cy = (minY + maxY) / 2;
-          requestAnimationFrame(() => {
-            vp.scrollTo({
-              left: Math.max(0, cx * fitZ - vp.clientWidth / 2),
-              top: Math.max(0, cy * fitZ - (vp.clientHeight - 70) / 2),
-              behavior: 'smooth',
-            });
-            syncViewportRect();
-          });
-        }
-
-        function centerView() {
-          const vp = viewport.current;
-          if (!vp || !tree.nodes.length) return;
-          const root = byId.get('root');
-          if (!root) return;
-          const cx = root.x + root.width / 2;
-          const cy = root.y + root.height / 2;
-          vp.scrollTo({
-            left: Math.max(0, cx * zoom - vp.clientWidth / 2),
-            top: Math.max(0, cy * zoom - vp.clientHeight / 2),
-            behavior: 'smooth',
-          });
-        }
-
-        useEffect(() => {
-          fitToView();
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, []);
-
-        useEffect(() => {
-          if (layoutTrigger > 0) fitToView();
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [layoutTrigger]);
-
         useEffect(() => {
           if (page !== 'all' && activeDay && page !== activeDay) {
             setPage(activeDay);
@@ -751,38 +680,11 @@ export function getNodeTitle(node) {
           setExpandedIds(new Set());
         }, [page, contentTab]);
 
-        useEffect(() => {
-          fitToView();
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [page, contentTab, expandedIds]);
-
-        useEffect(() => {
-          syncViewportRect();
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [zoom, tree.nodes.length]);
-
         function goToPage(nextPage) {
           setPage(nextPage);
           if (nextPage !== 'all') {
             onSelectDay?.(nextPage);
           }
-        }
-
-        function startPan(event) {
-          if (event.target !== event.currentTarget || event.button !== 0 || event.pointerType === 'touch') return;
-          const { scrollLeft, scrollTop } = viewport.current;
-          pan.current = { scrollLeft, scrollTop, x: event.clientX, y: event.clientY, pointer: event.pointerId };
-          event.currentTarget.setPointerCapture(event.pointerId);
-        }
-
-        function movePan(event) {
-          const start = pan.current;
-          if (start?.pointer !== event.pointerId) return;
-          viewport.current.scrollTo(
-            start.scrollLeft + start.x - event.clientX,
-            start.scrollTop + start.y - event.clientY,
-          );
-          syncViewportRect();
         }
 
         function buildSymmetricEdge(edge) {
@@ -862,159 +764,143 @@ export function getNodeTitle(node) {
 
             {/* Canvas */}
             <div
-              ref={viewport}
-              onScroll={syncViewportRect}
+              {...viewportProps}
               tabIndex={0}
               aria-label="Canvas sơ đồ đối xứng"
-              className={`flex-1 h-full w-full relative overflow-auto ${showGrid ? 'bg-dot-grid' : 'bg-plain-canvas'}`}
+              className={`mindmap-viewport flex-1 h-full w-full relative ${showGrid ? 'bg-dot-grid' : 'bg-plain-canvas'}`}
             >
-              <div style={{ width: Math.round(tree.canvasW * zoom), height: Math.round(tree.canvasH * zoom) }} className="relative">
-                <div
-                  className="relative"
-                  style={{
-                    width: tree.canvasW,
-                    height: tree.canvasH,
-                    transform: `scale(${zoom})`,
-                    transformOrigin: '0 0',
-                  }}
-                  onPointerDown={startPan}
-                  onPointerMove={movePan}
-                  onLostPointerCapture={event => {
-                    if (event.target === event.currentTarget) pan.current = null;
-                  }}
-                >
-                  {/* Color-matched Smooth Bezier Branches */}
-                  <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
-                    {tree.edges.map(edge => {
-                      const d = buildSymmetricEdge(edge);
-                      if (!d) return null;
-                      const isSelected = edge.conceptId && edge.conceptId === selectedNodeId;
-                      return (
-                        <path
-                          key={edge.id}
-                          d={d}
-                          fill="none"
-                          stroke={edge.theme.solid}
-                          strokeWidth={isSelected ? 2.4 : 1.5}
-                          strokeLinecap="round"
-                          opacity={isSelected ? 1 : 0.72}
-                        />
-                      );
-                    })}
-                  </svg>
+              <div className="mindmap-layer" data-mindmap-layer style={layerStyle}>
+                {/* Color-matched Smooth Bezier Branches */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
+                  {tree.edges.map(edge => {
+                    const d = buildSymmetricEdge(edge);
+                    if (!d) return null;
+                    const isSelected = edge.conceptId && edge.conceptId === selectedNodeId;
+                    return (
+                      <path
+                        key={edge.id}
+                        d={d}
+                        fill="none"
+                        stroke={edge.theme.solid}
+                        strokeWidth={isSelected ? 2.4 : 1.5}
+                        strokeLinecap="round"
+                        opacity={isSelected ? 1 : 0.72}
+                      />
+                    );
+                  })}
+                </svg>
 
-                  {/* Symmetric Nodes */}
-                  {tree.nodes.map(node => {
-                    if (node.kind === 'root') {
-                      return (
-                        <button
-                          key={node.id}
-                          type="button"
-                          onClick={() => handleNodeDoubleClick(node)}
-                          title={page === 'all' ? 'Khóa học AI20K · 14 Ngày' : 'Bấm để xem chi tiết ngày học'}
-                          style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
-                          className="mindmap-node rounded-2xl bg-[#111E38] text-white shadow-xl hover:shadow-2xl px-4 py-3 flex flex-col items-center justify-center text-center z-10 border border-slate-700 cursor-pointer"
-                        >
-                          <div className="text-[13.5px] font-bold tracking-tight text-white mb-1.5">
-                            {node.title}
-                          </div>
-                          {node.lines.map((line, i) => (
-                            <div key={i} className="text-[11px] text-slate-300 leading-snug truncate max-w-full">
-                              {line}
-                            </div>
-                          ))}
-                          <span className="mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/15 text-slate-200">
-                            {node.hiddenCount} nhánh
-                          </span>
-                        </button>
-                      );
-                    }
-
-                    const isSelected = node.conceptId && node.conceptId === selectedNodeId;
-                    const toggleBadgePos = node.side === 'left' ? '-left-3' : '-right-3';
-
-                    if (node.kind === 'l1') {
-                      return (
-                        <button
-                          key={node.id}
-                          type="button"
-                          onClick={() => handleNodeClick(node)}
-                          onDoubleClick={() => handleNodeDoubleClick(node)}
-                          style={{
-                            position: 'absolute',
-                            left: node.x,
-                            top: node.y,
-                            width: node.width,
-                            height: node.height,
-                            backgroundColor: node.theme.solid,
-                          }}
-                          className={`mindmap-node rounded-lg px-3 flex items-center justify-center text-center text-white font-bold text-[12px] shadow-md hover:brightness-105 z-10 cursor-pointer ${isSelected ? 'ring-2 ring-offset-2 ring-slate-900' : ''
-                            } ${node.dimmed ? 'opacity-25' : ''}`}
-                          title={`${node.text} — Bấm 1 lần để ${node.isCollapsed ? 'mở thư mục' : 'thu gọn'} · Bấm đúp để xem chi tiết`}
-                        >
-                          <span className="truncate">{node.text}</span>
-                          {node.hasChildren && (
-                            <span
-                              style={{ borderColor: node.theme.solid, color: node.theme.solid }}
-                              className={`absolute ${toggleBadgePos} top-1/2 -translate-y-1/2 min-w-[20px] h-5 px-1 rounded-full bg-white border-2 text-[10px] font-bold flex items-center justify-center shadow-sm leading-none`}
-                            >
-                              {node.isCollapsed ? `+${node.hiddenCount}` : '−'}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    }
-
-                    if (node.kind === 'l2') {
-                      return (
-                        <button
-                          key={node.id}
-                          type="button"
-                          onClick={() => handleNodeClick(node)}
-                          onDoubleClick={() => handleNodeDoubleClick(node)}
-                          style={{
-                            position: 'absolute',
-                            left: node.x,
-                            top: node.y,
-                            width: node.width,
-                            height: node.height,
-                            backgroundColor: node.theme.tint,
-                            borderColor: node.theme.tintBorder,
-                            color: node.theme.tintText,
-                          }}
-                          className={`mindmap-node rounded-md border px-2.5 flex items-center justify-center text-center font-semibold text-[11.5px] shadow-2xs hover:shadow-sm z-10 cursor-pointer ${isSelected ? 'ring-2 ring-blue-500' : ''
-                            } ${node.dimmed ? 'opacity-25' : ''}`}
-                          title={`${node.text} — Bấm 1 lần để ${node.isCollapsed ? 'mở' : 'thu gọn'}${page === 'all' ? ' · Bấm đúp để mở ngày này' : ' · Bấm đúp để xem chi tiết'}`}
-                        >
-                          <span className="truncate">{node.text}</span>
-                          {node.hasChildren && (
-                            <span
-                              style={{ borderColor: node.theme.tintBorder, color: node.theme.tintText }}
-                              className={`absolute ${toggleBadgePos} top-1/2 -translate-y-1/2 min-w-[18px] h-[18px] px-1 rounded-full bg-white border text-[9.5px] font-bold flex items-center justify-center shadow-2xs leading-none`}
-                            >
-                              {node.isCollapsed ? `+${node.hiddenCount}` : '−'}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    }
-
-                    // Level 3 compact white leaf bar
+                {/* Symmetric Nodes */}
+                {tree.nodes.map(node => {
+                  if (node.kind === 'root') {
                     return (
                       <button
                         key={node.id}
                         type="button"
-                        onDoubleClick={() => handleNodeDoubleClick(node)}
+                        onClick={() => handleNodeDoubleClick(node)}
+                        title={page === 'all' ? 'Khóa học AI20K · 14 Ngày' : 'Bấm để xem chi tiết ngày học'}
                         style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
-                        className={`mindmap-node rounded-md bg-white px-2.5 flex items-center justify-center text-center text-[11px] font-medium text-slate-700 border shadow-2xs hover:border-slate-400 z-10 cursor-pointer ${isSelected ? 'border-blue-600 ring-1 ring-blue-300' : 'border-slate-300/85'
-                          } ${node.dimmed ? 'opacity-25' : ''}`}
-                        title={`${node.text} — Bấm đúp để xem chi tiết`}
+                        className="mindmap-node rounded-2xl bg-[#111E38] text-white shadow-xl hover:shadow-2xl px-4 py-3 flex flex-col items-center justify-center text-center z-10 border border-slate-700 cursor-pointer"
                       >
-                        <span className="truncate">{node.text}</span>
+                        <div className="text-[13.5px] font-bold tracking-tight text-white mb-1.5">
+                          {node.title}
+                        </div>
+                        {node.lines.map((line, i) => (
+                          <div key={i} className="text-[11px] text-slate-300 leading-snug truncate max-w-full">
+                            {line}
+                          </div>
+                        ))}
+                        <span className="mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/15 text-slate-200">
+                          {node.hiddenCount} nhánh
+                        </span>
                       </button>
                     );
-                  })}
-                </div>
+                  }
+
+                  const isSelected = node.conceptId && node.conceptId === selectedNodeId;
+                  const toggleBadgePos = node.side === 'left' ? '-left-3' : '-right-3';
+
+                  if (node.kind === 'l1') {
+                    return (
+                      <button
+                        key={node.id}
+                        type="button"
+                        onClick={() => handleNodeClick(node)}
+                        onDoubleClick={() => handleNodeDoubleClick(node)}
+                        style={{
+                          position: 'absolute',
+                          left: node.x,
+                          top: node.y,
+                          width: node.width,
+                          height: node.height,
+                          backgroundColor: node.theme.solid,
+                        }}
+                        className={`mindmap-node rounded-lg px-3 flex items-center justify-center text-center text-white font-bold text-[12px] shadow-md hover:brightness-105 z-10 cursor-pointer ${isSelected ? 'ring-2 ring-offset-2 ring-slate-900' : ''
+                          } ${node.dimmed ? 'opacity-25' : ''}`}
+                        title={`${node.text} — Bấm 1 lần để ${node.isCollapsed ? 'mở thư mục' : 'thu gọn'} · Bấm đúp để xem chi tiết`}
+                      >
+                        <span className="truncate">{node.text}</span>
+                        {node.hasChildren && (
+                          <span
+                            style={{ borderColor: node.theme.solid, color: node.theme.solid }}
+                            className={`absolute ${toggleBadgePos} top-1/2 -translate-y-1/2 min-w-[20px] h-5 px-1 rounded-full bg-white border-2 text-[10px] font-bold flex items-center justify-center shadow-sm leading-none`}
+                          >
+                            {node.isCollapsed ? `+${node.hiddenCount}` : '−'}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  }
+
+                  if (node.kind === 'l2') {
+                    return (
+                      <button
+                        key={node.id}
+                        type="button"
+                        onClick={() => handleNodeClick(node)}
+                        onDoubleClick={() => handleNodeDoubleClick(node)}
+                        style={{
+                          position: 'absolute',
+                          left: node.x,
+                          top: node.y,
+                          width: node.width,
+                          height: node.height,
+                          backgroundColor: node.theme.tint,
+                          borderColor: node.theme.tintBorder,
+                          color: node.theme.tintText,
+                        }}
+                        className={`mindmap-node rounded-md border px-2.5 flex items-center justify-center text-center font-semibold text-[11.5px] shadow-2xs hover:shadow-sm z-10 cursor-pointer ${isSelected ? 'ring-2 ring-blue-500' : ''
+                          } ${node.dimmed ? 'opacity-25' : ''}`}
+                        title={`${node.text} — Bấm 1 lần để ${node.isCollapsed ? 'mở' : 'thu gọn'}${page === 'all' ? ' · Bấm đúp để mở ngày này' : ' · Bấm đúp để xem chi tiết'}`}
+                      >
+                        <span className="truncate">{node.text}</span>
+                        {node.hasChildren && (
+                          <span
+                            style={{ borderColor: node.theme.tintBorder, color: node.theme.tintText }}
+                            className={`absolute ${toggleBadgePos} top-1/2 -translate-y-1/2 min-w-[18px] h-[18px] px-1 rounded-full bg-white border text-[9.5px] font-bold flex items-center justify-center shadow-2xs leading-none`}
+                          >
+                            {node.isCollapsed ? `+${node.hiddenCount}` : '−'}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  }
+
+                  // Level 3 compact white leaf bar
+                  return (
+                    <button
+                      key={node.id}
+                      type="button"
+                      onDoubleClick={() => handleNodeDoubleClick(node)}
+                      style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
+                      className={`mindmap-node rounded-md bg-white px-2.5 flex items-center justify-center text-center text-[11px] font-medium text-slate-700 border shadow-2xs hover:border-slate-400 z-10 cursor-pointer ${isSelected ? 'border-blue-600 ring-1 ring-blue-300' : 'border-slate-300/85'
+                        } ${node.dimmed ? 'opacity-25' : ''}`}
+                      title={`${node.text} — Bấm đúp để xem chi tiết`}
+                    >
+                      <span className="truncate">{node.text}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -1075,7 +961,7 @@ export function getNodeTitle(node) {
               <div className="bg-white/95 backdrop-blur-sm border border-slate-200 shadow-xl rounded-xl px-3 py-1.5 flex items-center space-x-2 overflow-x-auto max-w-full">
                 <button
                   type="button"
-                  onClick={() => setZoom(z => clampZoom(z - 0.1))}
+                  onClick={() => stepZoom(-1)}
                   className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
                   title="Thu nhỏ"
                 >
@@ -1088,7 +974,7 @@ export function getNodeTitle(node) {
                 </span>
                 <button
                   type="button"
-                  onClick={() => setZoom(z => clampZoom(z + 0.1))}
+                  onClick={() => stepZoom(1)}
                   className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
                   title="Phóng to"
                 >
@@ -1101,7 +987,7 @@ export function getNodeTitle(node) {
 
                 <button
                   type="button"
-                  onClick={centerView}
+                  onClick={() => centerView(byId.get('root'))}
                   className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition"
                   title="Căn giữa sơ đồ"
                 >
@@ -1167,12 +1053,7 @@ export function getNodeTitle(node) {
                 ))}
                 <div
                   className="absolute border border-blue-600 bg-blue-500/10 rounded pointer-events-none"
-                  style={{
-                    left: `${Math.max(0, Math.min(95, (vpRect.left / tree.canvasW) * 100))}%`,
-                    top: `${Math.max(0, Math.min(95, (vpRect.top / tree.canvasH) * 100))}%`,
-                    width: `${Math.max(10, Math.min(100, (vpRect.width / tree.canvasW) * 100))}%`,
-                    height: `${Math.max(10, Math.min(100, (vpRect.height / tree.canvasH) * 100))}%`,
-                  }}
+                  style={minimapStyle}
                 />
               </div>
             </div>

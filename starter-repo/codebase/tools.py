@@ -1,18 +1,42 @@
-"""Công cụ của bài toán — NHÓM VIẾT. Điền ở guide bước 2.2 (thiết kế) và 3.2 (code).
+"""Read-only tools for the checkpoint coaching workflow."""
+from functools import lru_cache
+import json
+from pathlib import Path
 
-Mỗi công cụ là một hàm Python có @tool. Docstring ghi đúng 4 ý như sơ đồ ở spec.md §4:
-    tên · input · output · có tác động ra ngoài không (gửi tin, sửa dữ liệu, chấm điểm…)
-Khung tự ghi mỗi lần gọi công cụ vào trace (tên, input, output rút gọn, thời gian, lỗi).
+from tracing import tool
 
-Số công cụ, kiểu công cụ do thiết kế của nhóm quyết định — có bài chỉ cần một công cụ tra cứu.
-Công cụ có tác động ra ngoài: KHÔNG tự làm. Trả về bản nháp chờ người duyệt (guide bước 2.2, "chỗ người duyệt").
-Dữ liệu công cụ đọc (bài mẫu, thông báo mẫu, lịch…): để trong data/ và mô tả ở data/DATA_CARD.md.
-"""
-from tracing import tool, TOOLS  # noqa: F401  (TOOLS: danh sách công cụ đã đăng ký, dùng khi viết vòng lặp agent)
+
+DATA = Path(__file__).resolve().parents[2] / "data" / "lab-mapping" / "knowledge-graph.json"
+
+
+@lru_cache(maxsize=1)
+def load_knowledge():
+    return json.loads(DATA.read_text(encoding="utf-8"))
 
 
 @tool
-def search_example(query: str) -> list:
-    """(ví dụ — thay bằng công cụ của nhóm) Tra dữ liệu mẫu theo câu hỏi.
-    Input: câu hỏi (str). Output: danh sách đoạn {"code", "text"}. Không tác động ra ngoài."""
-    return [{"code": "VD-1", "text": "(ví dụ) đoạn dữ liệu giả — thay bằng dữ liệu thật của bài toán"}]
+def find_checkpoint(checkpoint_id: str) -> dict:
+    """Read a checkpoint ID; return its guide and candidate concepts. Read-only local data."""
+    data = load_knowledge()
+    view = data["checkpoint_views"].get(checkpoint_id)
+    if view is None:
+        return {}
+
+    seed_ids = set(view["concept_ids"])
+    neighbors = []
+    for edge in data["graph"]["edges"]:
+        left, right = edge["source"], edge["target"]
+        if (left in seed_ids) != (right in seed_ids):
+            neighbors.append(right if left in seed_ids else left)
+    related_ids = list(dict.fromkeys(neighbors))[:4]
+    nodes = {node["id"]: node for node in data["graph"]["nodes"]}
+    concepts = [
+        {
+            "id": nodes[node_id]["id"],
+            "label": nodes[node_id]["label"],
+            "definition": nodes[node_id]["definition"],
+            "direct": node_id in seed_ids,
+        }
+        for node_id in view["concept_ids"] + related_ids
+    ]
+    return {"view": view, "concepts": concepts}
