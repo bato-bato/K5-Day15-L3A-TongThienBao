@@ -10,14 +10,14 @@ function createSurveyForm() {
   console.log('Chỉnh sửa: ' + form.getEditUrl());
   console.log('Link trả lời sau khi xuất bản: ' + form.getPublishedUrl());
 
-  const multipleChoice = (title, options, other = false) => {
+  const multipleChoice = (title, options) => {
     const item = form.addMultipleChoiceItem().setTitle(title).setRequired(true);
-    if (options) item.setChoiceValues(options).showOtherOption(other);
+    if (options) item.setChoiceValues(options);
     return item;
   };
 
   const checkboxes = (title, options) => form.addCheckboxItem()
-    .setTitle(title).setChoiceValues(options).showOtherOption(true).setRequired(true);
+    .setTitle(title).setChoiceValues([...options, 'Khác']).setRequired(true);
 
   const branch = (item, routes) => item.setChoices(
     routes.map(([label, destination]) => item.createChoice(label, destination))
@@ -35,6 +35,12 @@ function createSurveyForm() {
   multipleChoice('Bạn đã làm bài lab gần nhất đến đâu?', [
     'Hoàn thành toàn bộ', 'Làm một phần và dự định làm tiếp',
     'Dừng giữa chừng và chưa có kế hoạch làm tiếp',
+  ]);
+  multipleChoice('Mục tiêu chính của bạn khi học AI trong khóa này là gì?', [
+    'Hiểu sâu cách AI hoạt động và vì sao các phương pháp cho ra kết quả.',
+    'Nắm các khái niệm cơ bản để áp dụng AI vào công việc.',
+    'Cả hai mục tiêu quan trọng như nhau.',
+    'Chưa có mục tiêu rõ ràng.', 'Khác',
   ]);
   const aiUse = multipleChoice('Cách bạn dùng AI trong bài lab đó gần nhất với kiểu nào?');
 
@@ -70,19 +76,15 @@ function createSurveyForm() {
   ]);
 
   const understanding = form.addPageBreakItem().setTitle('Mức độ hiểu bài và xem lại bài giảng');
-  form.addTextItem()
-    .setTitle('Trong phần lab đã làm, bạn tự đánh giá mình hiểu khoảng bao nhiêu phần trăm?')
-    .setHelpText('Nhập số từ 0 đến 100, hoặc để trống nếu chưa ước lượng được. “Hiểu” là bạn có thể giải thích mình đã làm gì và vì sao.')
-    .setValidation(FormApp.createTextValidation().requireNumberBetween(0, 100).build());
+  multipleChoice('Trong phần lab đã làm, bạn tự đánh giá mình hiểu khoảng bao nhiêu phần trăm?', [
+    '0–24%', '25–49%', '50–74%', '75–99%', '100%', 'Chưa tự đánh giá được',
+  ]).setHelpText('“Hiểu” là bạn có thể giải thích mình đã làm gì và vì sao.').setRequired(false);
   multipleChoice('Khi làm bài đó, có bước nào bạn chạy ra kết quả nhưng vẫn chưa hiểu vì sao không?', [
     'Có', 'Không', 'Không chắc', 'Chưa chạy ra kết quả',
   ]);
   multipleChoice('Bạn đã thử tự làm lại một bước chính mà không nhìn lời giải chưa?', [
     'Đã thử và tự làm lại được', 'Đã thử nhưng vẫn cần xem lời giải hoặc hỏi thêm', 'Chưa thử',
   ]);
-  form.addParagraphTextItem()
-    .setTitle('Kể ngắn một bước bạn từng bị kẹt hoặc chưa hiểu trong bài đó. Bạn đã xử lý thế nào và sau đó hiểu thêm được gì?')
-    .setHelpText('Trả lời trong 1–2 câu. Vui lòng bỏ tên và thông tin nhận diện.');
   multipleChoice('Trong lúc làm lab, có lúc nào bạn thấy cần xem lại lecture hoặc pre-class không?', [
     'Có', 'Không', 'Không nhớ',
   ]);
@@ -92,9 +94,10 @@ function createSurveyForm() {
   const support = multipleChoice('Bạn muốn tụi mình hỗ trợ nhóm bạn theo cách nào?');
 
   const link = form.addPageBreakItem().setTitle('Gửi link của nhóm bạn');
-  form.addParagraphTextItem()
+  form.addTextItem()
     .setTitle('Dán link khảo sát hoặc showcase của nhóm bạn.')
-    .setHelpText('Nếu gửi showcase, bạn có thể ghi thêm phần muốn mình góp ý.');
+    .setHelpText('Tùy chọn. Chỉ dán một đường liên kết.')
+    .setValidation(FormApp.createTextValidation().requireTextIsUrl().build());
 
   branch(background, [
     ['Tech — từng học hoặc làm trong lĩnh vực kỹ thuật như lập trình, dữ liệu, IT', tech],
