@@ -73,6 +73,7 @@ function computeTreeLayout({
   expandedLevels,
   expandedDays,
   searchQuery,
+  page,
 }) {
   const qLower = searchQuery.trim().toLowerCase();
   const LEAF_H = 66;
@@ -84,11 +85,16 @@ function computeTreeLayout({
   const nodes = [];
   const edges = [];
 
-  let cursorY = 70;
+  const isSinglePage = page !== 'all' && !qLower;
+  const targetLevels = isSinglePage
+    ? COURSE_LEVELS.filter(l => l.days.includes(page))
+    : COURSE_LEVELS;
+
+  let cursorY = 80;
   const levelCenters = [];
 
-  for (const level of COURSE_LEVELS) {
-    const isLevelOpen = qLower ? true : !!expandedLevels[level.id];
+  for (const level of targetLevels) {
+    const isLevelOpen = isSinglePage || qLower ? true : !!expandedLevels[level.id];
     const levelNodeId = `tree:${level.id}`;
 
     if (!isLevelOpen) {
@@ -115,8 +121,9 @@ function computeTreeLayout({
       continue;
     }
 
+    const levelDays = isSinglePage ? [page] : level.days;
     const dayCenters = [];
-    for (const d of level.days) {
+    for (const d of levelDays) {
       const dayNodes = (edits[`${contentTab}/${d}`] ?? workspace?.[contentTab]?.[d])?.nodes || [];
       const childConcepts = dayNodes.filter(n => n.node_type !== 'day_root');
       const dayTitle = getDayShortTitle(workspace, d);
@@ -126,7 +133,7 @@ function computeTreeLayout({
         || childConcepts.some(c => (c.text || '').toLowerCase().includes(qLower));
 
       const hasMatchingChild = qLower && childConcepts.some(c => (c.text || '').toLowerCase().includes(qLower));
-      const isDayOpen = qLower ? hasMatchingChild : !!expandedDays[d];
+      const isDayOpen = isSinglePage ? true : (qLower ? hasMatchingChild : !!expandedDays[d]);
       const dayNodeId = `tree:day:${d}`;
 
       if (!isDayOpen || childConcepts.length === 0) {
@@ -246,7 +253,7 @@ function computeTreeLayout({
     id: 'tree:root',
     kind: 'root',
     title: 'Khóa học AI in Action',
-    subtitle: '14 ngày · 4 cấp độ',
+    subtitle: isSinglePage ? `Trang ${page}/14 · Bài ${page}` : '14 ngày · 4 cấp độ',
     x: COL_X.root,
     y: rootY,
     width: WIDTHS.root,
@@ -255,7 +262,7 @@ function computeTreeLayout({
   });
 
   const canvasW = 1480;
-  const canvasH = Math.max(760, cursorY + 120);
+  const canvasH = Math.max(640, cursorY + 140);
   return { nodes, edges, canvasW, canvasH };
 }
 
@@ -269,6 +276,7 @@ export function CourseTree({
   searchQuery = '',
   layoutTrigger = 0,
   onSelectConcept,
+  onSelectDay,
   onOpenDayCanvas,
   onOpenMapper,
   onSwitchView,
@@ -277,6 +285,7 @@ export function CourseTree({
   const viewport = useRef(null);
   const pan = useRef(null);
   const [zoom, setZoom] = useState(0.95);
+  const [page, setPage] = useState(activeDay || 1);
   const [expandedLevels, setExpandedLevels] = useState(() => {
     const activeLvl = COURSE_LEVELS.find(l => l.days.includes(activeDay))?.id || 'lv1';
     return { lv1: activeLvl === 'lv1', lv2: activeLvl === 'lv2', lv3: activeLvl === 'lv3', lv4: activeLvl === 'lv4' };
@@ -285,8 +294,8 @@ export function CourseTree({
   const [vpRect, setVpRect] = useState({ left: 0, top: 0, width: 1000, height: 600 });
 
   const tree = useMemo(
-    () => computeTreeLayout({ workspace, edits, contentTab, expandedLevels, expandedDays, searchQuery }),
-    [workspace, edits, contentTab, expandedLevels, expandedDays, searchQuery],
+    () => computeTreeLayout({ workspace, edits, contentTab, expandedLevels, expandedDays, searchQuery, page }),
+    [workspace, edits, contentTab, expandedLevels, expandedDays, searchQuery, page],
   );
   const byId = useMemo(() => new Map(tree.nodes.map(n => [n.id, n])), [tree.nodes]);
 
@@ -370,7 +379,23 @@ export function CourseTree({
       setExpandedLevels(prev => (prev[lvl] ? prev : { ...prev, [lvl]: true }));
     }
     setExpandedDays(prev => (prev[activeDay] ? prev : { ...prev, [activeDay]: true }));
+    if (page !== 'all' && activeDay && page !== activeDay) {
+      setPage(activeDay);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeDay]);
+
+  useEffect(() => {
+    fitToView();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
+
+  function goToPage(nextPage) {
+    setPage(nextPage);
+    if (nextPage !== 'all') {
+      onSelectDay?.(nextPage);
+    }
+  }
 
   useEffect(() => {
     syncViewportRect();
@@ -663,8 +688,68 @@ export function CourseTree({
         </div>
       </div>
 
-      {/* Floating Bottom Controls */}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 bg-white/95 backdrop-blur-sm border border-slate-200 shadow-xl rounded-xl px-3 py-1.5 flex items-center space-x-2 max-w-[calc(100vw-2rem)] overflow-x-auto">
+      {/* Floating Bottom Controls + Lesson Pagination (1 trang = 1 bài) */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1.5 max-w-[calc(100vw-2rem)]">
+        {/* Pagination Bar */}
+        <div
+          className="bg-white/95 backdrop-blur-sm border border-slate-200 shadow-lg rounded-xl px-2.5 py-1 flex items-center gap-1 overflow-x-auto max-w-full"
+          aria-label="Phân trang bài học"
+        >
+          <span className="text-[11px] font-semibold text-slate-500 px-1.5 whitespace-nowrap">
+            {page === 'all' ? 'Tất cả 14 bài' : `Trang ${page}/14`}
+          </span>
+          <button
+            type="button"
+            disabled={page === 'all' || page <= 1}
+            onClick={() => goToPage(Math.max(1, (page === 'all' ? activeDay : page) - 1))}
+            className="w-6 h-6 rounded-md text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-35"
+            title="Bài trước"
+          >
+            ‹
+          </button>
+          {Array.from({ length: 14 }, (_, idx) => idx + 1).map(num => {
+            const isCurr = page === num;
+            return (
+              <button
+                key={num}
+                type="button"
+                onClick={() => goToPage(num)}
+                title={`Trang ${num}: Bài ${num}`}
+                className={`w-6 h-6 rounded-md text-[11px] font-mono font-semibold transition shrink-0 ${
+                  isCurr
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                {num}
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            disabled={page === 'all' || page >= 14}
+            onClick={() => goToPage(Math.min(14, (page === 'all' ? activeDay : page) + 1))}
+            className="w-6 h-6 rounded-md text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-35"
+            title="Bài tiếp theo"
+          >
+            ›
+          </button>
+          <div className="h-3.5 w-px bg-slate-200 mx-0.5 shrink-0" />
+          <button
+            type="button"
+            onClick={() => goToPage(page === 'all' ? activeDay : 'all')}
+            className={`px-2 py-0.5 rounded-md text-[11px] font-semibold whitespace-nowrap transition ${
+              page === 'all'
+                ? 'bg-slate-900 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            Tất cả
+          </button>
+        </div>
+
+        {/* Canvas Zoom & View Switcher */}
+        <div className="bg-white/95 backdrop-blur-sm border border-slate-200 shadow-xl rounded-xl px-3 py-1.5 flex items-center space-x-2 overflow-x-auto max-w-full">
         <button
           type="button"
           onClick={() => setZoom(z => clampZoom(z - 0.1))}
@@ -733,6 +818,7 @@ export function CourseTree({
           >
             Lab
           </button>
+        </div>
         </div>
       </div>
 

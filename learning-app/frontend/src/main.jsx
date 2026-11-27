@@ -91,7 +91,7 @@ const INSPECTOR_THEMES = {
   },
 };
 
-function splitTopLevelCommas(str) {
+function splitTopLevelBy(str, sep) {
   const items = [];
   let buf = '';
   let depth = 0;
@@ -99,15 +99,24 @@ function splitTopLevelCommas(str) {
     const ch = str[i];
     if (ch === '(') depth++;
     else if (ch === ')' && depth > 0) depth--;
-    if (ch === ',' && depth === 0) {
+    if (depth === 0 && str.slice(i, i + sep.length) === sep) {
       if (buf.trim()) items.push(buf.trim());
       buf = '';
+      i += sep.length - 1;
     } else {
       buf += ch;
     }
   }
   if (buf.trim()) items.push(buf.trim());
   return items;
+}
+
+function splitTopLevelCommas(str) {
+  return splitTopLevelBy(str, ',');
+}
+
+function splitTopLevelArrows(str) {
+  return splitTopLevelBy(str, '→');
 }
 
 function renderHighlightedText(text) {
@@ -145,9 +154,10 @@ function renderHighlightedText(text) {
       );
     }
     if (part.startsWith('(') && part.endsWith(')')) {
+      const inner = part.slice(1, -1).trim();
       return (
-        <span key={idx} className="text-slate-600 font-medium bg-slate-100 px-1 py-0.5 rounded mx-0.5">
-          {part}
+        <span key={idx} className="text-slate-700 font-medium bg-slate-100 border border-slate-200/80 px-1.5 py-0.5 rounded-md mx-0.5 text-[11px]">
+          {inner}
         </span>
       );
     }
@@ -199,20 +209,18 @@ function parseStudySections(rawText) {
     const label = hasLabel ? clean.slice(0, colonIdx).trim() : '';
     const rest = hasLabel ? clean.slice(colonIdx + 2).trim() : clean;
 
-    // 2. Step Flow: contains arrows "→"
-    if (rest.includes('→')) {
-      const steps = rest.split(/\s*→\s*/).map(s => s.trim()).filter(Boolean);
-      if (steps.length >= 2) {
-        return { kind: 'flow', label, steps };
+    // 2. Colon-separated List BEFORE Flow so commas separating items with "(A → B)" stay intact
+    if (hasLabel) {
+      const items = splitTopLevelCommas(rest);
+      if (items.length >= 2 && items.every(i => i.length <= 80)) {
+        return { kind: 'list', label, items };
       }
     }
 
-    // 3. Colon-separated List: "Label: item1, item2, item3" (top-level commas)
-    if (hasLabel) {
-      const items = splitTopLevelCommas(rest);
-      if (items.length >= 2 && items.every(i => i.length <= 75)) {
-        return { kind: 'list', label, items };
-      }
+    // 3. Step Flow: top-level arrows "→" outside parentheses
+    const flowSteps = splitTopLevelArrows(rest);
+    if (flowSteps.length >= 2) {
+      return { kind: 'flow', label, steps: flowSteps };
     }
 
     // 4. Implicit Vietnamese Pillar List: "... đòi hỏi A, B, C, D" or "... gồm A, B, C"
@@ -530,9 +538,8 @@ function App() {
                       key={id}
                       type="button"
                       onClick={() => switchView(id)}
-                      className={`flex-1 py-1 text-xs font-semibold rounded-md transition ${
-                        view === id ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                      }`}
+                      className={`flex-1 py-1 text-xs font-semibold rounded-md transition ${view === id ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                        }`}
                     >
                       {label}
                     </button>
@@ -548,13 +555,11 @@ function App() {
                         if (view === 'tree') setView('mindmaps');
                         setDayMenuOpen(false);
                       }}
-                      className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 transition ${
-                        day === d ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-50'
-                      }`}
+                      className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 transition ${day === d ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-50'
+                        }`}
                     >
-                      <span className={`w-6 text-center font-mono text-[11px] px-1 py-0.5 rounded ${
-                        day === d ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
-                      }`}>
+                      <span className={`w-6 text-center font-mono text-[11px] px-1 py-0.5 rounded ${day === d ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
+                        }`}>
                         D{d}
                       </span>
                       <span className="truncate">{getDayShortTitle(workspace, d)}</span>
@@ -610,9 +615,8 @@ function App() {
           <button
             type="button"
             onClick={() => setShowGrid(g => !g)}
-            className={`p-1.5 rounded-md transition text-xs flex items-center gap-1 ${
-              showGrid ? 'text-blue-600 bg-blue-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-            }`}
+            className={`p-1.5 rounded-md transition text-xs flex items-center gap-1 ${showGrid ? 'text-blue-600 bg-blue-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
             title="Bật/Tắt Lưới"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -708,6 +712,7 @@ function App() {
               setDay(targetDay);
               setSelectedId(nodeId);
             }}
+            onSelectDay={selectDay}
             onOpenDayCanvas={targetDay => {
               setDay(targetDay);
               setView(tab);
@@ -962,11 +967,10 @@ function App() {
                           {appliedTargets.map(t => (
                             <span
                               key={t.id}
-                              className={`px-2 py-1 rounded-lg border text-[11px] font-medium ${
-                                t.node_kind === 'checkpoint'
-                                  ? 'bg-indigo-100/80 border-indigo-200 text-indigo-900 font-semibold'
-                                  : 'bg-teal-50 border-teal-200 text-teal-900 font-mono text-[10.5px]'
-                              }`}
+                              className={`px-2 py-1 rounded-lg border text-[11px] font-medium ${t.node_kind === 'checkpoint'
+                                ? 'bg-indigo-100/80 border-indigo-200 text-indigo-900 font-semibold'
+                                : 'bg-teal-50 border-teal-200 text-teal-900 font-mono text-[10.5px]'
+                                }`}
                             >
                               {t.node_kind === 'checkpoint' ? `⚑ ${t.id}` : `‹› ${t.label}`}
                             </span>
@@ -1123,11 +1127,10 @@ function App() {
                       key={id}
                       type="button"
                       onClick={() => setMapMode(id)}
-                      className={`px-2 py-1 rounded-md text-[11px] font-medium border transition ${
-                        mapMode === id
-                          ? 'bg-blue-600 border-blue-600 text-white'
-                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                      }`}
+                      className={`px-2 py-1 rounded-md text-[11px] font-medium border transition ${mapMode === id
+                        ? 'bg-blue-600 border-blue-600 text-white'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                        }`}
                     >
                       {label}
                     </button>
@@ -1143,11 +1146,10 @@ function App() {
                       key={id}
                       type="button"
                       onClick={() => setMapDirection(id)}
-                      className={`px-2 py-1 rounded-md text-[11px] font-medium border transition ${
-                        mapDirection === id
-                          ? 'bg-indigo-600 border-indigo-600 text-white'
-                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                      }`}
+                      className={`px-2 py-1 rounded-md text-[11px] font-medium border transition ${mapDirection === id
+                        ? 'bg-indigo-600 border-indigo-600 text-white'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                        }`}
                     >
                       {label}
                     </button>
@@ -1167,13 +1169,12 @@ function App() {
 
               {mapResult && (
                 <div className="space-y-2.5">
-                  <div className={`px-3 py-2 rounded-lg font-semibold ${
-                    mapResult.blocked
-                      ? 'bg-red-50 text-red-700 border border-red-200'
-                      : mapResult.abstention
-                        ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  }`}>
+                  <div className={`px-3 py-2 rounded-lg font-semibold ${mapResult.blocked
+                    ? 'bg-red-50 text-red-700 border border-red-200'
+                    : mapResult.abstention
+                      ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                      : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    }`}>
                     {mapResult.blocked
                       ? '🛑 Input Guardrail: Đã chặn Prompt Injection'
                       : mapResult.abstention
@@ -1307,9 +1308,8 @@ function App() {
                       {ingestLoading ? 'Đang trích xuất & nối Graph…' : 'Nạp vào GraphRAG DB'}
                     </button>
                     {ingestStatus && (
-                      <div className={`px-2.5 py-1.5 rounded-lg font-medium ${
-                        ingestStatus.ok ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
-                      }`}>
+                      <div className={`px-2.5 py-1.5 rounded-lg font-medium ${ingestStatus.ok ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
+                        }`}>
                         {ingestStatus.ok
                           ? `✅ Đã nạp ${ingestStatus.data.lecture_id}: +${ingestStatus.data.nodes_added} nút, +${ingestStatus.data.edges_added} cạnh (${ingestStatus.data.cross_links_created} liên kết chéo).`
                           : ingestStatus.message}
