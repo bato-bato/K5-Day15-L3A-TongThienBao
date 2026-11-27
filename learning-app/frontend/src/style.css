@@ -1,3 +1,9 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
 #root {
   height: 100%;
   display: flex;
@@ -25,7 +31,7 @@
 
 .node-inspector-drawer {
   position: fixed;
-  inset: 4.25rem 1rem 1.25rem auto;
+  inset: 4.25rem 1rem 4.5rem auto;
   z-index: 30;
   width: min(450px, calc(100% - 2rem));
   height: auto;

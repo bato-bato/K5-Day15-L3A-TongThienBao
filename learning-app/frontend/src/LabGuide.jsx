@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { labs } from '../../../data/lab-mapping/labs.json';
 import { checkpoint_views } from '../../../data/lab-mapping/knowledge-graph.json';
 import { LectureReferences, resolveCheckpointMindmapNodes } from './LectureReferences.jsx';
@@ -37,14 +37,19 @@ function References({ checkpoint, guide }) {
 }
 
 export function LabGuide({ day, selection, onSelect, enrichedMindmaps, onOpenMindmap }) {
+  const guideRef = useRef(null);
   const lab = labs.find(item => item.day === day);
   const overviewId = lab ? `${lab.id}-overview` : 'overview';
   const activeCheckpoint = lab?.checkpoints.find(item => item.id === selection) ?? null;
   const showOverview = !activeCheckpoint;
   const guide = activeCheckpoint ? checkpoint_views[activeCheckpoint.id] : null;
 
+  useLayoutEffect(() => {
+    if (guideRef.current) guideRef.current.scrollTop = 0;
+  }, [day, selection]);
+
   return (
-    <div className="lab-guide">
+    <div className="lab-guide" ref={guideRef}>
       <header className="lab-page-header">
         <div>
           <h1>Ngày {String(day).padStart(2, '0')} · {lab?.title ?? 'Bài thực hành'}</h1>

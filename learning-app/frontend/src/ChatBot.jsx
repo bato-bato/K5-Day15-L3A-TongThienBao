@@ -204,18 +204,24 @@ export function ChatBot({ day, focus, labId, inspectorOpen = false, hasMinimap =
       ]
     : [`Tóm tắt ngày ${day}`, 'RAG là gì?', 'So sánh Generative và Agentic AI', 'Lethal Trifecta là gì?'];
 
-  const positionClass = inspectorOpen
-    ? 'right-4 md:right-[476px] bottom-5'
+  const pillPositionClass = inspectorOpen
+    ? 'right-4 bottom-4'
     : hasMinimap
       ? 'right-4 bottom-5 md:bottom-40'
       : 'right-4 bottom-5';
+
+  const panelPositionClass = inspectorOpen
+    ? 'right-4 md:right-[476px] bottom-24 h-[min(580px,calc(100vh-11rem))]'
+    : hasMinimap
+      ? 'right-4 bottom-5 md:bottom-40 h-[min(640px,calc(100vh-9rem))] md:h-[min(640px,calc(100vh-14rem))]'
+      : 'right-4 bottom-5 h-[min(640px,calc(100vh-9rem))] md:h-[min(640px,calc(100vh-11rem))]';
 
   if (!open) {
     return (
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`fixed ${positionClass} z-40 flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-xs font-semibold shadow-xl shadow-blue-500/30 hover:scale-[1.03] transition-all`}
+        className={`fixed ${pillPositionClass} z-40 flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-xs font-semibold shadow-xl shadow-blue-500/30 hover:scale-[1.03] transition-all`}
         aria-label="Mở Gia sư AI"
       >
         <span className="text-base">🎓</span> Gia sư AI
@@ -226,7 +232,7 @@ export function ChatBot({ day, focus, labId, inspectorOpen = false, hasMinimap =
 
   return (
     <aside
-      className={`fixed ${positionClass} z-40 w-[min(420px,calc(100vw-2rem))] h-[min(640px,calc(100vh-9rem))] md:h-[min(640px,calc(100vh-11rem))] bg-white border border-slate-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-xs transition-all`}
+      className={`fixed ${panelPositionClass} z-40 w-[min(420px,calc(100vw-2rem))] bg-white border border-slate-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-xs transition-all`}
       aria-label="Gia sư AI KG-RAG"
     >
       <div className="bg-gradient-to-r from-indigo-700 to-blue-700 px-4 py-2.5 text-white shrink-0">
