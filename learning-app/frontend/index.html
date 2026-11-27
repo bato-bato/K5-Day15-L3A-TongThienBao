@@ -1,12 +1,41 @@
 <!doctype html>
-<html lang="vi">
+<html class="h-full" lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f6f5ef" />
-    <title>AI in Action — 14 ngày học</title>
+    <meta name="theme-color" content="#f8fafc" />
+    <title>Sơ đồ Cây Kiến Thức Khóa Học AI - Mindmap Canvas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+              mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+            },
+            colors: {
+              brand: {
+                50: '#eff6ff',
+                100: '#dbeafe',
+                500: '#3b82f6',
+                600: '#2563eb',
+                700: '#1d4ed8',
+              },
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
+  <body class="h-full flex flex-col overflow-hidden bg-slate-50 font-sans text-slate-800 antialiased select-none">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

@@ -1,0 +1,27 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      LEARNING_DB_PATH: /data/learning.sqlite3
+      GRAPH_DB_PATH: /data/graphrag.sqlite3
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-gpt-4o-mini}
+      USE_REMOTE_EMBEDDINGS: ${USE_REMOTE_EMBEDDINGS:-0}
+    volumes:
+      - learning_data:/data
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  learning_data:

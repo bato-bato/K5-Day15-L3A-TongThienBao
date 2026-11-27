@@ -275,13 +275,15 @@ def get_day_mindmap_seed(day: int) -> list[dict[str, Any]]:
     root = next((n for n in day_nodes if n["type"] == "DayModule"), day_nodes[0])
     children = [n for n in day_nodes if n["id"] != root["id"]]
 
+    center_x = 920
+    center_y = 460
     root_uuid = str(uuid5(NAMESPACE_URL, f"aicb-kg:{root['id']}"))
     mindmap_nodes: list[dict[str, Any]] = [
         {
             "id": root_uuid,
             "text": f"{root['label']}\n—\n{root['summary']}",
-            "x": 420,
-            "y": 40,
+            "x": center_x,
+            "y": center_y,
             "parent_id": None,
             "node_type": "day_root",
             "source_ref": {
@@ -296,32 +298,37 @@ def get_day_mindmap_seed(day: int) -> list[dict[str, Any]]:
         }
     ]
 
-    # Grid layout for children under root without overlap
-    cols = 3
-    for idx, child in enumerate(children):
-        col = idx % cols
-        row = idx // cols
-        x = 60 + col * 360
-        y = 240 + row * 220
-        child_uuid = str(uuid5(NAMESPACE_URL, f"aicb-kg:{child['id']}"))
-        mindmap_nodes.append(
-            {
-                "id": child_uuid,
-                "text": f"[{child['type']}] {child['label']}\n{child['summary']}",
-                "x": min(4096, max(0, x)),
-                "y": min(4096, max(0, y)),
-                "parent_id": root_uuid,
-                "node_type": _map_kg_type_to_ui(child["type"]),
-                "source_ref": {
-                    "concept_id": child["id"],
-                    "day": child["day"],
-                    "pdf_pages": child["provenance"]["pdf_pages"],
-                    "section_ref": child["provenance"]["section_ref"],
-                    "key_quote": child["provenance"]["key_quote"],
-                },
-                "code_link": None,
-                "verification_status": "verified",
-            }
-        )
+    # Radial layout: split children evenly to left and right of central hub
+    half = (len(children) + 1) // 2
+    left_children = children[:half]
+    right_children = children[half:]
+
+    def _append_branch(branch_nodes: list[dict[str, Any]], x_pos: int) -> None:
+        count = len(branch_nodes)
+        for idx, child in enumerate(branch_nodes):
+            y_pos = round(center_y + (idx - (count - 1) / 2.0) * 130)
+            child_uuid = str(uuid5(NAMESPACE_URL, f"aicb-kg:{child['id']}"))
+            mindmap_nodes.append(
+                {
+                    "id": child_uuid,
+                    "text": f"[{child['type']}] {child['label']}\n{child['summary']}",
+                    "x": min(3900, max(40, x_pos)),
+                    "y": min(3900, max(40, y_pos)),
+                    "parent_id": root_uuid,
+                    "node_type": _map_kg_type_to_ui(child["type"]),
+                    "source_ref": {
+                        "concept_id": child["id"],
+                        "day": child["day"],
+                        "pdf_pages": child["provenance"]["pdf_pages"],
+                        "section_ref": child["provenance"]["section_ref"],
+                        "key_quote": child["provenance"]["key_quote"],
+                    },
+                    "code_link": None,
+                    "verification_status": "verified",
+                }
+            )
+
+    _append_branch(left_children, 500)
+    _append_branch(right_children, 1280)
 
     return mindmap_nodes
