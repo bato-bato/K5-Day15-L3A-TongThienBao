@@ -816,23 +816,14 @@ export function Mindmap({
           <button
             type="button"
             onClick={() => onSwitchView?.('tree')}
-            className="px-2 py-1 text-[11px] rounded-md font-semibold text-slate-600 hover:text-slate-900 transition"
+            className="px-2.5 py-1 text-[11px] rounded-md font-semibold text-slate-600 hover:text-slate-900 transition"
           >
-            Cây khóa học
-          </button>
-          <button
-            type="button"
-            onClick={() => onSwitchTab?.('mindmaps')}
-            className={`px-2 py-1 text-[11px] rounded-md font-semibold transition ${
-              tab === 'mindmaps' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Mindmap ngày
+            Mindmap
           </button>
           <button
             type="button"
             onClick={() => onSwitchTab?.('lab')}
-            className={`px-2 py-1 text-[11px] rounded-md font-semibold transition ${
+            className={`px-2.5 py-1 text-[11px] rounded-md font-semibold transition ${
               tab === 'lab' ? 'bg-white text-purple-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >

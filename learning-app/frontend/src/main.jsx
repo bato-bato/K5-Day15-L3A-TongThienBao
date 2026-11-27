@@ -286,8 +286,10 @@ function App() {
 
   function switchView(nextView) {
     setView(nextView);
-    if (nextView === 'mindmaps' || nextView === 'lab') {
-      setTab(nextView);
+    if (nextView === 'tree') {
+      setTab('mindmaps');
+    } else if (nextView === 'lab') {
+      setTab('lab');
     }
     setSelectedId(null);
   }
@@ -499,7 +501,7 @@ function App() {
               </svg>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-slate-800 tracking-tight text-sm hidden sm:inline">Sơ đồ Cây Khóa Học AI</span>
+              <span className="font-bold text-slate-800 tracking-tight text-sm hidden sm:inline">Sơ đồ Mindmap AI</span>
               <span className="bg-blue-100 text-blue-700 text-[10px] font-semibold px-1.5 py-0.5 rounded border border-blue-200">
                 AI Mindmap
               </span>
@@ -515,11 +517,11 @@ function App() {
               onClick={() => setDayMenuOpen(o => !o)}
               className="flex items-center gap-2 px-2.5 py-1.5 rounded-md hover:bg-slate-100 text-xs font-medium text-slate-700 border border-slate-200 transition"
             >
-              <span className={`w-2 h-2 rounded-full ${view === 'tree' ? 'bg-blue-600' : tab === 'mindmaps' ? 'bg-emerald-500' : 'bg-purple-500'}`} />
+              <span className={`w-2 h-2 rounded-full ${view === 'tree' ? 'bg-blue-600' : 'bg-purple-500'}`} />
               <span className="truncate max-w-[230px] sm:max-w-[280px]">
                 {view === 'tree'
-                  ? 'Cây khóa học · 4 Cấp độ · 14 Ngày'
-                  : `D${day} · ${tab === 'lab' ? `Lab: ${activeTitle}` : activeTitle}`}
+                  ? `D${day} · Mindmap: ${activeTitle}`
+                  : `D${day} · Lab: ${activeTitle}`}
               </span>
               <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -530,8 +532,7 @@ function App() {
               <div className="absolute left-0 mt-1.5 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2">
                 <div className="flex gap-1 p-1 bg-slate-100 rounded-lg mb-2">
                   {[
-                    ['tree', 'Cây khóa học'],
-                    ['mindmaps', 'Mindmap'],
+                    ['tree', 'Mindmap'],
                     ['lab', 'Lab'],
                   ].map(([id, label]) => (
                     <button
@@ -552,7 +553,6 @@ function App() {
                       type="button"
                       onClick={() => {
                         selectDay(d);
-                        if (view === 'tree') setView('mindmaps');
                         setDayMenuOpen(false);
                       }}
                       className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 transition ${day === d ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-50'

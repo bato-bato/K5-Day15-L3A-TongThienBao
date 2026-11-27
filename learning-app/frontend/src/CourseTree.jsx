@@ -169,7 +169,7 @@ function extractSubBranches(node) {
   return groups.slice(0, 3);
 }
 
-function layoutSideBranches(branches, side, themes, startX) {
+function layoutSideBranches(branches, side, themes, startX, collapsedIds) {
   const LEAF_W = 214;
   const LEAF_H = 26;
   const LEAF_GAP = 4;
@@ -192,11 +192,79 @@ function layoutSideBranches(branches, side, themes, startX) {
   branches.forEach((branch, bIdx) => {
     const theme = themes[bIdx % themes.length];
     const l1Id = `l1:${branch.id}`;
+    const hasL1Children = branch.subGroups.length > 0;
+    const isL1Collapsed = hasL1Children && collapsedIds.has(l1Id);
+
+    if (isL1Collapsed || !hasL1Children) {
+      const l1Y = cursorY;
+      placedNodes.push({
+        id: l1Id,
+        kind: 'l1',
+        side,
+        conceptId: branch.conceptId,
+        day: branch.day,
+        text: branch.label,
+        verified: branch.verified,
+        theme,
+        hasChildren: hasL1Children,
+        isCollapsed: isL1Collapsed,
+        hiddenCount: branch.subGroups.length,
+        x: l1X,
+        y: l1Y,
+        width: L1_W,
+        height: L1_H,
+      });
+      placedEdges.push({
+        id: `e:root->${l1Id}`,
+        fromId: 'root',
+        toId: l1Id,
+        side,
+        theme,
+        conceptId: branch.conceptId,
+      });
+      cursorY += L1_H + L1_GAP;
+      return;
+    }
+
     const l2Centers = [];
     const l1StartY = cursorY;
 
     branch.subGroups.forEach((sg, sgIdx) => {
       const l2Id = `l2:${branch.id}:${sgIdx}`;
+      const hasL2Children = sg.leaves.length > 0;
+      const isL2Collapsed = hasL2Children && collapsedIds.has(l2Id);
+
+      if (isL2Collapsed || !hasL2Children) {
+        const l2Y = cursorY;
+        placedNodes.push({
+          id: l2Id,
+          kind: 'l2',
+          side,
+          conceptId: branch.conceptId,
+          day: sg.dayOverride ?? branch.day,
+          text: sg.label,
+          theme,
+          hasChildren: hasL2Children,
+          isCollapsed: isL2Collapsed,
+          hiddenCount: sg.leaves.length,
+          x: l2X,
+          y: l2Y,
+          width: L2_W,
+          height: L2_H,
+        });
+        placedEdges.push({
+          id: `e:${l1Id}->${l2Id}`,
+          fromId: l1Id,
+          toId: l2Id,
+          side,
+          theme,
+          conceptId: branch.conceptId,
+        });
+        l2Centers.push(l2Y + L2_H / 2);
+        cursorY += L2_H + L2_GAP;
+        return;
+      }
+
       const leafCount = Math.max(1, sg.leaves.length);
       const leavesBlockH = leafCount * LEAF_H + (leafCount - 1) * LEAF_GAP;
       const l2StartY = cursorY;
@@ -209,7 +277,7 @@ function layoutSideBranches(branches, side, themes, startX) {
           kind: 'l3',
           side,
           conceptId: branch.conceptId,
-          day: branch.day,
+          day: sg.dayOverride ?? branch.day,
           text: leafText,
           theme,
           x: l3X,
@@ -233,9 +301,12 @@ function layoutSideBranches(branches, side, themes, startX) {
         kind: 'l2',
         side,
         conceptId: branch.conceptId,
-        day: branch.day,
+        day: sg.dayOverride ?? branch.day,
         text: sg.label,
         theme,
+        hasChildren: hasL2Children,
+        isCollapsed: false,
+        hiddenCount: sg.leaves.length,
         x: l2X,
         y: l2Y,
         width: L2_W,
@@ -269,6 +340,9 @@ function layoutSideBranches(branches, side, themes, startX) {
       text: branch.label,
       verified: branch.verified,
       theme,
+      hasChildren: hasL1Children,
+      isCollapsed: false,
+      hiddenCount: branch.subGroups.length,
       x: l1X,
       y: l1Y,
       width: L1_W,
@@ -286,11 +360,11 @@ function layoutSideBranches(branches, side, themes, startX) {
     cursorY += L1_GAP - L2_GAP;
   });
 
-  const totalHeight = Math.max(120, cursorY - L1_GAP);
+  const totalHeight = branches.length ? Math.max(120, cursorY - L1_GAP) : 0;
   return { nodes: placedNodes, edges: placedEdges, height: totalHeight };
 }
 
-function computeSymmetricLayout({ workspace, edits, contentTab, page, searchQuery }) {
+function computeSymmetricLayout({ workspace, edits, contentTab, page, searchQuery, collapsedIds }) {
   const CENTER_X = 940;
   const ROOT_W = 196;
   const ROOT_H = 114;
@@ -339,7 +413,7 @@ function computeSymmetricLayout({ workspace, edits, contentTab, page, searchQuer
         verified: false,
         subGroups: [{
           label: 'Gợi ý',
-          leaves: ['Chuyển sang Mindmap ngày để tự vẽ', 'Hoặc dùng AI GraphRAG nạp bài'],
+          leaves: ['Chọn ngày khác ở thanh phân trang phía dưới', 'Hoặc dùng AI GraphRAG nạp bài'],
         }],
       }];
     } else {
@@ -355,18 +429,21 @@ function computeSymmetricLayout({ workspace, edits, contentTab, page, searchQuer
     }
   }
 
+  const isRootCollapsed = collapsedIds.has('root');
   const half = Math.ceil(rawBranches.length / 2);
-  const leftBranches = rawBranches.slice(0, half);
-  const rightBranches = rawBranches.slice(half);
+  const leftBranches = isRootCollapsed ? [] : rawBranches.slice(0, half);
+  const rightBranches = isRootCollapsed ? [] : rawBranches.slice(half);
 
-  const leftLayout = layoutSideBranches(leftBranches, 'left', LEFT_THEMES, CENTER_X);
-  const rightLayout = layoutSideBranches(rightBranches, 'right', RIGHT_THEMES, CENTER_X);
+  const leftLayout = layoutSideBranches(leftBranches, 'left', LEFT_THEMES, CENTER_X, collapsedIds);
+  const rightLayout = layoutSideBranches(rightBranches, 'right', RIGHT_THEMES, CENTER_X, collapsedIds);
 
   const maxH = Math.max(leftLayout.height, rightLayout.height, ROOT_H + 80);
   const topPad = 64;
   const leftOffsetY = topPad + Math.round((maxH - leftLayout.height) / 2);
   const rightOffsetY = topPad + Math.round((maxH - rightLayout.height) / 2);
   const rootY = topPad + Math.round((maxH - ROOT_H) / 2);
+
+  const allL1Ids = rawBranches.map(b => `l1:${b.id}`);
 
   const allNodes = [
     {
@@ -376,6 +453,9 @@ function computeSymmetricLayout({ workspace, edits, contentTab, page, searchQuer
       day: page === 'all' ? 1 : page,
       title: rootTitle,
       lines: rootLines,
+      hasChildren: rawBranches.length > 0,
+      isCollapsed: isRootCollapsed,
+      hiddenCount: rawBranches.length,
       x: ROOT_X,
       y: rootY,
       width: ROOT_W,
@@ -396,7 +476,7 @@ function computeSymmetricLayout({ workspace, edits, contentTab, page, searchQuer
   const allEdges = [...leftLayout.edges, ...rightLayout.edges];
   const canvasW = 1880;
   const canvasH = Math.max(760, maxH + topPad * 2 + 90);
-  return { nodes: allNodes, edges: allEdges, canvasW, canvasH };
+  return { nodes: allNodes, edges: allEdges, canvasW, canvasH, allL1Ids };
 }
 
 export function CourseTree({
@@ -417,15 +497,62 @@ export function CourseTree({
 }) {
   const viewport = useRef(null);
   const pan = useRef(null);
+  const clickTimer = useRef(null);
   const [zoom, setZoom] = useState(0.88);
   const [page, setPage] = useState(activeDay || 1);
+  const [collapsedIds, setCollapsedIds] = useState(() => new Set());
   const [vpRect, setVpRect] = useState({ left: 0, top: 0, width: 1200, height: 700 });
 
+  useEffect(() => () => {
+    if (clickTimer.current) clearTimeout(clickTimer.current);
+  }, []);
+
   const tree = useMemo(
-    () => computeSymmetricLayout({ workspace, edits, contentTab, page, searchQuery }),
-    [workspace, edits, contentTab, page, searchQuery],
+    () => computeSymmetricLayout({ workspace, edits, contentTab, page, searchQuery, collapsedIds }),
+    [workspace, edits, contentTab, page, searchQuery, collapsedIds],
   );
   const byId = useMemo(() => new Map(tree.nodes.map(n => [n.id, n])), [tree.nodes]);
+
+  function toggleCollapse(nodeId) {
+    setCollapsedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) {
+        next.delete(nodeId);
+      } else {
+        next.add(nodeId);
+      }
+      return next;
+    });
+  }
+
+  function handleNodeClick(nodeId, hasChildren) {
+    if (!hasChildren) return;
+    if (clickTimer.current) clearTimeout(clickTimer.current);
+    clickTimer.current = setTimeout(() => {
+      clickTimer.current = null;
+      toggleCollapse(nodeId);
+    }, 200);
+  }
+
+  function handleNodeDoubleClick(node) {
+    if (clickTimer.current) {
+      clearTimeout(clickTimer.current);
+      clickTimer.current = null;
+    }
+    if (node.conceptId) {
+      onSelectConcept?.(node.day, node.conceptId);
+    } else if (page === 'all' && node.day) {
+      goToPage(node.day);
+    }
+  }
+
+  function collapseAllBranches() {
+    setCollapsedIds(new Set(tree.allL1Ids));
+  }
+
+  function expandAllBranches() {
+    setCollapsedIds(new Set());
+  }
 
   function syncViewportRect() {
     const vp = viewport.current;
@@ -501,6 +628,7 @@ export function CourseTree({
   }, [activeDay]);
 
   useEffect(() => {
+    setCollapsedIds(new Set());
     fitToView();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, contentTab]);
@@ -555,20 +683,6 @@ export function CourseTree({
     <section className="flex-1 relative overflow-hidden flex" aria-label="Sơ đồ cây đối xứng">
       {/* Left Compact Controls */}
       <aside className="absolute left-4 top-4 z-20 flex flex-col bg-white border border-slate-200/90 rounded-xl shadow-lg shadow-slate-900/5 p-1.5 space-y-1">
-        <button
-          type="button"
-          onClick={() => onOpenDayCanvas?.(page === 'all' ? activeDay : page)}
-          className="p-2 text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition group relative"
-          title="Chỉnh sửa Mindmap ngày này"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-          </svg>
-          <span className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-[11px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none shadow z-30">
-            Mở chế độ chỉnh sửa
-          </span>
-        </button>
-
         <button
           type="button"
           onClick={onOpenMapper}
@@ -655,9 +769,11 @@ export function CourseTree({
                   <button
                     key={node.id}
                     type="button"
-                    onClick={() => node.conceptId && onSelectConcept?.(node.day, node.conceptId)}
+                    onClick={() => handleNodeClick('root', node.hasChildren)}
+                    onDoubleClick={() => handleNodeDoubleClick(node)}
+                    title={node.isCollapsed ? 'Bấm 1 lần để mở rộng · Bấm đúp để xem chi tiết' : 'Bấm 1 lần để thu gọn · Bấm đúp để xem chi tiết'}
                     style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
-                    className="mindmap-node rounded-2xl bg-[#111E38] text-white shadow-xl hover:shadow-2xl px-4 py-3 flex flex-col items-center justify-center text-center z-10 border border-slate-700"
+                    className="mindmap-node rounded-2xl bg-[#111E38] text-white shadow-xl hover:shadow-2xl px-4 py-3 flex flex-col items-center justify-center text-center z-10 border border-slate-700 cursor-pointer"
                   >
                     <div className="text-[13.5px] font-bold tracking-tight text-white mb-1.5">
                       {node.title}
@@ -667,24 +783,25 @@ export function CourseTree({
                         {line}
                       </div>
                     ))}
+                    {node.hasChildren && (
+                      <span className="mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/15 text-slate-200">
+                        {node.isCollapsed ? `+${node.hiddenCount} nhánh` : '− Thu gọn'}
+                      </span>
+                    )}
                   </button>
                 );
               }
 
               const isSelected = node.conceptId && node.conceptId === selectedNodeId;
+              const toggleBadgePos = node.side === 'left' ? '-left-3' : '-right-3';
 
               if (node.kind === 'l1') {
                 return (
                   <button
                     key={node.id}
                     type="button"
-                    onClick={() => {
-                      if (node.conceptId) {
-                        onSelectConcept?.(node.day, node.conceptId);
-                      } else if (page === 'all') {
-                        goToPage(node.day);
-                      }
-                    }}
+                    onClick={() => handleNodeClick(node.id, node.hasChildren)}
+                    onDoubleClick={() => handleNodeDoubleClick(node)}
                     style={{
                       position: 'absolute',
                       left: node.x,
@@ -693,11 +810,19 @@ export function CourseTree({
                       height: node.height,
                       backgroundColor: node.theme.solid,
                     }}
-                    className={`mindmap-node rounded-lg px-3 flex items-center justify-center text-center text-white font-bold text-[12px] shadow-md hover:brightness-105 z-10 ${isSelected ? 'ring-2 ring-offset-2 ring-slate-900' : ''
+                    className={`mindmap-node rounded-lg px-3 flex items-center justify-center text-center text-white font-bold text-[12px] shadow-md hover:brightness-105 z-10 cursor-pointer ${isSelected ? 'ring-2 ring-offset-2 ring-slate-900' : ''
                       } ${node.dimmed ? 'opacity-25' : ''}`}
-                    title={node.text}
+                    title={`${node.text} — Bấm 1 lần để ${node.isCollapsed ? 'mở rộng' : 'thu gọn'} · Bấm đúp để xem chi tiết`}
                   >
                     <span className="truncate">{node.text}</span>
+                    {node.hasChildren && (
+                      <span
+                        style={{ borderColor: node.theme.solid, color: node.theme.solid }}
+                        className={`absolute ${toggleBadgePos} top-1/2 -translate-y-1/2 min-w-[20px] h-5 px-1 rounded-full bg-white border-2 text-[10px] font-bold flex items-center justify-center shadow-sm leading-none`}
+                      >
+                        {node.isCollapsed ? `+${node.hiddenCount}` : '−'}
+                      </span>
+                    )}
                   </button>
                 );
               }
@@ -707,7 +832,8 @@ export function CourseTree({
                   <button
                     key={node.id}
                     type="button"
-                    onClick={() => node.conceptId && onSelectConcept?.(node.day, node.conceptId)}
+                    onClick={() => handleNodeClick(node.id, node.hasChildren)}
+                    onDoubleClick={() => handleNodeDoubleClick(node)}
                     style={{
                       position: 'absolute',
                       left: node.x,
@@ -718,11 +844,19 @@ export function CourseTree({
                       borderColor: node.theme.tintBorder,
                       color: node.theme.tintText,
                     }}
-                    className={`mindmap-node rounded-md border px-2.5 flex items-center justify-center text-center font-semibold text-[11.5px] shadow-2xs hover:shadow-sm z-10 ${isSelected ? 'ring-2 ring-blue-500' : ''
+                    className={`mindmap-node rounded-md border px-2.5 flex items-center justify-center text-center font-semibold text-[11.5px] shadow-2xs hover:shadow-sm z-10 cursor-pointer ${isSelected ? 'ring-2 ring-blue-500' : ''
                       } ${node.dimmed ? 'opacity-25' : ''}`}
-                    title={node.text}
+                    title={`${node.text} — Bấm 1 lần để ${node.isCollapsed ? 'mở rộng' : 'thu gọn'} · Bấm đúp để xem chi tiết`}
                   >
                     <span className="truncate">{node.text}</span>
+                    {node.hasChildren && (
+                      <span
+                        style={{ borderColor: node.theme.tintBorder, color: node.theme.tintText }}
+                        className={`absolute ${toggleBadgePos} top-1/2 -translate-y-1/2 min-w-[18px] h-[18px] px-1 rounded-full bg-white border text-[9.5px] font-bold flex items-center justify-center shadow-2xs leading-none`}
+                      >
+                        {node.isCollapsed ? `+${node.hiddenCount}` : '−'}
+                      </span>
+                    )}
                   </button>
                 );
               }
@@ -732,11 +866,11 @@ export function CourseTree({
                 <button
                   key={node.id}
                   type="button"
-                  onClick={() => node.conceptId && onSelectConcept?.(node.day, node.conceptId)}
+                  onDoubleClick={() => handleNodeDoubleClick(node)}
                   style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
-                  className={`mindmap-node rounded-md bg-white px-2.5 flex items-center justify-center text-center text-[11px] font-medium text-slate-700 border shadow-2xs hover:border-slate-400 z-10 ${isSelected ? 'border-blue-600 ring-1 ring-blue-300' : 'border-slate-300/85'
+                  className={`mindmap-node rounded-md bg-white px-2.5 flex items-center justify-center text-center text-[11px] font-medium text-slate-700 border shadow-2xs hover:border-slate-400 z-10 cursor-pointer ${isSelected ? 'border-blue-600 ring-1 ring-blue-300' : 'border-slate-300/85'
                     } ${node.dimmed ? 'opacity-25' : ''}`}
-                  title={node.text}
+                  title={`${node.text} — Bấm đúp để xem chi tiết`}
                 >
                   <span className="truncate">{node.text}</span>
                 </button>
@@ -844,6 +978,14 @@ export function CourseTree({
           >
             Vừa khung hình
           </button>
+          <button
+            type="button"
+            onClick={collapsedIds.size > 0 ? expandAllBranches : collapseAllBranches}
+            className="px-2 py-1 text-xs text-slate-600 hover:text-blue-700 hover:bg-blue-50 rounded transition font-medium whitespace-nowrap"
+            title={collapsedIds.size > 0 ? 'Mở rộng tất cả các mục' : 'Thu gọn tất cả các nhánh con'}
+          >
+            {collapsedIds.size > 0 ? 'Mở hết' : 'Thu gọn hết'}
+          </button>
 
           <div className="h-4 w-px bg-slate-200 shrink-0" />
 
@@ -853,14 +995,7 @@ export function CourseTree({
               onClick={() => onSwitchView?.('tree')}
               className="px-2.5 py-1 text-[11px] rounded-md font-semibold bg-white text-blue-700 shadow-sm"
             >
-              Cây khóa học
-            </button>
-            <button
-              type="button"
-              onClick={() => onSwitchView?.('mindmaps')}
-              className="px-2.5 py-1 text-[11px] rounded-md font-semibold text-slate-600 hover:text-slate-900"
-            >
-              Mindmap ngày
+              Mindmap
             </button>
             <button
               type="button"
