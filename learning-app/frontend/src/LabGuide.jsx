@@ -37,7 +37,7 @@ function References({ checkpoint, guide }) {
   );
 }
 
-export function LabGuide({ day, onDayChange, selection, onSelect, workspace, loadError, onRetry, onJumpToConcept }) {
+export function LabGuide({ day, onDayChange, selection, onSelect, workspace, loadError, onRetry, onJumpToConcept, onOpenMindmap }) {
   const lab = labs.find(item => item.day === day);
   const checkpoint = lab?.checkpoints.find(item => item.id === selection) ?? lab?.checkpoints[0];
   const guide = checkpoint_views[checkpoint?.id];
@@ -112,7 +112,7 @@ export function LabGuide({ day, onDayChange, selection, onSelect, workspace, loa
             </dl>
             {guide?.self_check && <div className="lab-self-check"><strong>Tự kiểm</strong><p>{guide.self_check}</p></div>}
             <SourceLink href={checkpoint.definition_source.url}>Xem đề gốc</SourceLink>
-            <LectureReferences guide={guide} workspace={workspace} loadError={loadError} onRetry={onRetry} onJumpToConcept={onJumpToConcept} />
+            <LectureReferences guide={guide} workspace={workspace} loadError={loadError} onRetry={onRetry} onOpenMindmap={onOpenMindmap} />
             <References checkpoint={checkpoint} guide={guide} />
           </article>)}
         </div>

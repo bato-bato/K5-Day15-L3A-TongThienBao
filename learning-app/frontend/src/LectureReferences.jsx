@@ -39,23 +39,24 @@ const lectureForTopic = {
   deployment: 'PAT_D12_DOCKER_2026',
 };
 
-export function LectureReferences({ guide, workspace, loadError, onRetry, onJumpToConcept }) {
+export function LectureReferences({ guide, workspace, loadError, onRetry, onOpenMindmap }) {
   const targets = new Set((guide?.concept_ids ?? []).map(id => lectureForTopic[id]).filter(Boolean));
-  const notes = Object.values(workspace?.mindmaps ?? {}).flatMap(day => day.nodes)
-    .filter(node => targets.has(node.source_ref?.concept_id));
+  const notes = Object.entries(workspace?.mindmaps ?? {}).flatMap(([day, draft]) => draft.nodes
+    .filter(node => targets.has(node.source_ref?.concept_id))
+    .map(node => ({ day: Number(day), node })));
   return (
     <details className="lab-extra">
       <summary>Kiến thức từ Lecture{notes.length > 0 && ` (${notes.length})`}</summary>
       {loadError && !workspace ? <p>Chưa tải được Lecture. <button type="button" onClick={onRetry}>Thử lại</button></p>
         : !workspace ? <p>Đang tải Lecture…</p>
         : notes.length === 0 ? <p>Chưa có mục Lecture được liên kết với checkpoint này.</p>
-        : <ul>{notes.map(node => {
+        : <ul>{notes.map(({ day, node }) => {
           const [title, ...body] = node.text.split('\n');
           return <li key={node.id}>
             <strong>{title.replace(/^\[[^\]]+\]\s*/, '')}</strong>
             <p>{body.join(' ')}</p>
             <small>{node.source_ref.section_ref}</small>
-            <button className="lab-node-link" type="button" onClick={() => onJumpToConcept(node.source_ref.concept_id, node.source_ref.day)}>Mở đúng nút trên Mindmap →</button>
+            <button className="lab-node-link" type="button" aria-haspopup="dialog" onClick={() => onOpenMindmap(day, node.id)}>Mở đúng nút trên Mindmap →</button>
           </li>;
         })}</ul>}
     </details>

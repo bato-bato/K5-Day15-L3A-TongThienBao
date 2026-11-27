@@ -277,9 +277,18 @@ function computeDayXMindLayout({ nodes, day, tab, nodeColors, filterType, search
   return { nodes: allNodes, edges: allEdges, canvasW, canvasH };
 }
 
+function findNodeAnchor(nodes, nodeId) {
+  if (!nodeId) return undefined;
+  const matches = nodes.filter(node => node.nodeId === nodeId);
+  return matches.find(node => node.kind === 'l1')
+    ?? matches.find(node => node.kind === 'l2')
+    ?? matches[0];
+}
+
 export function Mindmap({
   nodes,
   selectedId,
+  initialFocusId,
   onSelect,
   onChange,
   onOpenMapper,
@@ -308,12 +317,14 @@ export function Mindmap({
     [nodes, day, tab, nodeColors, filterType, searchQuery],
   );
   const placedById = useMemo(() => new Map(layout.nodes.map(n => [n.id, n])), [layout.nodes]);
+  const selectedAnchor = onChange ? undefined : findNodeAnchor(layout.nodes, selectedId);
 
   const { zoom, stepZoom, fitToView, centerView, viewportProps, layerStyle, minimapStyle } =
     useMindmapViewport(layout, {
       viewKey: `${day}:${tab}`,
       layoutTrigger,
       bottomInset: 60,
+      initialFocus: findNodeAnchor(layout.nodes, initialFocusId),
       onBackgroundPointerDown: () => {
         onSelect?.(null);
         setPaletteOpen(false);
@@ -394,12 +405,7 @@ export function Mindmap({
   }
 
   const editingNode = editingId ? byId.get(editingId) : null;
-  const editingAnchor = editingId
-    ? layout.nodes.find(n => n.nodeId === editingId && n.kind === 'l1')
-      || layout.nodes.find(n => n.nodeId === editingId && n.kind === 'l2')
-      || layout.nodes.find(n => n.nodeId === editingId)
-      || layout.nodes[0]
-    : null;
+  const editingAnchor = editingId ? findNodeAnchor(layout.nodes, editingId) ?? layout.nodes[0] : null;
 
   const selectedTheme = selectedNode
     ? layout.nodes.find(n => n.nodeId === selectedNode.id)?.theme || XMIND_THEMES[0]
@@ -408,7 +414,7 @@ export function Mindmap({
   return (
     <section className="flex-1 relative overflow-hidden flex" aria-label="Sơ đồ tư duy XMind">
       {/* Left Floating Quick Toolbar */}
-      <aside className="absolute left-4 top-4 z-20 flex flex-col bg-white border border-slate-200/90 rounded-xl shadow-lg shadow-slate-900/5 p-1.5 space-y-1">
+      {onChange && <aside className="absolute left-4 top-4 z-20 flex flex-col bg-white border border-slate-200/90 rounded-xl shadow-lg shadow-slate-900/5 p-1.5 space-y-1">
         <button
           type="button"
           onClick={addInView}
@@ -489,10 +495,10 @@ export function Mindmap({
             title={title}
           />
         ))}
-      </aside>
+      </aside>}
 
       {/* Floating Contextual Toolbar */}
-      {selectedNode && (
+      {onChange && selectedNode && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center">
           <div className="bg-white border border-slate-200 shadow-xl rounded-xl px-2 py-1.5 flex items-center gap-1 text-xs">
             <button
@@ -600,7 +606,7 @@ export function Mindmap({
 
           {/* Symmetric 3-Level XMind Nodes */}
           {layout.nodes.map(node => {
-            const isSelected = node.nodeId && node.nodeId === selectedId;
+            const isSelected = onChange ? !!node.nodeId && node.nodeId === selectedId : node === selectedAnchor;
 
             if (node.kind === 'root') {
               return (
@@ -611,15 +617,16 @@ export function Mindmap({
                     e.stopPropagation();
                     if (node.nodeId) onSelect?.(node.nodeId);
                   }}
-                  onDoubleClick={e => {
+                  onDoubleClick={onChange && (e => {
                     e.stopPropagation();
                     if (node.nodeId) setEditingId(node.nodeId);
-                  }}
+                  })}
+                  aria-pressed={isSelected}
                   style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
                   className={`mindmap-node rounded-2xl bg-[#111E38] text-white shadow-xl hover:shadow-2xl px-4 py-3 flex flex-col items-center justify-center text-center z-10 border border-slate-700 cursor-pointer ${
                     isSelected ? 'ring-2 ring-offset-2 ring-blue-500' : ''
                   } ${node.dimmed ? 'opacity-25' : ''}`}
-                  title="Bấm chọn · Bấm đúp để chỉnh sửa"
+                  title={onChange ? 'Bấm chọn · Bấm đúp để chỉnh sửa' : node.lines[0]}
                 >
                   <div className="text-[13.5px] font-bold tracking-tight text-white mb-1.5">
                     {node.title}
@@ -642,10 +649,11 @@ export function Mindmap({
                     e.stopPropagation();
                     if (node.nodeId) onSelect?.(node.nodeId);
                   }}
-                  onDoubleClick={e => {
+                  onDoubleClick={onChange && (e => {
                     e.stopPropagation();
                     if (node.nodeId) setEditingId(node.nodeId);
-                  }}
+                  })}
+                  aria-pressed={isSelected}
                   style={{
                     position: 'absolute',
                     left: node.x,
@@ -657,7 +665,7 @@ export function Mindmap({
                   className={`mindmap-node rounded-lg px-3 flex items-center justify-center text-center text-white font-bold text-[12px] shadow-md hover:brightness-105 z-10 cursor-pointer ${
                     isSelected ? 'ring-2 ring-offset-2 ring-slate-900' : ''
                   } ${node.dimmed ? 'opacity-25' : ''}`}
-                  title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
+                  title={onChange ? `${node.text} — Bấm để xem · Bấm đúp để sửa` : node.text}
                 >
                   <span className="mindmap-label">{node.label}</span>
                 </button>
@@ -673,10 +681,11 @@ export function Mindmap({
                     e.stopPropagation();
                     if (node.nodeId) onSelect?.(node.nodeId);
                   }}
-                  onDoubleClick={e => {
+                  onDoubleClick={onChange && (e => {
                     e.stopPropagation();
                     if (node.nodeId) setEditingId(node.nodeId);
-                  }}
+                  })}
+                  aria-pressed={isSelected}
                   style={{
                     position: 'absolute',
                     left: node.x,
@@ -690,7 +699,7 @@ export function Mindmap({
                   className={`mindmap-node rounded-md border px-2.5 flex items-center justify-center text-center font-semibold text-[11.5px] shadow-2xs hover:shadow-sm z-10 cursor-pointer ${
                     isSelected ? 'ring-2 ring-blue-500' : ''
                   } ${node.dimmed ? 'opacity-25' : ''}`}
-                  title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
+                  title={onChange ? `${node.text} — Bấm để xem · Bấm đúp để sửa` : node.text}
                 >
                   <span className="mindmap-label">{node.label}</span>
                 </button>
@@ -705,15 +714,16 @@ export function Mindmap({
                   e.stopPropagation();
                   if (node.nodeId) onSelect?.(node.nodeId);
                 }}
-                onDoubleClick={e => {
+                onDoubleClick={onChange && (e => {
                   e.stopPropagation();
                   if (node.nodeId) setEditingId(node.nodeId);
-                }}
+                })}
+                aria-pressed={isSelected}
                 style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
                 className={`mindmap-node rounded-md bg-white px-2.5 flex items-center justify-center text-center text-[11px] font-medium text-slate-700 border shadow-2xs hover:border-slate-400 z-10 cursor-pointer ${
                   isSelected ? 'border-blue-600 ring-1 ring-blue-300' : 'border-slate-300/85'
                 } ${node.dimmed ? 'opacity-25' : ''}`}
-                title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
+                title={onChange ? `${node.text} — Bấm để xem · Bấm đúp để sửa` : node.text}
               >
                 <span className="mindmap-label">{node.label}</span>
               </button>
@@ -823,9 +833,8 @@ export function Mindmap({
           Vừa khung hình
         </button>
 
-        <div className="h-4 w-px bg-slate-200 shrink-0" />
-
-        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg shrink-0">
+        {onSwitchTab && <div className="h-4 w-px bg-slate-200 shrink-0" />}
+        {onSwitchTab && <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg shrink-0">
           <button
             type="button"
             onClick={() => onSwitchView?.('tree')}
@@ -851,9 +860,9 @@ export function Mindmap({
           >
             Lab
           </button>
-        </div>
+        </div>}
 
-        <div className="flex items-center gap-1 shrink-0">
+        {onSwitchDay && <div className="flex items-center gap-1 shrink-0">
           <button
             type="button"
             disabled={day <= 1}
@@ -875,7 +884,7 @@ export function Mindmap({
           >
             ›
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* Live CanvasMinimap (Bottom Right) */}

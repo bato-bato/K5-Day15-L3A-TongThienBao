@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChatBot } from './ChatBot.jsx';
 import { CourseTree } from './CourseTree.jsx';
@@ -281,10 +281,406 @@ function parseExplanationSummary(text) {
   return { headline, concepts, codeFiles, stats };
 }
 
+function NodeInspector({ selectedNode, className = '', titleId, onClose, onRelatedConcept, onExploreGraph }) {
+  const conceptId = selectedNode.source_ref?.concept_id;
+  const [nodeGraph, setNodeGraph] = useState(null);
+
+  useEffect(() => {
+    if (!conceptId) return;
+    let cancelled = false;
+    request(`/api/graph/subgraph?node_id=${encodeURIComponent(conceptId)}&hops=2&direction=both`)
+      .then(data => {
+        if (!cancelled) setNodeGraph({ conceptId, data });
+      })
+      .catch(() => {
+        if (!cancelled) setNodeGraph({ conceptId, data: null });
+      });
+    return () => { cancelled = true; };
+  }, [conceptId]);
+
+  const study = parseStudySections(selectedNode.text);
+  const typeKey = selectedNode.node_type || 'note';
+  const typeLabel = NODE_TYPE_LABELS[typeKey] || typeKey;
+  const theme = INSPECTOR_THEMES[typeKey] || INSPECTOR_THEMES.note;
+  const gData = nodeGraph?.conceptId === conceptId ? nodeGraph?.data : null;
+  const selfGraphNode = gData?.nodes?.find(n => n.id === conceptId);
+  const keywords = selfGraphNode?.keywords || [];
+  const relatedConcepts = (gData?.nodes || []).filter(
+    n => n.node_kind === 'concept' && n.id !== conceptId && n.type !== 'DayModule'
+  ).slice(0, 4);
+  const appliedTargets = (gData?.nodes || []).filter(
+    n => n.node_kind === 'checkpoint' || n.node_kind === 'code_symbol'
+  ).slice(0, 4);
+  const topCommunity = gData?.communities?.[0] || null;
+
+  return (
+    <aside className={`node-inspector ${className}`} aria-label="Kiểm chứng nguồn nút">
+      {/* Colored Hero Header */}
+      <div className={`bg-gradient-to-r ${theme.hero} px-4 py-3.5 shrink-0`}>
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className={`px-2 py-0.5 rounded-full text-[10.5px] font-bold border ${theme.badge}`}>
+              {theme.icon} {typeLabel}
+            </span>
+            {selectedNode.verification_status === 'verified' && (
+              <span className="px-2 py-0.5 rounded-full bg-emerald-400/25 border border-emerald-200/40 text-white text-[10.5px] font-semibold">
+                ✓ Verified
+              </span>
+            )}
+            {selectedNode.source_ref?.pdf_pages?.length > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-black/20 text-white text-[10.5px] font-mono">
+                D{selectedNode.source_ref.day} · Tr.{selectedNode.source_ref.pdf_pages.join(',')}
+              </span>
+            )}
+          </div>
+          <button
+            type="button"
+            aria-label="Đóng chi tiết nút"
+            autoFocus={Boolean(titleId)}
+            onClick={onClose}
+            className="text-white/80 hover:text-white hover:bg-white/15 px-1.5 py-0.5 rounded-md text-sm font-bold"
+          >
+            ×
+          </button>
+        </div>
+        <h3 id={titleId} className="text-[15.5px] font-bold leading-snug text-white">
+          {study.title}
+        </h3>
+      </div>
+
+      <div className="p-4 overflow-y-auto space-y-3.5 text-xs select-text">
+        {/* Key Quote Callout (prominent at top when available) */}
+        {selectedNode.source_ref?.key_quote && (
+          <div className="bg-amber-50/90 border border-amber-200 border-l-4 border-l-amber-500 rounded-xl p-3">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-amber-700 mb-1">
+              💡 Điểm cốt lõi cần nhớ
+            </div>
+            <blockquote className="text-[12.5px] font-medium text-slate-800 leading-relaxed">
+              “{selectedNode.source_ref.key_quote.replace(/->/g, '→')}”
+            </blockquote>
+          </div>
+        )}
+
+        {/* Parsed Study Blocks */}
+        {study.blocks.length > 0 && (
+          <div className="space-y-2.5">
+            <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">
+              Nội dung trọng tâm ({study.blocks.length} ý)
+            </div>
+            {study.blocks.map((blk, idx) => {
+              if (blk.kind === 'formula') {
+                return (
+                  <div key={idx} className="bg-indigo-50/80 border border-indigo-200 rounded-xl p-3 space-y-2">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-indigo-700">
+                      Công thức / Cấu trúc
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold text-[11.5px]">
+                        {blk.lhs}
+                      </span>
+                      <span className="text-indigo-500 font-bold">=</span>
+                      {blk.terms.map((term, tIdx) => (
+                        <React.Fragment key={tIdx}>
+                          {tIdx > 0 && <span className="text-indigo-400 font-bold">+</span>}
+                          <span className="px-2.5 py-1 rounded-lg bg-white border border-indigo-200 text-slate-800 font-semibold text-[11.5px] shadow-sm">
+                            {term}
+                          </span>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              if (blk.kind === 'flow') {
+                return (
+                  <div key={idx} className="bg-sky-50/80 border border-sky-200 rounded-xl p-3 space-y-2">
+                    {blk.label && (
+                      <div className="text-[11.5px] font-bold text-sky-900">{renderHighlightedText(blk.label)}</div>
+                    )}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {blk.steps.map((step, sIdx) => (
+                        <React.Fragment key={sIdx}>
+                          {sIdx > 0 && <span className="text-sky-500 font-bold">→</span>}
+                          <span className="px-2.5 py-1 rounded-lg bg-white border border-sky-200 text-slate-800 font-semibold text-[11.5px] shadow-sm">
+                            {step}
+                          </span>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              if (blk.kind === 'pillars') {
+                return (
+                  <div key={idx} className="bg-emerald-50/60 border border-emerald-200 rounded-xl p-3 space-y-2">
+                    <div className="text-[11.5px] font-bold text-emerald-950">
+                      {renderHighlightedText(blk.label)}
+                    </div>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {blk.items.map((item, iIdx) => (
+                        <div
+                          key={iIdx}
+                          className="flex items-center gap-2 bg-white border border-emerald-200/80 rounded-lg px-2.5 py-1.5 shadow-sm"
+                        >
+                          <span className="w-5 h-5 rounded-md bg-emerald-600 text-white font-mono text-[10px] font-bold grid place-items-center shrink-0">
+                            0{iIdx + 1}
+                          </span>
+                          <span className="font-semibold text-slate-800 text-[11.5px] leading-tight">
+                            {item}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              if (blk.kind === 'list') {
+                return (
+                  <div key={idx} className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                    <div className="text-[11.5px] font-bold text-slate-900 leading-snug">
+                      {renderHighlightedText(blk.label)}
+                    </div>
+                    <div className="space-y-1.5">
+                      {blk.items.map((item, iIdx) => (
+                        <div
+                          key={iIdx}
+                          className="flex items-start gap-2 bg-white border border-slate-200/90 rounded-lg px-2.5 py-1.5"
+                        >
+                          <span className="w-4 h-4 rounded-full bg-blue-100 text-blue-700 font-bold text-[10px] grid place-items-center shrink-0 mt-0.5">
+                            {iIdx + 1}
+                          </span>
+                          <span className="text-slate-800 font-medium text-[11.5px] leading-snug">
+                            {renderHighlightedText(item)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={idx} className="flex items-start gap-2.5 bg-white border border-slate-200 rounded-xl p-3 shadow-2xs">
+                  <span className={`mt-1.5 w-2 h-2 rounded-full ${theme.accent} shrink-0`} />
+                  <div className="text-slate-700 leading-relaxed text-[12px]">
+                    {blk.label && (
+                      <strong className="text-slate-900 mr-1">{renderHighlightedText(blk.label)}:</strong>
+                    )}
+                    <span>{renderHighlightedText(blk.text)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Keywords from Graph DB */}
+        {keywords.length > 0 && (
+          <div className="space-y-1.5">
+            <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">
+              Từ khóa cần nắm
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {keywords.map(kw => (
+                <span
+                  key={kw}
+                  className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 font-mono text-[10.5px]"
+                >
+                  #{kw}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Live GraphRAG Links: Applied Checkpoints, Code & Related Concepts */}
+        {(appliedTargets.length > 0 || relatedConcepts.length > 0 || topCommunity) && (
+          <div className="bg-purple-50/60 border border-purple-200 rounded-xl p-3 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-purple-950 text-[12px]">
+                Mạng tri thức GraphRAG (Lý thuyết ↔ Thực hành)
+              </span>
+              {topCommunity && (
+                <span className="px-2 py-0.5 rounded-full bg-white border border-purple-200 text-purple-700 text-[10px] font-semibold">
+                  {topCommunity.community_id}
+                </span>
+              )}
+            </div>
+
+            {appliedTargets.length > 0 && (
+              <div className="space-y-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-purple-700">
+                  Áp dụng trong Checkpoint & Code Lab
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {appliedTargets.map(t => (
+                    <span
+                      key={t.id}
+                      className={`px-2 py-1 rounded-lg border text-[11px] font-medium ${t.node_kind === 'checkpoint'
+                        ? 'bg-indigo-100/80 border-indigo-200 text-indigo-900 font-semibold'
+                        : 'bg-teal-50 border-teal-200 text-teal-900 font-mono text-[10.5px]'
+                        }`}
+                    >
+                      {t.node_kind === 'checkpoint' ? `⚑ ${t.id}` : `‹› ${t.label}`}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {relatedConcepts.length > 0 && (
+              <div className="space-y-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-purple-700">
+                  Khái niệm liên kết ({relatedConcepts.length})
+                </div>
+                <div className="space-y-1">
+                  {relatedConcepts.map(rc => (
+                    <button
+                      key={rc.id}
+                      type="button"
+                      onClick={() => onRelatedConcept(rc.id, rc.day)}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg bg-white hover:bg-purple-100/60 border border-purple-200/80 flex items-center justify-between gap-2 transition"
+                    >
+                      <span className="truncate font-medium text-slate-800 text-[11.5px]">
+                        → {rc.label}
+                      </span>
+                      <span className="text-[10px] font-mono text-purple-700 shrink-0">
+                        D{rc.day}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Lecture Provenance Metadata */}
+        {selectedNode.source_ref && (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-slate-700 text-[11.5px]">Truy vết Nguồn (Provenance)</span>
+              <code className="bg-white px-2 py-0.5 rounded-md border border-slate-200 text-blue-700 text-[10.5px] font-semibold">
+                {selectedNode.source_ref.concept_id}
+              </code>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-[11px]">
+              <div className="bg-white rounded-lg px-2.5 py-1.5 border border-slate-200/80">
+                <div className="text-[9.5px] uppercase tracking-wider text-slate-400 font-semibold">Trang PDF</div>
+                <div className="font-semibold text-slate-800">
+                  Ngày {selectedNode.source_ref.day} · Tr. {selectedNode.source_ref.pdf_pages?.join(', ') || '—'}
+                </div>
+              </div>
+              <div className="bg-white rounded-lg px-2.5 py-1.5 border border-slate-200/80">
+                <div className="text-[9.5px] uppercase tracking-wider text-slate-400 font-semibold">Mục giáo trình</div>
+                <div className="font-semibold text-slate-800 truncate" title={selectedNode.source_ref.section_ref}>
+                  {selectedNode.source_ref.section_ref}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {selectedNode.code_link && (
+          <div className="bg-teal-50/70 border border-teal-200 rounded-xl p-3.5 space-y-1.5">
+            <div className="font-bold text-teal-900">Liên kết Code Lab (Repo Parser AST)</div>
+            <div><strong>File:</strong> <code className="bg-white px-1.5 py-0.5 rounded border border-teal-100">{selectedNode.code_link.file_path}</code></div>
+            {selectedNode.code_link.symbol && (
+              <div><strong>Hàm / Lớp:</strong> <code className="bg-white px-1.5 py-0.5 rounded border border-teal-100">{selectedNode.code_link.symbol}()</code></div>
+            )}
+            <div><strong>Dòng:</strong> L{selectedNode.code_link.line_start}–L{selectedNode.code_link.line_end}</div>
+          </div>
+        )}
+
+        {study.title && (
+          <button
+            type="button"
+            onClick={() => onExploreGraph(study.title)}
+            className="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-sm"
+          >
+            <span>⚡</span> Khám phá GraphRAG & Code Lab cho nút này →
+          </button>
+        )}
+      </div>
+    </aside>
+  );
+}
+
+function LectureNodeDialog({ node, onClose, onRelatedConcept, onExploreGraph }) {
+  const dialogRef = useRef(null);
+
+  useLayoutEffect(() => {
+    dialogRef.current.showModal();
+  }, []);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className="lecture-node-dialog"
+      aria-labelledby="lecture-node-title"
+      onClose={event => {
+        event.stopPropagation();
+        onClose();
+      }}
+    >
+      <NodeInspector
+        key={node.id}
+        selectedNode={node}
+        titleId="lecture-node-title"
+        onClose={() => dialogRef.current.close()}
+        onRelatedConcept={onRelatedConcept}
+        onExploreGraph={onExploreGraph}
+      />
+    </dialog>
+  );
+}
+
+function LectureMindmapDialog({ day, title, nodes, nodeId, onClose, findRelatedConcept, onExploreGraph }) {
+  const dialogRef = useRef(null);
+  const [selectedId, setSelectedId] = useState(nodeId);
+  const [detail, setDetail] = useState(null);
+
+  useLayoutEffect(() => {
+    dialogRef.current.showModal();
+  }, []);
+
+  function selectNode(nextId) {
+    setSelectedId(nextId);
+    const node = nodes.find(item => item.id === nextId);
+    if (node) setDetail({ day, node });
+  }
+
+  return (
+    <dialog ref={dialogRef} className="lecture-mindmap-dialog" aria-labelledby="lecture-mindmap-title" onClose={onClose}>
+      <div className="lecture-mindmap-panel">
+        <header>
+          <h2 id="lecture-mindmap-title">Mindmap · Ngày {day} · {title}</h2>
+          <button type="button" aria-label="Đóng Mindmap" onClick={() => dialogRef.current.close()}>×</button>
+        </header>
+        <Mindmap nodes={nodes} day={day} selectedId={selectedId} initialFocusId={nodeId} onSelect={selectNode} />
+      </div>
+      {detail && (
+        <LectureNodeDialog
+          node={detail.node}
+          onClose={() => setDetail(null)}
+          onRelatedConcept={(conceptId, targetDay) => {
+            const node = findRelatedConcept(conceptId, targetDay);
+            if (node) setDetail({ day: targetDay, node });
+          }}
+          onExploreGraph={query => onExploreGraph(query, detail.day, detail.node.id)}
+        />
+      )}
+    </dialog>
+  );
+}
+
 function App() {
-  const [view, setView] = useState('tree');
+  const [view, setView] = useState('lab');
   const [day, setDay] = useState(2);
-  const [tab, setTab] = useState('mindmaps');
+  const [tab, setTab] = useState('lab');
   const [workspace, setWorkspace] = useState(null);
   const [loadError, setLoadError] = useState(false);
   const [edits, setEdits] = useState({});
@@ -292,6 +688,7 @@ function App() {
   const [messages, setMessages] = useState({});
   const [selectedId, setSelectedId] = useState(null);
   const [labCheckpoint, setLabCheckpoint] = useState(null);
+  const [lectureMindmap, setLectureMindmap] = useState(null);
 
   const [dayMenuOpen, setDayMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -313,7 +710,6 @@ function App() {
   const [ingestContent, setIngestContent] = useState('');
   const [ingestLoading, setIngestLoading] = useState(false);
   const [ingestStatus, setIngestStatus] = useState(null);
-  const [nodeGraph, setNodeGraph] = useState({ loading: false, data: null });
 
   const searchInputRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -345,6 +741,31 @@ function App() {
     setSelectedId(target ? target.id : null);
   }
 
+  function openLectureMindmap(targetDay, nodeId) {
+    setLectureMindmap({ day: targetDay, nodes: workspace.mindmaps[targetDay].nodes, nodeId });
+  }
+
+  function selectRelatedConcept(conceptId, targetDay) {
+    if (targetDay < 1 || targetDay > 14 || !targetDay) return;
+    selectDay(targetDay);
+    const targetNodes = (edits[`${tab}/${targetDay}`] ?? workspace?.[tab]?.[targetDay] ?? EMPTY).nodes;
+    const node = targetNodes.find(item => item.source_ref?.concept_id === conceptId);
+    if (node) setSelectedId(node.id);
+  }
+
+  function exploreGraph(query, targetDay = day) {
+    setMapperOpen(true);
+    runMapping(query, targetDay);
+  }
+
+  function exploreLectureGraph(query, targetDay, nodeId) {
+    setLectureMindmap(null);
+    switchView('mindmaps');
+    setDay(targetDay);
+    setSelectedId(nodeId);
+    exploreGraph(query, targetDay);
+  }
+
   function selectDay(nextDay) {
     setDay(nextDay);
     setSelectedId(null);
@@ -367,24 +788,6 @@ function App() {
   }
 
   useEffect(() => { load(); }, []);
-
-  useEffect(() => {
-    const conceptId = selectedNode?.source_ref?.concept_id;
-    if (!conceptId) {
-      setNodeGraph({ loading: false, data: null });
-      return;
-    }
-    let cancelled = false;
-    setNodeGraph({ loading: true, data: null });
-    request(`/api/graph/subgraph?node_id=${encodeURIComponent(conceptId)}&hops=2&direction=both`)
-      .then(data => {
-        if (!cancelled) setNodeGraph({ loading: false, data });
-      })
-      .catch(() => {
-        if (!cancelled) setNodeGraph({ loading: false, data: null });
-      });
-    return () => { cancelled = true; };
-  }, [selectedNode?.id, selectedNode?.source_ref?.concept_id]);
 
   useEffect(() => {
     function onKeyDown(event) {
@@ -470,7 +873,7 @@ function App() {
     URL.revokeObjectURL(url);
   }
 
-  async function runMapping(overrideQuery) {
+  async function runMapping(overrideQuery, targetDay = day) {
     const q = (overrideQuery ?? mapQuery).trim();
     if (!q) return;
     if (overrideQuery !== undefined) setMapQuery(overrideQuery);
@@ -482,7 +885,7 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: q,
-          day: mapScopeDay ? day : null,
+          day: mapScopeDay ? targetDay : null,
           mode: mapMode,
           direction: mapDirection,
         }),
@@ -569,8 +972,8 @@ function App() {
             </div>
           </div>
           <nav className="workspace-view-tabs" aria-label="Khu vực học">
-            <button type="button" aria-current={tab === 'mindmaps' ? 'page' : undefined} onClick={() => switchView('tree')}>Mindmap</button>
             <button type="button" aria-current={tab === 'lab' ? 'page' : undefined} onClick={() => switchView('lab')}>Lab</button>
+            <button type="button" aria-current={tab === 'mindmaps' ? 'page' : undefined} onClick={() => switchView('tree')}>Mindmap</button>
           </nav>
 
           <div className="h-4 w-px bg-slate-300 mx-1 hidden sm:block" />
@@ -756,6 +1159,7 @@ function App() {
             loadError={loadError}
             onRetry={load}
             onJumpToConcept={jumpToConcept}
+            onOpenMindmap={openLectureMindmap}
           />
         ) : !workspace ? (
           <section className="flex-1 flex flex-col items-center justify-center gap-3 text-sm text-slate-500">
@@ -818,330 +1222,15 @@ function App() {
           />
         )}
 
-        {/* Provenance & Structured Study Inspector Drawer (Right) */}
-        {selectedNode && (() => {
-          const study = parseStudySections(selectedNode.text);
-          const typeKey = selectedNode.node_type || 'note';
-          const typeLabel = NODE_TYPE_LABELS[typeKey] || typeKey;
-          const theme = INSPECTOR_THEMES[typeKey] || INSPECTOR_THEMES.note;
-          const conceptId = selectedNode.source_ref?.concept_id;
-          const gData = nodeGraph.data;
-          const selfGraphNode = gData?.nodes?.find(n => n.id === conceptId);
-          const keywords = selfGraphNode?.keywords || [];
-          const relatedConcepts = (gData?.nodes || []).filter(
-            n => n.node_kind === 'concept' && n.id !== conceptId && n.type !== 'DayModule'
-          ).slice(0, 4);
-          const appliedTargets = (gData?.nodes || []).filter(
-            n => n.node_kind === 'checkpoint' || n.node_kind === 'code_symbol'
-          ).slice(0, 4);
-          const topCommunity = gData?.communities?.[0] || null;
-
-          return (
-            <aside
-              className="fixed top-16 right-4 bottom-20 w-[min(450px,calc(100vw-2rem))] bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-2xl z-30 flex flex-col overflow-hidden"
-              aria-label="Kiểm chứng nguồn nút"
-            >
-              {/* Colored Hero Header */}
-              <div className={`bg-gradient-to-r ${theme.hero} px-4 py-3.5 shrink-0`}>
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className={`px-2 py-0.5 rounded-full text-[10.5px] font-bold border ${theme.badge}`}>
-                      {theme.icon} {typeLabel}
-                    </span>
-                    {selectedNode.verification_status === 'verified' && (
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-400/25 border border-emerald-200/40 text-white text-[10.5px] font-semibold">
-                        ✓ Verified
-                      </span>
-                    )}
-                    {selectedNode.source_ref?.pdf_pages?.length > 0 && (
-                      <span className="px-2 py-0.5 rounded-full bg-black/20 text-white text-[10.5px] font-mono">
-                        D{selectedNode.source_ref.day} · Tr.{selectedNode.source_ref.pdf_pages.join(',')}
-                      </span>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedId(null)}
-                    className="text-white/80 hover:text-white hover:bg-white/15 px-1.5 py-0.5 rounded-md text-sm font-bold"
-                  >
-                    ×
-                  </button>
-                </div>
-                <h3 className="text-[15.5px] font-bold leading-snug text-white">
-                  {study.title}
-                </h3>
-              </div>
-
-              <div className="p-4 overflow-y-auto space-y-3.5 text-xs select-text">
-                {/* Key Quote Callout (prominent at top when available) */}
-                {selectedNode.source_ref?.key_quote && (
-                  <div className="bg-amber-50/90 border border-amber-200 border-l-4 border-l-amber-500 rounded-xl p-3">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-amber-700 mb-1">
-                      💡 Điểm cốt lõi cần nhớ
-                    </div>
-                    <blockquote className="text-[12.5px] font-medium text-slate-800 leading-relaxed">
-                      “{selectedNode.source_ref.key_quote.replace(/->/g, '→')}”
-                    </blockquote>
-                  </div>
-                )}
-
-                {/* Parsed Study Blocks */}
-                {study.blocks.length > 0 && (
-                  <div className="space-y-2.5">
-                    <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">
-                      Nội dung trọng tâm ({study.blocks.length} ý)
-                    </div>
-                    {study.blocks.map((blk, idx) => {
-                      if (blk.kind === 'formula') {
-                        return (
-                          <div key={idx} className="bg-indigo-50/80 border border-indigo-200 rounded-xl p-3 space-y-2">
-                            <div className="text-[10px] font-bold uppercase tracking-wider text-indigo-700">
-                              Công thức / Cấu trúc
-                            </div>
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold text-[11.5px]">
-                                {blk.lhs}
-                              </span>
-                              <span className="text-indigo-500 font-bold">=</span>
-                              {blk.terms.map((term, tIdx) => (
-                                <React.Fragment key={tIdx}>
-                                  {tIdx > 0 && <span className="text-indigo-400 font-bold">+</span>}
-                                  <span className="px-2.5 py-1 rounded-lg bg-white border border-indigo-200 text-slate-800 font-semibold text-[11.5px] shadow-sm">
-                                    {term}
-                                  </span>
-                                </React.Fragment>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      if (blk.kind === 'flow') {
-                        return (
-                          <div key={idx} className="bg-sky-50/80 border border-sky-200 rounded-xl p-3 space-y-2">
-                            {blk.label && (
-                              <div className="text-[11.5px] font-bold text-sky-900">{renderHighlightedText(blk.label)}</div>
-                            )}
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              {blk.steps.map((step, sIdx) => (
-                                <React.Fragment key={sIdx}>
-                                  {sIdx > 0 && <span className="text-sky-500 font-bold">→</span>}
-                                  <span className="px-2.5 py-1 rounded-lg bg-white border border-sky-200 text-slate-800 font-semibold text-[11.5px] shadow-sm">
-                                    {step}
-                                  </span>
-                                </React.Fragment>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      if (blk.kind === 'pillars') {
-                        return (
-                          <div key={idx} className="bg-emerald-50/60 border border-emerald-200 rounded-xl p-3 space-y-2">
-                            <div className="text-[11.5px] font-bold text-emerald-950">
-                              {renderHighlightedText(blk.label)}
-                            </div>
-                            <div className="grid grid-cols-2 gap-1.5">
-                              {blk.items.map((item, iIdx) => (
-                                <div
-                                  key={iIdx}
-                                  className="flex items-center gap-2 bg-white border border-emerald-200/80 rounded-lg px-2.5 py-1.5 shadow-sm"
-                                >
-                                  <span className="w-5 h-5 rounded-md bg-emerald-600 text-white font-mono text-[10px] font-bold grid place-items-center shrink-0">
-                                    0{iIdx + 1}
-                                  </span>
-                                  <span className="font-semibold text-slate-800 text-[11.5px] leading-tight">
-                                    {item}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      if (blk.kind === 'list') {
-                        return (
-                          <div key={idx} className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
-                            <div className="text-[11.5px] font-bold text-slate-900 leading-snug">
-                              {renderHighlightedText(blk.label)}
-                            </div>
-                            <div className="space-y-1.5">
-                              {blk.items.map((item, iIdx) => (
-                                <div
-                                  key={iIdx}
-                                  className="flex items-start gap-2 bg-white border border-slate-200/90 rounded-lg px-2.5 py-1.5"
-                                >
-                                  <span className="w-4 h-4 rounded-full bg-blue-100 text-blue-700 font-bold text-[10px] grid place-items-center shrink-0 mt-0.5">
-                                    {iIdx + 1}
-                                  </span>
-                                  <span className="text-slate-800 font-medium text-[11.5px] leading-snug">
-                                    {renderHighlightedText(item)}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      return (
-                        <div key={idx} className="flex items-start gap-2.5 bg-white border border-slate-200 rounded-xl p-3 shadow-2xs">
-                          <span className={`mt-1.5 w-2 h-2 rounded-full ${theme.accent} shrink-0`} />
-                          <div className="text-slate-700 leading-relaxed text-[12px]">
-                            {blk.label && (
-                              <strong className="text-slate-900 mr-1">{renderHighlightedText(blk.label)}:</strong>
-                            )}
-                            <span>{renderHighlightedText(blk.text)}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Keywords from Graph DB */}
-                {keywords.length > 0 && (
-                  <div className="space-y-1.5">
-                    <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">
-                      Từ khóa cần nắm
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {keywords.map(kw => (
-                        <span
-                          key={kw}
-                          className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 font-mono text-[10.5px]"
-                        >
-                          #{kw}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Live GraphRAG Links: Applied Checkpoints, Code & Related Concepts */}
-                {(appliedTargets.length > 0 || relatedConcepts.length > 0 || topCommunity) && (
-                  <div className="bg-purple-50/60 border border-purple-200 rounded-xl p-3 space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-purple-950 text-[12px]">
-                        Mạng tri thức GraphRAG (Lý thuyết ↔ Thực hành)
-                      </span>
-                      {topCommunity && (
-                        <span className="px-2 py-0.5 rounded-full bg-white border border-purple-200 text-purple-700 text-[10px] font-semibold">
-                          {topCommunity.community_id}
-                        </span>
-                      )}
-                    </div>
-
-                    {appliedTargets.length > 0 && (
-                      <div className="space-y-1">
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-purple-700">
-                          Áp dụng trong Checkpoint & Code Lab
-                        </div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {appliedTargets.map(t => (
-                            <span
-                              key={t.id}
-                              className={`px-2 py-1 rounded-lg border text-[11px] font-medium ${t.node_kind === 'checkpoint'
-                                ? 'bg-indigo-100/80 border-indigo-200 text-indigo-900 font-semibold'
-                                : 'bg-teal-50 border-teal-200 text-teal-900 font-mono text-[10.5px]'
-                                }`}
-                            >
-                              {t.node_kind === 'checkpoint' ? `⚑ ${t.id}` : `‹› ${t.label}`}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {relatedConcepts.length > 0 && (
-                      <div className="space-y-1">
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-purple-700">
-                          Khái niệm liên kết ({relatedConcepts.length})
-                        </div>
-                        <div className="space-y-1">
-                          {relatedConcepts.map(rc => (
-                            <button
-                              key={rc.id}
-                              type="button"
-                              onClick={() => {
-                                if (rc.day >= 1 && rc.day <= 14) {
-                                  selectDay(rc.day);
-                                  const targetNodes = (edits[`${tab}/${rc.day}`] ?? workspace?.[tab]?.[rc.day])?.nodes || [];
-                                  const match = targetNodes.find(n => n.source_ref?.concept_id === rc.id);
-                                  if (match) setSelectedId(match.id);
-                                }
-                              }}
-                              className="w-full text-left px-2.5 py-1.5 rounded-lg bg-white hover:bg-purple-100/60 border border-purple-200/80 flex items-center justify-between gap-2 transition"
-                            >
-                              <span className="truncate font-medium text-slate-800 text-[11.5px]">
-                                → {rc.label}
-                              </span>
-                              <span className="text-[10px] font-mono text-purple-700 shrink-0">
-                                D{rc.day}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Lecture Provenance Metadata */}
-                {selectedNode.source_ref && (
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-700 text-[11.5px]">Truy vết Nguồn (Provenance)</span>
-                      <code className="bg-white px-2 py-0.5 rounded-md border border-slate-200 text-blue-700 text-[10.5px] font-semibold">
-                        {selectedNode.source_ref.concept_id}
-                      </code>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-[11px]">
-                      <div className="bg-white rounded-lg px-2.5 py-1.5 border border-slate-200/80">
-                        <div className="text-[9.5px] uppercase tracking-wider text-slate-400 font-semibold">Trang PDF</div>
-                        <div className="font-semibold text-slate-800">
-                          Ngày {selectedNode.source_ref.day} · Tr. {selectedNode.source_ref.pdf_pages?.join(', ') || '—'}
-                        </div>
-                      </div>
-                      <div className="bg-white rounded-lg px-2.5 py-1.5 border border-slate-200/80">
-                        <div className="text-[9.5px] uppercase tracking-wider text-slate-400 font-semibold">Mục giáo trình</div>
-                        <div className="font-semibold text-slate-800 truncate" title={selectedNode.source_ref.section_ref}>
-                          {selectedNode.source_ref.section_ref}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {selectedNode.code_link && (
-                  <div className="bg-teal-50/70 border border-teal-200 rounded-xl p-3.5 space-y-1.5">
-                    <div className="font-bold text-teal-900">Liên kết Code Lab (Repo Parser AST)</div>
-                    <div><strong>File:</strong> <code className="bg-white px-1.5 py-0.5 rounded border border-teal-100">{selectedNode.code_link.file_path}</code></div>
-                    {selectedNode.code_link.symbol && (
-                      <div><strong>Hàm / Lớp:</strong> <code className="bg-white px-1.5 py-0.5 rounded border border-teal-100">{selectedNode.code_link.symbol}()</code></div>
-                    )}
-                    <div><strong>Dòng:</strong> L{selectedNode.code_link.line_start}–L{selectedNode.code_link.line_end}</div>
-                  </div>
-                )}
-
-                {study.title && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMapperOpen(true);
-                      runMapping(study.title);
-                    }}
-                    className="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-sm"
-                  >
-                    <span>⚡</span> Khám phá GraphRAG & Code Lab cho nút này →
-                  </button>
-                )}
-              </div>
-            </aside>
-          );
-        })()}
+        {selectedNode && (
+          <NodeInspector
+            selectedNode={selectedNode}
+            className="node-inspector-drawer"
+            onClose={() => setSelectedId(null)}
+            onRelatedConcept={selectRelatedConcept}
+            onExploreGraph={exploreGraph}
+          />
+        )}
 
         {/* AI Lecture-to-Lab GraphRAG Mapper Drawer (Left) */}
         {mapperOpen && (() => {
@@ -1569,6 +1658,15 @@ function App() {
         })()}
       </main>
 
+      {lectureMindmap && (
+        <LectureMindmapDialog
+          {...lectureMindmap}
+          title={getDayShortTitle(workspace, lectureMindmap.day)}
+          onClose={() => setLectureMindmap(null)}
+          findRelatedConcept={(conceptId, targetDay) => workspace.mindmaps[targetDay]?.nodes.find(node => node.source_ref?.concept_id === conceptId)}
+          onExploreGraph={exploreLectureGraph}
+        />
+      )}
       {workspace && view !== 'lab' && <ChatBot day={day} focus={chatFocus} onJumpToConcept={jumpToConcept} />}
     </div>
   );
