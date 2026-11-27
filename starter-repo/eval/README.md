@@ -1,5 +1,13 @@
 # Hồ sơ đánh giá CP2
 
+## Báo cáo nộp CP2
+
+Nhóm chọn Track A và chốt lát cắt hỗ trợ học viên L3 đang vướng ở một checkpoint Lab bằng một gợi ý có nguồn. So với CP1, nhóm đã thêm sơ đồ, bộ câu thử, chuẩn chấm và bản chạy mock. Canvas ghi nhận tín hiệu ban đầu 102/453 sự kiện Lab có cờ bỏ qua. Nhóm đã soạn câu hỏi khảo sát và đang chờ xác nhận phản hồi. [Canvas](../../canvas.md) · [Sơ đồ và chuẩn đạt](../spec.md) · [Data Card](../data/DATA_CARD.md)
+
+Lệnh python run.py check đã qua. Bản mock xử lý được cả 20 đầu vào và nhóm dùng Codex để chấm thử 5 output theo tiêu chí đã khóa. **4/5 câu đạt.** B14 trượt vì lời nhắc bổ sung dữ liệu chưa nêu rõ cần đoạn mã hoặc đường dẫn đúng. [Bộ câu thử](benchmark.csv) · [Metric spec](metric_spec.yaml) · [Bảng chấm thử](#chấm-thử-5-output-mock)
+
+Chuẩn benchmark đã chốt tại commit ba91ef0 lúc 17:54 ngày 27/11/2026, giờ Việt Nam. Nhóm chưa đo mức đồng thuận giữa hai người chấm và chưa có kết quả đánh giá model thật.
+
 ## Dữ liệu và độ phủ
 
 Dùng dữ liệu checkpoint và vị trí code mẫu từ 14 repo Lab công khai và Knowledge Graph trong thư mục data/lab-mapping của repo. Câu có nguồn data_that được dựng từ nội dung thực của checkpoint. Xem [Data Card](../data/DATA_CARD.md).
@@ -34,7 +42,7 @@ Chạy ngày 27/11/2026 từ gốc repo với python run.py, MODEL_PROVIDER=fake
 | B16 | Đạt | Dẫn day01-cp2-e03, cell cb4be31f, ghi còn TODO trong repo mẫu và chưa chứng minh đã triển khai. |
 | B19 | Đạt | Nêu rõ phạm vi hỗ trợ checkpoint, chuyển về tự thực hành và không xuất nội dung nội bộ. Trace ghi 0 lượt gọi model. |
 
-**Kết quả chấm thử.** 4/5 output mock đạt theo lượt chấm bằng AI. Đây là số câu qua của mẫu 5 ca, tách với tỷ lệ đồng thuận giữa hai người. Kết quả chấm độc lập của hai người và kết quả benchmark model thật vẫn đang chờ.
+Số câu đạt trong bảng dùng để rà cách áp dụng tiêu chí cho output mock.
 
 ## Chạy và lưu kết quả
 
