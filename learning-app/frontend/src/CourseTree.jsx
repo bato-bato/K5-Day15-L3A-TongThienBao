@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { sizeMindmap } from './mindmapSizing.js';
 import { useMindmapViewport } from './useMindmapViewport.js';
 
 export const COURSE_LEVELS = [
@@ -21,12 +22,6 @@ export const RIGHT_THEMES = [
   { solid: '#3D7A38', tint: '#F0FDF4', tintBorder: '#86EFAC', tintText: '#166534', mini: 'bg-green-700' },
   { solid: '#B93848', tint: '#FEF2F2', tintBorder: '#FCA5A5', tintText: '#991B1B', mini: 'bg-rose-700' },
 ];
-
-export function truncateText(str, maxLen) {
-  const s = (str || '').trim();
-  if (s.length <= maxLen) return s;
-  return `${s.slice(0, maxLen - 1).trim()}…`;
-}
 
 function splitTopLevelBy(str, sep) {
   const items = [];
@@ -60,16 +55,13 @@ export function getNodeTitle(node) {
   return line.replace(/^\[[^\]]+\]\s*/, '').trim() || 'Ý tưởng mới';
 }
 
-  function shortenL2Label(rawLabel) {
+  function cleanGroupLabel(rawLabel) {
     if (!rawLabel) return 'Khái niệm';
     const cleaned = rawLabel
       .replace(/^\(\d+\)\s*/, '')
       .replace(/\([^)]*\)/g, '')
       .trim();
-    if (!cleaned) return 'Khái niệm';
-    const words = cleaned.split(/\s+/);
-    if (words.length <= 4) return truncateText(cleaned, 22);
-    return truncateText(words.slice(0, 4).join(' '), 22);
+    return cleaned || 'Khái niệm';
   }
 
   function inferTopicLabel(chunk, parentTitle) {
@@ -81,22 +73,22 @@ export function getNodeTitle(node) {
     // Rule A: Cost / comparison verbs ("Output đắt gấp 3–5 lần Input", "Tiếng Việt..., code, JSON tốn nhiều token...")
     const costMatch = cleanNoParens.match(/^(.{2,30}?)\s+(đắt gấp|rẻ hơn)\b/i);
     if (costMatch) {
-      return shortenL2Label(`Giá ${costMatch[1].trim()}`);
+      return cleanGroupLabel(`Giá ${costMatch[1].trim()}`);
     }
     const spendMatch = cleanNoParens.match(/^(.+?)\s+tốn\b/i);
     if (spendMatch) {
       const subj = spendMatch[1].trim();
       if (subj.includes(',')) {
         const firstItem = subj.split(',')[0].trim();
-        return firstItem && firstItem.length <= 24 ? shortenL2Label(firstItem) : 'Độ tốn token';
+        return firstItem && firstItem.length <= 24 ? cleanGroupLabel(firstItem) : 'Độ tốn token';
       }
-      return subj.length <= 24 ? shortenL2Label(subj) : 'Độ tốn token';
+      return subj.length <= 24 ? cleanGroupLabel(subj) : 'Độ tốn token';
     }
 
     // Rule B: Leading term followed by parenthetical ("Decoder-only (GPT, Claude, Gemini)...")
     const parenLead = clean.match(/^([^(]{2,34})\s*\(([^)]{2,60})\)/);
     if (parenLead) {
-      return shortenL2Label(parenLead[1].trim());
+      return cleanGroupLabel(parenLead[1].trim());
     }
 
     // Rule C: Subject before common Vietnamese action/state verbs
@@ -107,7 +99,7 @@ export function getNodeTitle(node) {
     if (subjMatch) {
       const subj = subjMatch[1].trim();
       if (!GENERIC_FILLERS.has(subj.toLowerCase())) {
-        return shortenL2Label(subj);
+        return cleanGroupLabel(subj);
       }
     }
 
@@ -120,12 +112,12 @@ export function getNodeTitle(node) {
       .trim();
     if (stripped) {
       const words = stripped.split(/\s+/);
-      return truncateText(words.slice(0, Math.min(4, words.length)).join(' '), 22);
+      return words.slice(0, 4).join(' ');
     }
 
     // Rule E: Fallback to parent title segment
     const parentSegment = (parentTitle || '').split(/[&—–:]/)[0].trim();
-    return shortenL2Label(parentSegment || 'Khái niệm');
+    return cleanGroupLabel(parentSegment || 'Khái niệm');
   }
 
   export function extractSubBranches(node) {
@@ -137,8 +129,7 @@ export function getNodeTitle(node) {
     if (!body) {
       return [{
         label: node?.source_ref?.pdf_pages?.length ? `Tr.${node.source_ref.pdf_pages.join(',')}` : 'Ghi chú',
-        leaves: [truncateText(getNodeTitle(node), 36)],
-        leaves: [truncateText(parentTitle, 36)],
+        leaves: [parentTitle],
       }];
     }
 
@@ -154,11 +145,11 @@ export function getNodeTitle(node) {
 
       // Hierarchy "A > B > C"
       if (chunk.includes(' > ')) {
-        const hItems = chunk.split(/\s+>\s+/).map(t => truncateText(t.trim(), 36)).filter(Boolean);
+        const hItems = chunk.split(/\s+>\s+/).map(t => t.trim()).filter(Boolean);
         if (hItems.length >= 3) {
           const parentSegment = (parentTitle || '').split(/[&—–:]/)[0].trim();
           groups.push({
-            label: shortenL2Label(parentSegment || hItems[0]),
+            label: cleanGroupLabel(parentSegment || hItems[0]),
             leaves: hItems.slice(0, 5),
           });
           continue;
@@ -170,12 +161,12 @@ export function getNodeTitle(node) {
         const lhs = chunk.slice(0, eqIdx).trim();
         const rhs = chunk.slice(eqIdx + 3).trim();
         if (rhs.includes(' + ')) {
-          const terms = rhs.split(/\s+\+\s+/).map(t => truncateText(t.replace(/\([^)]*\)/g, '').trim(), 36)).filter(Boolean);
+          const terms = rhs.split(/\s+\+\s+/).map(t => t.replace(/\([^)]*\)/g, '').trim()).filter(Boolean);
           if (terms.length >= 2) {
-            groups.push({ label: truncateText(lhs, 20), leaves: terms.slice(0, 4) });
+            groups.push({ label: lhs, leaves: terms.slice(0, 4) });
             const eqLabel = lhs.length <= 2
-              ? truncateText(`${lhs} = ${terms.slice(0, 2).join(' + ')}`, 22)
-              : truncateText(lhs, 20);
+              ? `${lhs} = ${terms.slice(0, 2).join(' + ')}`
+              : lhs;
             groups.push({ label: eqLabel, leaves: terms.slice(0, 4) });
             continue;
           }
@@ -190,9 +181,8 @@ export function getNodeTitle(node) {
       const commaItems = splitTopLevelBy(rest, ',');
       if (hasLabel && commaItems.length >= 2) {
         groups.push({
-          label: shortenL2Label(label, groups.length + 1),
-          label: shortenL2Label(label),
-          leaves: commaItems.slice(0, 4).map(it => truncateText(it, 36)),
+          label: cleanGroupLabel(label),
+          leaves: commaItems.slice(0, 4),
         });
         continue;
       }
@@ -200,9 +190,8 @@ export function getNodeTitle(node) {
       const arrowSteps = splitTopLevelBy(rest, '→');
       if (arrowSteps.length >= 2) {
         groups.push({
-          label: shortenL2Label(label || 'Quy trình', groups.length + 1),
-          label: shortenL2Label(label || 'Quy trình'),
-          leaves: arrowSteps.slice(0, 4).map(st => truncateText(st, 36)),
+          label: cleanGroupLabel(label || 'Quy trình'),
+          leaves: arrowSteps.slice(0, 4),
         });
         continue;
       }
@@ -212,9 +201,8 @@ export function getNodeTitle(node) {
         const vItems = splitTopLevelBy(verbMatch[2], ',');
         if (vItems.length >= 2) {
           groups.push({
-            label: shortenL2Label(verbMatch[1], groups.length + 1),
-            label: shortenL2Label(verbMatch[1]),
-            leaves: vItems.slice(0, 4).map(it => truncateText(it, 36)),
+            label: cleanGroupLabel(verbMatch[1]),
+            leaves: vItems.slice(0, 4),
           });
           continue;
         }
@@ -226,20 +214,20 @@ export function getNodeTitle(node) {
         const hasEndVerb = /\b(?:tốn nhiều|đắt gấp|rẻ hơn|là|giúp|gồm)\b/i.test(chunk);
         const inferredLabel = hasEndVerb
           ? inferTopicLabel(chunk, parentTitle)
-          : shortenL2Label((parentTitle || '').split(/[&—–:]/)[0].trim() || inferTopicLabel(chunk, parentTitle));
+          : cleanGroupLabel((parentTitle || '').split(/[&—–:]/)[0].trim() || inferTopicLabel(chunk, parentTitle));
         groups.push({
           label: inferredLabel,
-          leaves: commaItems.slice(0, 4).map(it => truncateText(it, 36)),
+          leaves: commaItems.slice(0, 4),
         });
         continue;
       }
 
       // Compact fallback leaf with inferred topic label (never "Ý 1", "Ý 2")
       const fallbackItems = commaItems.length >= 2
-        ? commaItems.slice(0, 4).map(it => truncateText(it, 36))
-        : [truncateText(rest, 38)];
+        ? commaItems.slice(0, 4)
+        : [rest];
       groups.push({
-        label: label ? shortenL2Label(label) : inferTopicLabel(rest, parentTitle),
+        label: label ? cleanGroupLabel(label) : inferTopicLabel(rest, parentTitle),
         leaves: fallbackItems,
       });
     }
@@ -250,7 +238,7 @@ export function getNodeTitle(node) {
       let lbl = g.label || 'Khái niệm';
       if (seenLabels.has(lbl.toLowerCase()) && g.leaves?.[0]) {
         const alt = g.leaves[0].replace(/\([^)]*\)/g, '').trim().split(/\s+/).slice(0, 3).join(' ');
-        if (alt) lbl = truncateText(alt, 22);
+        if (alt) lbl = alt;
       }
       seenLabels.add(lbl.toLowerCase());
       return { ...g, label: lbl };
@@ -265,28 +253,17 @@ export function getNodeTitle(node) {
     } else if (deduped.length === 1 && node?.code_link?.file_path) {
       deduped.push({
         label: 'Code Lab',
-        leaves: [truncateText(node.code_link.file_path.split('/').slice(-2).join('/'), 36)],
+        leaves: [node.code_link.file_path.split('/').slice(-2).join('/')],
       });
     }
 
     return deduped.slice(0, 3);
   }
 
-      function layoutSideBranches(branches, side, themes, startX, expandedIds, forceExpandAll) {
-        const LEAF_W = 214;
-        const LEAF_H = 26;
+      function layoutSideBranches(branches, side, themes, nodeBox, expandedIds, forceExpandAll) {
         const LEAF_GAP = 4;
-        const L2_W = 136;
-        const L2_H = 30;
         const L2_GAP = 14;
-        const L1_W = 166;
-        const L1_H = 36;
         const L1_GAP = 26;
-
-        // X positions for each column on left vs right side
-        const l1X = side === 'left' ? startX - 180 - L1_W : startX + 180;
-        const l2X = side === 'left' ? l1X - 58 - L2_W : l1X + L1_W + 58;
-        const l3X = side === 'left' ? l2X - 52 - LEAF_W : l2X + L2_W + 52;
 
         const placedNodes = [];
         const placedEdges = [];
@@ -295,6 +272,7 @@ export function getNodeTitle(node) {
         branches.forEach((branch, bIdx) => {
           const theme = themes[bIdx % themes.length];
           const l1Id = `l1:${branch.id}`;
+          const l1 = nodeBox(branch.label, 'l1', side);
           const hasL1Children = branch.subGroups.length > 0;
           const isL1Expanded = hasL1Children && (forceExpandAll || expandedIds.has(l1Id));
 
@@ -312,10 +290,8 @@ export function getNodeTitle(node) {
               hasChildren: hasL1Children,
               isCollapsed: hasL1Children,
               hiddenCount: branch.subGroups.length,
-              x: l1X,
+              ...l1,
               y: l1Y,
-              width: L1_W,
-              height: L1_H,
             });
             placedEdges.push({
               id: `e:root->${l1Id}`,
@@ -325,15 +301,16 @@ export function getNodeTitle(node) {
               theme,
               conceptId: branch.conceptId,
             });
-            cursorY += L1_H + L1_GAP;
+            cursorY += l1.height + L1_GAP;
             return;
           }
 
-          const l2Centers = [];
           const l1StartY = cursorY;
+          const firstChildIndex = placedNodes.length;
 
           branch.subGroups.forEach((sg, sgIdx) => {
             const l2Id = `l2:${branch.id}:${sgIdx}`;
+            const l2 = nodeBox(sg.label, 'l2', side);
             const hasL2Children = sg.leaves.length > 0;
             const isL2Expanded = hasL2Children && (forceExpandAll || expandedIds.has(l2Id));
 
@@ -350,10 +327,8 @@ export function getNodeTitle(node) {
                 hasChildren: hasL2Children,
                 isCollapsed: hasL2Children,
                 hiddenCount: sg.leaves.length,
-                x: l2X,
+                ...l2,
                 y: l2Y,
-                width: L2_W,
-                height: L2_H,
               });
               placedEdges.push({
                 id: `e:${l1Id}->${l2Id}`,
@@ -363,18 +338,18 @@ export function getNodeTitle(node) {
                 theme,
                 conceptId: branch.conceptId,
               });
-              l2Centers.push(l2Y + L2_H / 2);
-              cursorY += L2_H + L2_GAP;
+              cursorY += l2.height + L2_GAP;
               return;
             }
 
-            const leafCount = Math.max(1, sg.leaves.length);
-            const leavesBlockH = leafCount * LEAF_H + (leafCount - 1) * LEAF_GAP;
-            const l2StartY = cursorY;
+            const leaves = sg.leaves.map(text => nodeBox(text, 'l3', side));
+            const leavesHeight = leaves.reduce((total, leaf) => total + leaf.height, 0) + (leaves.length - 1) * LEAF_GAP;
+            const groupHeight = Math.max(l2.height, leavesHeight);
+            let leafY = cursorY + (groupHeight - leavesHeight) / 2;
 
             sg.leaves.forEach((leafText, lIdx) => {
               const l3Id = `l3:${branch.id}:${sgIdx}:${lIdx}`;
-              const ly = l2StartY + lIdx * (LEAF_H + LEAF_GAP);
+              const leaf = leaves[lIdx];
               placedNodes.push({
                 id: l3Id,
                 kind: 'l3',
@@ -383,11 +358,10 @@ export function getNodeTitle(node) {
                 day: sg.dayOverride ?? branch.day,
                 text: leafText,
                 theme,
-                x: l3X,
-                y: ly,
-                width: LEAF_W,
-                height: LEAF_H,
+                ...leaf,
+                y: leafY,
               });
+              leafY += leaf.height + LEAF_GAP;
               placedEdges.push({
                 id: `e:${l2Id}->${l3Id}`,
                 fromId: l2Id,
@@ -398,7 +372,7 @@ export function getNodeTitle(node) {
               });
             });
 
-            const l2Y = Math.round(l2StartY + (leavesBlockH - L2_H) / 2);
+            const l2Y = cursorY + (groupHeight - l2.height) / 2;
             placedNodes.push({
               id: l2Id,
               kind: 'l2',
@@ -410,10 +384,8 @@ export function getNodeTitle(node) {
               hasChildren: hasL2Children,
               isCollapsed: false,
               hiddenCount: sg.leaves.length,
-              x: l2X,
+              ...l2,
               y: l2Y,
-              width: L2_W,
-              height: L2_H,
             });
             placedEdges.push({
               id: `e:${l1Id}->${l2Id}`,
@@ -424,15 +396,14 @@ export function getNodeTitle(node) {
               conceptId: branch.conceptId,
             });
 
-            l2Centers.push(l2Y + L2_H / 2);
-            cursorY += Math.max(L2_H, leavesBlockH) + L2_GAP;
+            cursorY += groupHeight + L2_GAP;
           });
 
-          const l1EndY = cursorY - L2_GAP;
-          const l1CenterY = l2Centers.length
-            ? (l2Centers[0] + l2Centers[l2Centers.length - 1]) / 2
-            : (l1StartY + l1EndY) / 2;
-          const l1Y = Math.round(l1CenterY - L1_H / 2);
+          const childrenHeight = cursorY - L2_GAP - l1StartY;
+          const branchHeight = Math.max(l1.height, childrenHeight);
+          const childOffset = (branchHeight - childrenHeight) / 2;
+          for (let i = firstChildIndex; i < placedNodes.length; i++) placedNodes[i].y += childOffset;
+          const l1Y = l1StartY + (branchHeight - l1.height) / 2;
 
           placedNodes.push({
             id: l1Id,
@@ -446,10 +417,8 @@ export function getNodeTitle(node) {
             hasChildren: hasL1Children,
             isCollapsed: false,
             hiddenCount: branch.subGroups.length,
-            x: l1X,
+            ...l1,
             y: l1Y,
-            width: L1_W,
-            height: L1_H,
           });
           placedEdges.push({
             id: `e:root->${l1Id}`,
@@ -460,7 +429,7 @@ export function getNodeTitle(node) {
             conceptId: branch.conceptId,
           });
 
-          cursorY += L1_GAP - L2_GAP;
+          cursorY = l1StartY + branchHeight + L1_GAP;
         });
 
         const totalHeight = branches.length ? Math.max(120, cursorY - L1_GAP) : 0;
@@ -468,10 +437,6 @@ export function getNodeTitle(node) {
       }
 
       function computeSymmetricLayout({ workspace, edits, contentTab, page, searchQuery, expandedIds }) {
-        const CENTER_X = 940;
-        const ROOT_W = 196;
-        const ROOT_H = 114;
-        const ROOT_X = CENTER_X - ROOT_W / 2;
         const qLower = searchQuery.trim().toLowerCase();
         const forceExpandAll = Boolean(qLower);
 
@@ -493,8 +458,8 @@ export function getNodeTitle(node) {
               const dNodes = (edits[`${contentTab}/${d}`] ?? workspace?.[contentTab]?.[d])?.nodes || [];
               const concepts = dNodes.filter(n => n.node_type !== 'day_root');
               return {
-                label: `D${String(d).padStart(2, '0')} · ${truncateText(getDayShortTitle(workspace, d), 14)}`,
-                leaves: concepts.slice(0, 4).map(c => truncateText(getNodeTitle(c), 34)),
+                label: `D${String(d).padStart(2, '0')} · ${getDayShortTitle(workspace, d)}`,
+                leaves: concepts.slice(0, 4).map(c => getNodeTitle(c)),
                 dayOverride: d,
               };
             }),
@@ -505,7 +470,7 @@ export function getNodeTitle(node) {
           rootConceptId = rootNode?.id || null;
           rootTitle = `AI20K · Ngày ${page}`;
           const dayShort = getDayShortTitle(workspace, page);
-          rootLines = [truncateText(dayShort, 24), contentTab === 'lab' ? 'Lab Mapping' : 'Knowledge Graph'];
+          rootLines = [dayShort, contentTab === 'lab' ? 'Lab Mapping' : 'Knowledge Graph'];
 
           const children = dayNodes.filter(n => n.node_type !== 'day_root');
           if (children.length === 0) {
@@ -525,7 +490,7 @@ export function getNodeTitle(node) {
               id: node.id,
               conceptId: node.id,
               day: page,
-              label: truncateText(getNodeTitle(node), 26),
+              label: getNodeTitle(node),
               verified: node.verification_status === 'verified',
               matchesSearch: !qLower || (node.text || '').toLowerCase().includes(qLower),
               subGroups: extractSubBranches(node),
@@ -537,14 +502,16 @@ export function getNodeTitle(node) {
         const leftBranches = rawBranches.slice(0, half);
         const rightBranches = rawBranches.slice(half);
 
-        const leftLayout = layoutSideBranches(leftBranches, 'left', LEFT_THEMES, CENTER_X, expandedIds, forceExpandAll);
-        const rightLayout = layoutSideBranches(rightBranches, 'right', RIGHT_THEMES, CENTER_X, expandedIds, forceExpandAll);
+        const { nodeBox, centerX, rootWidth, rootHeight, rootLabels, canvasW } =
+          sizeMindmap(rawBranches, rootLines, text => text);
+        const leftLayout = layoutSideBranches(leftBranches, 'left', LEFT_THEMES, nodeBox, expandedIds, forceExpandAll);
+        const rightLayout = layoutSideBranches(rightBranches, 'right', RIGHT_THEMES, nodeBox, expandedIds, forceExpandAll);
 
-        const maxH = Math.max(leftLayout.height, rightLayout.height, ROOT_H + 80);
+        const maxH = Math.max(leftLayout.height, rightLayout.height, rootHeight + 80);
         const topPad = 64;
         const leftOffsetY = topPad + Math.round((maxH - leftLayout.height) / 2);
         const rightOffsetY = topPad + Math.round((maxH - rightLayout.height) / 2);
-        const rootY = topPad + Math.round((maxH - ROOT_H) / 2);
+        const rootY = topPad + Math.round((maxH - rootHeight) / 2);
 
         const allExpandableIds = [];
         rawBranches.forEach(b => {
@@ -565,14 +532,14 @@ export function getNodeTitle(node) {
             conceptId: rootConceptId,
             day: page === 'all' ? 1 : page,
             title: rootTitle,
-            lines: rootLines,
+            lines: rootLabels,
             hasChildren: false,
             isCollapsed: false,
             hiddenCount: rawBranches.length,
-            x: ROOT_X,
+            x: centerX - rootWidth / 2,
             y: rootY,
-            width: ROOT_W,
-            height: ROOT_H,
+            width: rootWidth,
+            height: rootHeight,
           },
           ...leftLayout.nodes.map(n => ({
             ...n,
@@ -587,7 +554,6 @@ export function getNodeTitle(node) {
         ];
 
         const allEdges = [...leftLayout.edges, ...rightLayout.edges];
-        const canvasW = 1880;
         const canvasH = Math.max(760, maxH + topPad * 2 + 90);
         return { nodes: allNodes, edges: allEdges, canvasW, canvasH, allExpandableIds };
       }
@@ -806,7 +772,7 @@ export function getNodeTitle(node) {
                           {node.title}
                         </div>
                         {node.lines.map((line, i) => (
-                          <div key={i} className="text-[11px] text-slate-300 leading-snug truncate max-w-full">
+                          <div key={i} className="text-[11px] text-slate-300 mindmap-label">
                             {line}
                           </div>
                         ))}
@@ -839,7 +805,7 @@ export function getNodeTitle(node) {
                           } ${node.dimmed ? 'opacity-25' : ''}`}
                         title={`${node.text} — Bấm 1 lần để ${node.isCollapsed ? 'mở thư mục' : 'thu gọn'} · Bấm đúp để xem chi tiết`}
                       >
-                        <span className="truncate">{node.text}</span>
+                        <span className="mindmap-label">{node.label}</span>
                         {node.hasChildren && (
                           <span
                             style={{ borderColor: node.theme.solid, color: node.theme.solid }}
@@ -873,7 +839,7 @@ export function getNodeTitle(node) {
                           } ${node.dimmed ? 'opacity-25' : ''}`}
                         title={`${node.text} — Bấm 1 lần để ${node.isCollapsed ? 'mở' : 'thu gọn'}${page === 'all' ? ' · Bấm đúp để mở ngày này' : ' · Bấm đúp để xem chi tiết'}`}
                       >
-                        <span className="truncate">{node.text}</span>
+                        <span className="mindmap-label">{node.label}</span>
                         {node.hasChildren && (
                           <span
                             style={{ borderColor: node.theme.tintBorder, color: node.theme.tintText }}
@@ -897,7 +863,7 @@ export function getNodeTitle(node) {
                         } ${node.dimmed ? 'opacity-25' : ''}`}
                       title={`${node.text} — Bấm đúp để xem chi tiết`}
                     >
-                      <span className="truncate">{node.text}</span>
+                      <span className="mindmap-label">{node.label}</span>
                     </button>
                   );
                 })}

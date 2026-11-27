@@ -2,10 +2,10 @@ import React, { useMemo, useRef, useState } from 'react';
 import {
   LEFT_THEMES,
   RIGHT_THEMES,
-  truncateText,
   getNodeTitle,
   extractSubBranches,
 } from './CourseTree.jsx';
+import { sizeMindmap } from './mindmapSizing.js';
 import { useMindmapViewport } from './useMindmapViewport.js';
 
 const MAX_POSITION = 4096;
@@ -22,20 +22,10 @@ function makeId() {
   return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join('-');
 }
 
-function layoutDaySide(branches, side, defaultThemes, startX, nodeColors) {
-  const LEAF_W = 220;
-  const LEAF_H = 26;
+function layoutDaySide(branches, side, defaultThemes, nodeBox, nodeColors) {
   const LEAF_GAP = 4;
-  const L2_W = 148;
-  const L2_H = 30;
   const L2_GAP = 14;
-  const L1_W = 180;
-  const L1_H = 36;
   const L1_GAP = 26;
-
-  const l1X = side === 'left' ? startX - 180 - L1_W : startX + 180;
-  const l2X = side === 'left' ? l1X - 58 - L2_W : l1X + L1_W + 58;
-  const l3X = side === 'left' ? l2X - 52 - LEAF_W : l2X + L2_W + 52;
 
   const placedNodes = [];
   const placedEdges = [];
@@ -47,19 +37,21 @@ function layoutDaySide(branches, side, defaultThemes, startX, nodeColors) {
       ? XMIND_THEMES[customIdx]
       : defaultThemes[bIdx % defaultThemes.length];
     const l1Id = `l1:${branch.nodeId}`;
-    const l2Centers = [];
+    const l1 = nodeBox(branch.label, 'l1', side);
     const l1StartY = cursorY;
+    const firstChildIndex = placedNodes.length;
 
     branch.subGroups.forEach((sg, sgIdx) => {
       const l2Id = `l2:${branch.nodeId}:${sgIdx}`;
-      const leaves = sg.leaves?.length ? sg.leaves : [];
-      const leafCount = Math.max(1, leaves.length);
-      const leavesBlockH = leaves.length ? leafCount * LEAF_H + (leafCount - 1) * LEAF_GAP : L2_H;
-      const l2StartY = cursorY;
+      const l2 = nodeBox(sg.label, 'l2', side);
+      const leaves = sg.leaves.map(leaf => nodeBox(leaf.text, 'l3', side));
+      const leavesHeight = leaves.reduce((total, leaf) => total + leaf.height, 0) + Math.max(0, leaves.length - 1) * LEAF_GAP;
+      const groupHeight = Math.max(l2.height, leavesHeight);
+      let leafY = cursorY + (groupHeight - leavesHeight) / 2;
 
-      leaves.forEach((leaf, lIdx) => {
+      sg.leaves.forEach((leaf, lIdx) => {
         const l3Id = `l3:${branch.nodeId}:${sgIdx}:${lIdx}`;
-        const ly = l2StartY + lIdx * (LEAF_H + LEAF_GAP);
+        const box = leaves[lIdx];
         placedNodes.push({
           id: l3Id,
           kind: 'l3',
@@ -68,11 +60,10 @@ function layoutDaySide(branches, side, defaultThemes, startX, nodeColors) {
           rawNode: leaf.rawNode,
           text: leaf.text,
           theme,
-          x: l3X,
-          y: ly,
-          width: LEAF_W,
-          height: LEAF_H,
+          ...box,
+          y: leafY,
         });
+        leafY += box.height + LEAF_GAP;
         placedEdges.push({
           id: `e:${l2Id}->${l3Id}`,
           fromId: l2Id,
@@ -83,7 +74,7 @@ function layoutDaySide(branches, side, defaultThemes, startX, nodeColors) {
         });
       });
 
-      const l2Y = Math.round(l2StartY + (leavesBlockH - L2_H) / 2);
+      const l2Y = cursorY + (groupHeight - l2.height) / 2;
       placedNodes.push({
         id: l2Id,
         kind: 'l2',
@@ -92,10 +83,8 @@ function layoutDaySide(branches, side, defaultThemes, startX, nodeColors) {
         rawNode: sg.rawNode,
         text: sg.label,
         theme,
-        x: l2X,
+        ...l2,
         y: l2Y,
-        width: L2_W,
-        height: L2_H,
       });
       placedEdges.push({
         id: `e:${l1Id}->${l2Id}`,
@@ -106,15 +95,14 @@ function layoutDaySide(branches, side, defaultThemes, startX, nodeColors) {
         nodeId: sg.nodeId,
       });
 
-      l2Centers.push(l2Y + L2_H / 2);
-      cursorY += Math.max(L2_H, leavesBlockH) + L2_GAP;
+      cursorY += groupHeight + L2_GAP;
     });
 
-    const l1EndY = cursorY - L2_GAP;
-    const l1CenterY = l2Centers.length
-      ? (l2Centers[0] + l2Centers[l2Centers.length - 1]) / 2
-      : (l1StartY + l1EndY) / 2;
-    const l1Y = Math.round(l1CenterY - L1_H / 2);
+    const childrenHeight = Math.max(0, cursorY - L2_GAP - l1StartY);
+    const branchHeight = Math.max(l1.height, childrenHeight);
+    const childOffset = (branchHeight - childrenHeight) / 2;
+    for (let i = firstChildIndex; i < placedNodes.length; i++) placedNodes[i].y += childOffset;
+    const l1Y = l1StartY + (branchHeight - l1.height) / 2;
 
     placedNodes.push({
       id: l1Id,
@@ -125,10 +113,8 @@ function layoutDaySide(branches, side, defaultThemes, startX, nodeColors) {
       text: branch.label,
       verified: branch.verified,
       theme,
-      x: l1X,
+      ...l1,
       y: l1Y,
-      width: L1_W,
-      height: L1_H,
     });
     placedEdges.push({
       id: `e:root->${l1Id}`,
@@ -139,7 +125,7 @@ function layoutDaySide(branches, side, defaultThemes, startX, nodeColors) {
       nodeId: branch.nodeId,
     });
 
-    cursorY += L1_GAP - L2_GAP;
+    cursorY = l1StartY + branchHeight + L1_GAP;
   });
 
   const totalHeight = branches.length ? Math.max(120, cursorY - L1_GAP) : 0;
@@ -147,10 +133,6 @@ function layoutDaySide(branches, side, defaultThemes, startX, nodeColors) {
 }
 
 function computeDayXMindLayout({ nodes, day, tab, nodeColors, filterType, searchQuery }) {
-  const CENTER_X = 980;
-  const ROOT_W = 196;
-  const ROOT_H = 114;
-  const ROOT_X = CENTER_X - ROOT_W / 2;
   const qLower = searchQuery.trim().toLowerCase();
 
   const byId = new Map(nodes.map(n => [n.id, n]));
@@ -186,20 +168,20 @@ function computeDayXMindLayout({ nodes, day, tab, nodeColors, filterType, search
         let leaves;
         if (grandKids.length > 0) {
           leaves = grandKids.map(gc => ({
-            text: truncateText(getNodeTitle(gc), 36),
+            text: getNodeTitle(gc),
             nodeId: gc.id,
             rawNode: gc,
           }));
         } else {
           const flatLeaves = extractSubBranches(c).flatMap(sg => sg.leaves).slice(0, 4);
-          leaves = (flatLeaves.length ? flatLeaves : [truncateText(getNodeTitle(c), 36)]).map(t => ({
+          leaves = (flatLeaves.length ? flatLeaves : [getNodeTitle(c)]).map(t => ({
             text: t,
             nodeId: c.id,
             rawNode: c,
           }));
         }
         return {
-          label: truncateText(getNodeTitle(c), 24),
+          label: getNodeTitle(c),
           nodeId: c.id,
           rawNode: c,
           leaves,
@@ -221,7 +203,7 @@ function computeDayXMindLayout({ nodes, day, tab, nodeColors, filterType, search
     return {
       nodeId: b.id,
       rawNode: b,
-      label: truncateText(getNodeTitle(b), 26),
+      label: getNodeTitle(b),
       verified: b.verification_status === 'verified',
       subGroups,
     };
@@ -244,23 +226,25 @@ function computeDayXMindLayout({ nodes, day, tab, nodeColors, filterType, search
   const leftBranches = rawBranches.slice(0, half);
   const rightBranches = rawBranches.slice(half);
 
-  const leftLayout = layoutDaySide(leftBranches, 'left', LEFT_THEMES, CENTER_X, nodeColors);
-  const rightLayout = layoutDaySide(rightBranches, 'right', RIGHT_THEMES, CENTER_X, nodeColors);
-
-  const maxH = Math.max(leftLayout.height, rightLayout.height, ROOT_H + 80);
-  const topPad = 64;
-  const leftOffsetY = topPad + Math.round((maxH - leftLayout.height) / 2);
-  const rightOffsetY = topPad + Math.round((maxH - rightLayout.height) / 2);
-  const rootY = topPad + Math.round((maxH - ROOT_H) / 2);
-
   const shortTitle = rootNode
     ? getNodeTitle(rootNode).replace(/^Ngày\s+\d+:\s*/i, '').trim()
     : `Ngày ${day}`;
   const rootTitle = tab === 'lab' ? `Lab · Ngày ${day}` : `AI20K · Ngày ${day}`;
   const rootLines = [
-    truncateText(shortTitle, 24),
+    shortTitle,
     tab === 'lab' ? 'Lab Mapping' : 'Knowledge Graph',
   ];
+
+  const { nodeBox, centerX, rootWidth, rootHeight, rootLabels, canvasW } =
+    sizeMindmap(rawBranches, rootLines, leaf => leaf.text);
+  const leftLayout = layoutDaySide(leftBranches, 'left', LEFT_THEMES, nodeBox, nodeColors);
+  const rightLayout = layoutDaySide(rightBranches, 'right', RIGHT_THEMES, nodeBox, nodeColors);
+
+  const maxH = Math.max(leftLayout.height, rightLayout.height, rootHeight + 80);
+  const topPad = 64;
+  const leftOffsetY = topPad + Math.round((maxH - leftLayout.height) / 2);
+  const rightOffsetY = topPad + Math.round((maxH - rightLayout.height) / 2);
+  const rootY = topPad + Math.round((maxH - rootHeight) / 2);
 
   const allNodes = [
     {
@@ -269,11 +253,11 @@ function computeDayXMindLayout({ nodes, day, tab, nodeColors, filterType, search
       nodeId: rootNode?.id || null,
       rawNode: rootNode,
       title: rootTitle,
-      lines: rootLines,
-      x: ROOT_X,
+      lines: rootLabels,
+      x: centerX - rootWidth / 2,
       y: rootY,
-      width: ROOT_W,
-      height: ROOT_H,
+      width: rootWidth,
+      height: rootHeight,
       dimmed: rootNode ? isDimmed(rootNode) : false,
     },
     ...leftLayout.nodes.map(n => ({
@@ -289,7 +273,6 @@ function computeDayXMindLayout({ nodes, day, tab, nodeColors, filterType, search
   ];
 
   const allEdges = [...leftLayout.edges, ...rightLayout.edges];
-  const canvasW = 1960;
   const canvasH = Math.max(760, maxH + topPad * 2 + 90);
   return { nodes: allNodes, edges: allEdges, canvasW, canvasH };
 }
@@ -642,7 +625,7 @@ export function Mindmap({
                     {node.title}
                   </div>
                   {node.lines.map((line, i) => (
-                    <div key={i} className="text-[11px] text-slate-300 leading-snug truncate max-w-full">
+                    <div key={i} className="text-[11px] text-slate-300 mindmap-label">
                       {line}
                     </div>
                   ))}
@@ -676,7 +659,7 @@ export function Mindmap({
                   } ${node.dimmed ? 'opacity-25' : ''}`}
                   title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
                 >
-                  <span className="truncate">{node.text}</span>
+                  <span className="mindmap-label">{node.label}</span>
                 </button>
               );
             }
@@ -709,7 +692,7 @@ export function Mindmap({
                   } ${node.dimmed ? 'opacity-25' : ''}`}
                   title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
                 >
-                  <span className="truncate">{node.text}</span>
+                  <span className="mindmap-label">{node.label}</span>
                 </button>
               );
             }
@@ -732,7 +715,7 @@ export function Mindmap({
                 } ${node.dimmed ? 'opacity-25' : ''}`}
                 title={`${node.text} — Bấm để xem · Bấm đúp để sửa`}
               >
-                <span className="truncate">{node.text}</span>
+                <span className="mindmap-label">{node.label}</span>
               </button>
             );
           })}
