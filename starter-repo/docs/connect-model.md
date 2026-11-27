@@ -22,6 +22,8 @@ API_KEY=<key của nhóm, không dấu ngoặc kép>
 
 ## 2. Chép code vào `codebase/ai.py`
 
+Nhánh `openai` đã có sẵn trong `codebase/ai.py`. Nếu dùng OpenAI, điền `.env` theo mục 1 rồi sang mục 3 để thử.
+
 Giữ nguyên phần đầu file (`load_env`, các biến) và nhánh `fake`.
 1. Thêm 3 dòng `import` lên đầu file.
 2. Dán hàm `post_json`.

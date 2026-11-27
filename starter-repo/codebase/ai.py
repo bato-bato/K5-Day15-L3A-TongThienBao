@@ -14,13 +14,15 @@ Chế độ giả (mặc định khi .env chưa có MODEL_PROVIDER, hoặc MODEL
     chọn từ dữ liệu đã nạp, model "fake", token 0 — để luồng chạy hết từ trước CP2 (guide bước 3.2).
     Lượt `run.py eval` / `run.py simulate` chạy bằng model giả KHÔNG được tính.
 
-Nối model thật: điền .env (chép từ .env.example), rồi viết nhánh gọi API ở dưới theo docs/connect-model.md
-(có ví dụ OpenAI, Claude, model chạy trên máy, và cách nối nhà cung cấp khác). Không dán API key vào file này.
+Nối model OpenAI: điền MODEL_PROVIDER=openai, MODEL_NAME và API_KEY trong .env.
+Cách cấu hình: docs/connect-model.md. Không dán API key vào file này.
 """
 import json
 import os
 import re
 import unicodedata
+import urllib.error
+import urllib.request
 
 from tracing import model_call
 
@@ -44,6 +46,7 @@ load_env()
 MODEL_PROVIDER = (os.environ.get("MODEL_PROVIDER") or "fake").strip().lower()
 MODEL_NAME = (os.environ.get("MODEL_NAME") or "").strip()
 API_KEY = (os.environ.get("API_KEY") or "").strip()
+OPENAI_URL = "https://api.openai.com/v1/chat/completions"
 
 
 def mock_answer(user: str) -> str:
@@ -88,8 +91,36 @@ def call_model(system: str, user: str) -> dict:
     if MODEL_PROVIDER == "fake":
         return {"text": mock_answer(user), "model": "fake", "tokens_in": 0, "tokens_out": 0}
 
-    # NHÓM VIẾT: gọi model thật ở đây (theo MODEL_PROVIDER, MODEL_NAME, API_KEY) rồi trả đúng 4 khoá.
-    # Ví dụ chép được cho từng nhà cung cấp: docs/connect-model.md mục 2.
-    raise NotImplementedError(
-        "chưa viết phần gọi model thật cho MODEL_PROVIDER=%s trong codebase/ai.py — xem docs/connect-model.md"
-        % MODEL_PROVIDER)
+    if MODEL_PROVIDER != "openai":
+        raise NotImplementedError(f"Chưa hỗ trợ MODEL_PROVIDER={MODEL_PROVIDER}.")
+    if not MODEL_NAME or not API_KEY:
+        raise RuntimeError("Điền MODEL_NAME và API_KEY trong starter-repo/.env.")
+
+    messages = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": user})
+    body = {
+        "model": MODEL_NAME,
+        "messages": messages,
+        "response_format": {"type": "json_object"},
+    }
+    request = urllib.request.Request(
+        OPENAI_URL,
+        data=json.dumps(body).encode("utf-8"),
+        headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            result = json.load(response)
+    except urllib.error.HTTPError as error:
+        raise RuntimeError(f"Model API trả HTTP {error.code}.") from None
+
+    usage = result["usage"]
+    return {
+        "text": result["choices"][0]["message"]["content"],
+        "model": result["model"],
+        "tokens_in": usage["prompt_tokens"],
+        "tokens_out": usage["completion_tokens"],
+    }

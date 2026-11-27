@@ -1,48 +1,23 @@
-# Tổng hợp bằng chứng pain
+# Tổng hợp bằng chứng về vấn đề của học viên · CP3
 
-> Điền ở guide bước 1.2, xong trước **CP3 10:00 Thứ Bảy 28/11**. Chấm ở rubric R1.
-> Ba nguồn ngang nhau — tối thiểu **≥1 nguồn đạt ngưỡng**. Mạnh nhất: đào data ra insight → hỏi người dùng để kiểm lại (hoặc ngược lại).
+## Nguồn và kết quả
 
-## 1. Nguồn đã dùng
+**102/453 sự kiện `lab_completed` (22,5%)** trong log Preclass của BTC có `data.skipped=true`. Theo từ điển sự kiện, cờ này được ghi khi học viên bấm bỏ qua trong bài thực hành. Mẫu số là toàn bộ sự kiện `lab_completed` trong tệp `events.csv` của bộ log 05–25/11/2026. Tỷ lệ tính theo sự kiện, gồm cả các lượt thực hành lặp lại của cùng một người. [Mô tả dữ liệu](../../data/preclass/README.md) · [Cách đếm và mã tái lập](data-mining.md)
 
-| Nguồn | Đạt ngưỡng? | File |
-|---|---|---|
-| Đào data (x/N, %, cách đếm chạy lại được, ≥5 ví dụ) | ☐ | `evidence/data-mining.md` |
-| Phỏng vấn (≥3 người ngoài nhóm, đúng người dùng) | ☐ | `evidence/interviews/P1.md`… |
-| Khảo sát (≥20 người ngoài nhóm, đúng người dùng) | ☐ | `evidence/survey/` |
+Nguồn log đáp ứng ngưỡng CP3 với tỷ lệ có thể tái lập và năm bản ghi gốc dưới đây. Nhóm đã soạn câu hỏi khảo sát. Kết quả khảo sát và phỏng vấn chưa được xác nhận. [Yêu cầu bằng chứng CP3](../../02-guide.md#b1-2) · [Câu hỏi khảo sát](survey/questions.md)
 
-## 2. Số chính
+## Năm ví dụ nguyên văn
 
-- Đào data: __/__ (__%) …
-- Phỏng vấn: __/3 người gặp *(n nhỏ không ghi %)* · số lần / tháng: P1 __, P2 __, P3 __ · mỗi lần mất __–__ phút
-- Khảo sát: n = __ · __/__ (__%) …
+Trích hai cột `lesson_id` và `data` từ năm bản ghi `lab_completed` có `skipped=true` đầu tiên trong `events.csv`. Số thứ tự tính cả dòng tiêu đề. Mã học viên, mã phiên và thời gian đã được lược bỏ.
 
-Phỏng vấn nhiều vai thì đếm theo từng vai, không cộng chung.
+| Bản ghi | `lesson_id` | `data` |
+|---:|---|---|
+| 1066 | `program-day01:ai-llm-foundation` | `{"lab_key": "d01-lab-ban-la-llm", "skipped": true, "steps": 2, "steps_done": 1}` |
+| 1280 | `program-day01:ai-llm-foundation` | `{"lab_key": "d01-lab-ban-la-llm", "skipped": true, "steps": 2, "steps_done": 1}` |
+| 1869 | `program-day02:ai-problem-definition` | `{"lab_key": "d02-lab-cham-gate", "skipped": true, "steps": 3, "steps_done": 2}` |
+| 4079 | `program-day04:prompt-engineering-tool-calling` | `{"lab_key": "d04-lab-soi-system-prompt", "skipped": true, "steps": 3, "steps_done": 2}` |
+| 4562 | `program-day02:ai-problem-definition` | `{"lab_key": "d02-lab-cham-gate", "skipped": true, "steps": 3, "steps_done": 2}` |
 
-| | Vai | Gặp pain? | Số lần / 1 tháng qua | Lần gần nhất mất | Đang xoay xở bằng |
-|---|---|---|---|---|---|
-| P1 | | | | | |
-| P2 | | | | | |
-| P3 | | | | | |
+## Kết luận
 
-## 3. ≥5 trích dẫn hoặc ví dụ nguyên văn (có nguồn, bỏ tên)
-
-1. "…" — P_ / dòng data __ / phiếu khảo sát __
-2.
-3.
-4.
-5.
-
-## 4. Các nguồn có khớp nhau không
-
-Data nói __; người dùng nói __. Khớp / lệch ở đâu, vì sao: __
-
-## 5. Kết luận
-
-Giả thuyết ở `evidence/hypothesis.md`: **đúng / sai / phải đổi** — vì __. Điều vẫn chưa biết: __
-
-## Lịch hẹn (dùng cho CP2 — chỉ ghi vai và giờ, không tên)
-
-| Vai | Giờ hẹn | Đã xong? |
-|---|---|---|
-| | | |
+**Giả thuyết trong Canvas cần thu hẹp.** Log xác nhận có thao tác bỏ qua trong bài thực hành Preclass. Giả thuyết rằng học viên L3 gặp khó khi nối kiến thức Lecture với bước Lab, rồi nhờ AI làm cả bài hoặc bỏ qua tự kiểm, vẫn cần đối chiếu với trải nghiệm của học viên. Buổi phỏng vấn hoặc khảo sát có thể hỏi về lần gần nhất họ bỏ qua một bước, lý do bỏ qua và cách họ tự kiểm kết quả. [Canvas của nhóm](../canvas.md)
