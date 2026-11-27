@@ -1,0 +1,51 @@
+﻿run_id,session,persona,turns,inputs,model,model_calls,tool_calls,tokens_in,tokens_out,latency_s,error,tokens_by_model
+simulate-3@20261128-015704,S001,dung_vua,1,"Day 01 CP2 phần Embedding, lúc gọi emb_model.encode thì bước này làm gì trước kh",gpt-6.2-sol,1,1,1499,95,2.772,,"{""gpt-6.2-sol"": {""in"": 1499, ""out"": 95}}"
+simulate-3@20261128-015704,S002,dung_vua,1,"Day 09 M2, làm sao tự kiểm LLM judge chấm gần với người?",gpt-6.2-sol,1,1,581,99,3.195,,"{""gpt-6.2-sol"": {""in"": 581, ""out"": 99}}"
+simulate-3@20261128-015704,S003,dung_it,1,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-6.2-sol,1,1,648,87,2.622,,"{""gpt-6.2-sol"": {""in"": 648, ""out"": 87}}"
+simulate-3@20261128-015704,S004,dung_vua,1,Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-6.2-sol,1,1,731,98,3.342,,"{""gpt-6.2-sol"": {""in"": 731, ""out"": 98}}"
+simulate-3@20261128-015704,S005,dung_vua,1,"Day 02 CP6 chọn Rule, Workflow hay Agent thì xem tiêu chí nào trước để mình tự q",gpt-6.2-sol,1,1,569,101,3.323,,"{""gpt-6.2-sol"": {""in"": 569, ""out"": 101}}"
+simulate-3@20261128-015704,S006,dung_it,1,"Day 08 CP3, ledger và idempotency giúp lần xử lý lại không tạo thêm tác động như",gpt-6.2-sol,1,1,948,93,3.168,,"{""gpt-6.2-sol"": {""in"": 948, ""out"": 93}}"
+simulate-3@20261128-015704,S007,dung_it,1,"Day 01 CP2 phần Embedding, lúc gọi emb_model.encode thì bước này làm gì trước kh",gpt-6.2-sol,1,1,1499,107,3.329,,"{""gpt-6.2-sol"": {""in"": 1499, ""out"": 107}}"
+simulate-3@20261128-015704,S008,dung_vua,1,"Day 01 CP2, file src/magic.py liên quan khái niệm nào?",,0,1,0,0,0.001,,{}
+simulate-3@20261128-015704,S009,dung_it,1,"Day 10 CP2, tại sao phải ký tiêu chí chấp nhận trước khi chạy eval?",gpt-6.2-sol,1,1,566,99,2.958,,"{""gpt-6.2-sol"": {""in"": 566, ""out"": 99}}"
+simulate-3@20261128-015704,S010,dung_nhieu,2,"Day 01 CP2 phần Embedding, lúc gọi emb_model.encode thì bước này làm gì trước kh ‖ Day 07 M02: citation trong bước đóng gói context có tác dụng gì?",gpt-6.2-sol,2,2,2529,179,5.479,,"{""gpt-6.2-sol"": {""in"": 2529, ""out"": 179}}"
+simulate-3@20261128-015704,S011,dung_vua,1,"Day 14 CP7, p95 cho mình hiểu gì khi đọc báo cáo benchmark?",gpt-6.2-sol,1,1,930,98,2.693,,"{""gpt-6.2-sol"": {""in"": 930, ""out"": 98}}"
+simulate-3@20261128-015704,S012,dung_it,1,"Day 08 CP3, ledger và idempotency giúp lần xử lý lại không tạo thêm tác động như",gpt-6.2-sol,1,1,948,88,2.806,,"{""gpt-6.2-sol"": {""in"": 948, ""out"": 88}}"
+simulate-3@20261128-015704,S013,dung_nhieu,2,"Day 14 CP7, p95 cho mình hiểu gì khi đọc báo cáo benchmark? ‖ Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-6.2-sol,2,2,1578,184,5.946,,"{""gpt-6.2-sol"": {""in"": 1578, ""out"": 184}}"
+simulate-3@20261128-015704,S014,dung_it,1,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-6.2-sol,1,1,648,88,3.176,,"{""gpt-6.2-sol"": {""in"": 648, ""out"": 88}}"
+simulate-3@20261128-015704,S015,dung_it,1,Mình đang kẹt CP2 và chưa hiểu đoạn đang làm.,,0,0,0,0,0.0,,{}
+simulate-3@20261128-015704,S016,dung_vua,1,"Day 02 CP6 chọn Rule, Workflow hay Agent thì xem tiêu chí nào trước để mình tự q",gpt-6.2-sol,1,1,569,105,3.279,,"{""gpt-6.2-sol"": {""in"": 569, ""out"": 105}}"
+simulate-3@20261128-015704,S017,dung_vua,1,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-6.2-sol,1,1,648,93,2.897,,"{""gpt-6.2-sol"": {""in"": 648, ""out"": 93}}"
+simulate-3@20261128-015704,S018,dung_nhieu,2,Trang 95 của giáo trình Day 07 nói gì cho M02? ‖ Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-6.2-sol,1,2,731,114,3.866,,"{""gpt-6.2-sol"": {""in"": 731, ""out"": 114}}"
+simulate-3@20261128-015704,S019,dung_vua,1,Mình đang kẹt CP2 và chưa hiểu đoạn đang làm.,,0,0,0,0,0.0,,{}
+simulate-3@20261128-015704,S020,dung_vua,1,Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-6.2-sol,1,1,731,87,2.84,,"{""gpt-6.2-sol"": {""in"": 731, ""out"": 87}}"
+simulate-3@20261128-015704,S021,dung_it,1,"Day 09 M2, làm sao tự kiểm LLM judge chấm gần với người?",gpt-6.2-sol,1,1,581,85,2.854,,"{""gpt-6.2-sol"": {""in"": 581, ""out"": 85}}"
+simulate-3@20261128-015704,S022,dung_vua,1,Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-6.2-sol,1,1,731,90,3.108,,"{""gpt-6.2-sol"": {""in"": 731, ""out"": 90}}"
+simulate-3@20261128-015704,S023,dung_nhieu,2,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh ‖ Trang 95 của giáo trình Day 07 nói gì cho M02?",gpt-6.2-sol,1,2,648,78,2.52,,"{""gpt-6.2-sol"": {""in"": 648, ""out"": 78}}"
+simulate-3@20261128-015704,S024,dung_it,1,Mình đang kẹt CP2 và chưa hiểu đoạn đang làm.,,0,0,0,0,0.0,,{}
+simulate-3@20261128-015704,S025,dung_it,1,Mình đang kẹt CP2 và chưa hiểu đoạn đang làm.,,0,0,0,0,0.0,,{}
+simulate-3@20261128-015704,S026,dung_it,1,"Day 10 CP2, tại sao phải ký tiêu chí chấp nhận trước khi chạy eval?",gpt-6.2-sol,1,1,566,98,2.857,,"{""gpt-6.2-sol"": {""in"": 566, ""out"": 98}}"
+simulate-3@20261128-015704,S027,dung_vua,1,Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-6.2-sol,1,1,731,97,3.056,,"{""gpt-6.2-sol"": {""in"": 731, ""out"": 97}}"
+simulate-3@20261128-015704,S028,dung_vua,1,Day 07 M02: citation trong bước đóng gói context có tác dụng gì?,gpt-6.2-sol,1,1,1030,80,2.812,,"{""gpt-6.2-sol"": {""in"": 1030, ""out"": 80}}"
+simulate-3@20261128-015704,S029,dung_vua,1,"Day 09 M2, làm sao tự kiểm LLM judge chấm gần với người?",gpt-6.2-sol,1,1,581,96,3.118,,"{""gpt-6.2-sol"": {""in"": 581, ""out"": 96}}"
+simulate-3@20261128-015704,S030,dung_it,1,Trang 95 của giáo trình Day 07 nói gì cho M02?,,0,1,0,0,0.001,,{}
+simulate-3@20261128-015704,S031,dung_it,1,"Day 09 M2, làm sao tự kiểm LLM judge chấm gần với người?",gpt-6.2-sol,1,1,581,87,3.533,,"{""gpt-6.2-sol"": {""in"": 581, ""out"": 87}}"
+simulate-3@20261128-015704,S032,dung_vua,1,"Day 02 CP6 chọn Rule, Workflow hay Agent thì xem tiêu chí nào trước để mình tự q",gpt-6.2-sol,1,1,569,107,3.382,,"{""gpt-6.2-sol"": {""in"": 569, ""out"": 107}}"
+simulate-3@20261128-015704,S033,dung_it,1,"Day 02 CP6 chọn Rule, Workflow hay Agent thì xem tiêu chí nào trước để mình tự q",gpt-6.2-sol,1,1,569,102,3.201,,"{""gpt-6.2-sol"": {""in"": 569, ""out"": 102}}"
+simulate-3@20261128-015704,S034,dung_nhieu,2,"Trang 95 của giáo trình Day 07 nói gì cho M02? ‖ Day 10 CP2, tại sao phải ký tiêu chí chấp nhận trước khi chạy eval?",gpt-6.2-sol,1,2,566,87,2.812,,"{""gpt-6.2-sol"": {""in"": 566, ""out"": 87}}"
+simulate-3@20261128-015704,S035,dung_it,1,"Day 14 CP7, p95 cho mình hiểu gì khi đọc báo cáo benchmark?",gpt-6.2-sol,1,1,930,118,3.156,,"{""gpt-6.2-sol"": {""in"": 930, ""out"": 118}}"
+simulate-3@20261128-015704,S036,dung_it,1,"Day 01 CP2 trong repo template, knn_predict có dùng được để chứng minh mình đã t",gpt-6.2-sol,1,1,1497,122,3.915,,"{""gpt-6.2-sol"": {""in"": 1497, ""out"": 122}}"
+simulate-3@20261128-015704,S037,dung_it,1,"Day 01 CP2, MiniLM và kNN khác vai trò thế nào? Cho mình một bước tự kiểm.",gpt-6.2-sol,1,1,1497,91,2.673,,"{""gpt-6.2-sol"": {""in"": 1497, ""out"": 91}}"
+simulate-3@20261128-015704,S038,dung_it,1,"Day 06 M03, mình tự kiểm phần chunking và ranh giới đoạn thế nào?",gpt-6.2-sol,1,1,887,98,3.112,,"{""gpt-6.2-sol"": {""in"": 887, ""out"": 98}}"
+simulate-3@20261128-015704,S039,dung_it,1,"Day 10 CP2, tại sao phải ký tiêu chí chấp nhận trước khi chạy eval?",gpt-6.2-sol,1,1,566,86,2.6,,"{""gpt-6.2-sol"": {""in"": 566, ""out"": 86}}"
+simulate-3@20261128-015704,S040,dung_vua,1,"Day 01 CP2, file src/magic.py liên quan khái niệm nào?",,0,1,0,0,0.001,,{}
+simulate-3@20261128-015704,S041,dung_nhieu,2,Trang 95 của giáo trình Day 07 nói gì cho M02? ‖ Mình đang kẹt CP2 và chưa hiểu đoạn đang làm.,,0,1,0,0,0.001,,{}
+simulate-3@20261128-015704,S042,dung_it,1,"Day 06 M03, mình tự kiểm phần chunking và ranh giới đoạn thế nào?",gpt-6.2-sol,1,1,887,108,3.787,,"{""gpt-6.2-sol"": {""in"": 887, ""out"": 108}}"
+simulate-3@20261128-015704,S043,dung_vua,1,Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-6.2-sol,1,1,731,93,3.161,,"{""gpt-6.2-sol"": {""in"": 731, ""out"": 93}}"
+simulate-3@20261128-015704,S044,dung_vua,1,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-6.2-sol,1,1,648,73,2.762,,"{""gpt-6.2-sol"": {""in"": 648, ""out"": 73}}"
+simulate-3@20261128-015704,S045,dung_it,1,Day 07 M02: citation trong bước đóng gói context có tác dụng gì?,gpt-6.2-sol,1,1,1030,85,2.634,,"{""gpt-6.2-sol"": {""in"": 1030, ""out"": 85}}"
+simulate-3@20261128-015704,S046,dung_vua,1,"Day 01 CP2, file src/magic.py liên quan khái niệm nào?",,0,1,0,0,0.001,,{}
+simulate-3@20261128-015704,S047,dung_vua,1,Trang 95 của giáo trình Day 07 nói gì cho M02?,,0,1,0,0,0.0,,{}
+simulate-3@20261128-015704,S048,dung_it,1,"Day 01 CP2, MiniLM và kNN khác vai trò thế nào? Cho mình một bước tự kiểm.",gpt-6.2-sol,1,1,1497,97,3.268,,"{""gpt-6.2-sol"": {""in"": 1497, ""out"": 97}}"
+simulate-3@20261128-015704,S049,dung_vua,1,"Day 01 CP2 phần Embedding, lúc gọi emb_model.encode thì bước này làm gì trước kh",gpt-6.2-sol,1,1,1499,106,3.29,,"{""gpt-6.2-sol"": {""in"": 1499, ""out"": 106}}"
+simulate-3@20261128-015704,S050,dung_vua,1,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-6.2-sol,1,1,648,84,2.859,,"{""gpt-6.2-sol"": {""in"": 648, ""out"": 84}}"

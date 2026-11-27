@@ -1,0 +1,51 @@
+﻿run_id,session,persona,turns,inputs,model,model_calls,tool_calls,tokens_in,tokens_out,latency_s,error,tokens_by_model
+simulate-2@20261128-015557,S001,dung_vua,1,"Day 01 CP2 phần Embedding, lúc gọi emb_model.encode thì bước này làm gì trước kh",gpt-5.4-mini,1,1,1499,96,2.249,,"{""gpt-5.4-mini"": {""in"": 1499, ""out"": 96}}"
+simulate-2@20261128-015557,S002,dung_vua,1,"Day 09 M2, làm sao tự kiểm LLM judge chấm gần với người?",gpt-5.4-mini,1,1,581,14,1.195,,"{""gpt-5.4-mini"": {""in"": 581, ""out"": 14}}"
+simulate-2@20261128-015557,S003,dung_it,1,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-5.4-mini,1,1,648,14,1.059,,"{""gpt-5.4-mini"": {""in"": 648, ""out"": 14}}"
+simulate-2@20261128-015557,S004,dung_vua,1,Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-5.4-mini,1,1,731,89,1.84,,"{""gpt-5.4-mini"": {""in"": 731, ""out"": 89}}"
+simulate-2@20261128-015557,S005,dung_vua,1,"Day 02 CP6 chọn Rule, Workflow hay Agent thì xem tiêu chí nào trước để mình tự q",gpt-5.4-mini,1,1,569,95,1.945,,"{""gpt-5.4-mini"": {""in"": 569, ""out"": 95}}"
+simulate-2@20261128-015557,S006,dung_it,1,"Day 08 CP3, ledger và idempotency giúp lần xử lý lại không tạo thêm tác động như",gpt-5.4-mini,1,1,948,86,1.835,,"{""gpt-5.4-mini"": {""in"": 948, ""out"": 86}}"
+simulate-2@20261128-015557,S007,dung_it,1,"Day 01 CP2 phần Embedding, lúc gọi emb_model.encode thì bước này làm gì trước kh",gpt-5.4-mini,1,1,1499,82,1.69,,"{""gpt-5.4-mini"": {""in"": 1499, ""out"": 82}}"
+simulate-2@20261128-015557,S008,dung_vua,1,"Day 01 CP2, file src/magic.py liên quan khái niệm nào?",,0,1,0,0,0.0,,{}
+simulate-2@20261128-015557,S009,dung_it,1,"Day 10 CP2, tại sao phải ký tiêu chí chấp nhận trước khi chạy eval?",gpt-5.4-mini,1,1,566,98,1.729,,"{""gpt-5.4-mini"": {""in"": 566, ""out"": 98}}"
+simulate-2@20261128-015557,S010,dung_nhieu,2,"Day 01 CP2 phần Embedding, lúc gọi emb_model.encode thì bước này làm gì trước kh ‖ Day 07 M02: citation trong bước đóng gói context có tác dụng gì?",gpt-5.4-mini,2,2,2529,168,3.423,,"{""gpt-5.4-mini"": {""in"": 2529, ""out"": 168}}"
+simulate-2@20261128-015557,S011,dung_vua,1,"Day 14 CP7, p95 cho mình hiểu gì khi đọc báo cáo benchmark?",gpt-5.4-mini,1,1,930,99,1.789,,"{""gpt-5.4-mini"": {""in"": 930, ""out"": 99}}"
+simulate-2@20261128-015557,S012,dung_it,1,"Day 08 CP3, ledger và idempotency giúp lần xử lý lại không tạo thêm tác động như",gpt-5.4-mini,1,1,948,89,1.78,,"{""gpt-5.4-mini"": {""in"": 948, ""out"": 89}}"
+simulate-2@20261128-015557,S013,dung_nhieu,2,"Day 14 CP7, p95 cho mình hiểu gì khi đọc báo cáo benchmark? ‖ Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-5.4-mini,2,2,1578,116,2.856,,"{""gpt-5.4-mini"": {""in"": 1578, ""out"": 116}}"
+simulate-2@20261128-015557,S014,dung_it,1,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-5.4-mini,1,1,648,14,1.078,,"{""gpt-5.4-mini"": {""in"": 648, ""out"": 14}}"
+simulate-2@20261128-015557,S015,dung_it,1,Mình đang kẹt CP2 và chưa hiểu đoạn đang làm.,,0,0,0,0,0.0,,{}
+simulate-2@20261128-015557,S016,dung_vua,1,"Day 02 CP6 chọn Rule, Workflow hay Agent thì xem tiêu chí nào trước để mình tự q",gpt-5.4-mini,1,1,569,14,0.994,,"{""gpt-5.4-mini"": {""in"": 569, ""out"": 14}}"
+simulate-2@20261128-015557,S017,dung_vua,1,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-5.4-mini,1,1,648,56,1.432,,"{""gpt-5.4-mini"": {""in"": 648, ""out"": 56}}"
+simulate-2@20261128-015557,S018,dung_nhieu,2,Trang 95 của giáo trình Day 07 nói gì cho M02? ‖ Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-5.4-mini,1,2,731,93,1.59,,"{""gpt-5.4-mini"": {""in"": 731, ""out"": 93}}"
+simulate-2@20261128-015557,S019,dung_vua,1,Mình đang kẹt CP2 và chưa hiểu đoạn đang làm.,,0,0,0,0,0.0,,{}
+simulate-2@20261128-015557,S020,dung_vua,1,Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-5.4-mini,1,1,731,97,1.758,,"{""gpt-5.4-mini"": {""in"": 731, ""out"": 97}}"
+simulate-2@20261128-015557,S021,dung_it,1,"Day 09 M2, làm sao tự kiểm LLM judge chấm gần với người?",gpt-5.4-mini,1,1,581,74,1.568,,"{""gpt-5.4-mini"": {""in"": 581, ""out"": 74}}"
+simulate-2@20261128-015557,S022,dung_vua,1,Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-5.4-mini,1,1,731,83,1.633,,"{""gpt-5.4-mini"": {""in"": 731, ""out"": 83}}"
+simulate-2@20261128-015557,S023,dung_nhieu,2,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh ‖ Trang 95 của giáo trình Day 07 nói gì cho M02?",gpt-5.4-mini,1,2,648,14,1.212,,"{""gpt-5.4-mini"": {""in"": 648, ""out"": 14}}"
+simulate-2@20261128-015557,S024,dung_it,1,Mình đang kẹt CP2 và chưa hiểu đoạn đang làm.,,0,0,0,0,0.008,,{}
+simulate-2@20261128-015557,S025,dung_it,1,Mình đang kẹt CP2 và chưa hiểu đoạn đang làm.,,0,0,0,0,0.0,,{}
+simulate-2@20261128-015557,S026,dung_it,1,"Day 10 CP2, tại sao phải ký tiêu chí chấp nhận trước khi chạy eval?",gpt-5.4-mini,1,1,566,99,1.986,,"{""gpt-5.4-mini"": {""in"": 566, ""out"": 99}}"
+simulate-2@20261128-015557,S027,dung_vua,1,Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-5.4-mini,1,1,731,104,1.89,,"{""gpt-5.4-mini"": {""in"": 731, ""out"": 104}}"
+simulate-2@20261128-015557,S028,dung_vua,1,Day 07 M02: citation trong bước đóng gói context có tác dụng gì?,gpt-5.4-mini,1,1,1030,93,1.92,,"{""gpt-5.4-mini"": {""in"": 1030, ""out"": 93}}"
+simulate-2@20261128-015557,S029,dung_vua,1,"Day 09 M2, làm sao tự kiểm LLM judge chấm gần với người?",gpt-5.4-mini,1,1,581,94,1.628,,"{""gpt-5.4-mini"": {""in"": 581, ""out"": 94}}"
+simulate-2@20261128-015557,S030,dung_it,1,Trang 95 của giáo trình Day 07 nói gì cho M02?,,0,1,0,0,0.001,,{}
+simulate-2@20261128-015557,S031,dung_it,1,"Day 09 M2, làm sao tự kiểm LLM judge chấm gần với người?",gpt-5.4-mini,1,1,581,29,1.123,,"{""gpt-5.4-mini"": {""in"": 581, ""out"": 29}}"
+simulate-2@20261128-015557,S032,dung_vua,1,"Day 02 CP6 chọn Rule, Workflow hay Agent thì xem tiêu chí nào trước để mình tự q",gpt-5.4-mini,1,1,569,14,0.978,,"{""gpt-5.4-mini"": {""in"": 569, ""out"": 14}}"
+simulate-2@20261128-015557,S033,dung_it,1,"Day 02 CP6 chọn Rule, Workflow hay Agent thì xem tiêu chí nào trước để mình tự q",gpt-5.4-mini,1,1,569,109,1.698,,"{""gpt-5.4-mini"": {""in"": 569, ""out"": 109}}"
+simulate-2@20261128-015557,S034,dung_nhieu,2,"Trang 95 của giáo trình Day 07 nói gì cho M02? ‖ Day 10 CP2, tại sao phải ký tiêu chí chấp nhận trước khi chạy eval?",gpt-5.4-mini,1,2,566,87,1.772,,"{""gpt-5.4-mini"": {""in"": 566, ""out"": 87}}"
+simulate-2@20261128-015557,S035,dung_it,1,"Day 14 CP7, p95 cho mình hiểu gì khi đọc báo cáo benchmark?",gpt-5.4-mini,1,1,930,98,1.694,,"{""gpt-5.4-mini"": {""in"": 930, ""out"": 98}}"
+simulate-2@20261128-015557,S036,dung_it,1,"Day 01 CP2 trong repo template, knn_predict có dùng được để chứng minh mình đã t",gpt-5.4-mini,1,1,1497,108,1.695,,"{""gpt-5.4-mini"": {""in"": 1497, ""out"": 108}}"
+simulate-2@20261128-015557,S037,dung_it,1,"Day 01 CP2, MiniLM và kNN khác vai trò thế nào? Cho mình một bước tự kiểm.",gpt-5.4-mini,1,1,1497,91,1.694,,"{""gpt-5.4-mini"": {""in"": 1497, ""out"": 91}}"
+simulate-2@20261128-015557,S038,dung_it,1,"Day 06 M03, mình tự kiểm phần chunking và ranh giới đoạn thế nào?",gpt-5.4-mini,1,1,887,103,1.57,,"{""gpt-5.4-mini"": {""in"": 887, ""out"": 103}}"
+simulate-2@20261128-015557,S039,dung_it,1,"Day 10 CP2, tại sao phải ký tiêu chí chấp nhận trước khi chạy eval?",gpt-5.4-mini,1,1,566,81,1.577,,"{""gpt-5.4-mini"": {""in"": 566, ""out"": 81}}"
+simulate-2@20261128-015557,S040,dung_vua,1,"Day 01 CP2, file src/magic.py liên quan khái niệm nào?",,0,1,0,0,0.001,,{}
+simulate-2@20261128-015557,S041,dung_nhieu,2,Trang 95 của giáo trình Day 07 nói gì cho M02? ‖ Mình đang kẹt CP2 và chưa hiểu đoạn đang làm.,,0,1,0,0,0.001,,{}
+simulate-2@20261128-015557,S042,dung_it,1,"Day 06 M03, mình tự kiểm phần chunking và ranh giới đoạn thế nào?",gpt-5.4-mini,1,1,887,112,1.799,,"{""gpt-5.4-mini"": {""in"": 887, ""out"": 112}}"
+simulate-2@20261128-015557,S043,dung_vua,1,Day 04 CP3 đang xử lý agent loop. Giới hạn bước và trace giúp mình biết gì khi c,gpt-5.4-mini,1,1,731,87,1.659,,"{""gpt-5.4-mini"": {""in"": 731, ""out"": 87}}"
+simulate-2@20261128-015557,S044,dung_vua,1,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-5.4-mini,1,1,648,14,1.018,,"{""gpt-5.4-mini"": {""in"": 648, ""out"": 14}}"
+simulate-2@20261128-015557,S045,dung_it,1,Day 07 M02: citation trong bước đóng gói context có tác dụng gì?,gpt-5.4-mini,1,1,1030,88,1.629,,"{""gpt-5.4-mini"": {""in"": 1030, ""out"": 88}}"
+simulate-2@20261128-015557,S046,dung_vua,1,"Day 01 CP2, file src/magic.py liên quan khái niệm nào?",,0,1,0,0,0.001,,{}
+simulate-2@20261128-015557,S047,dung_vua,1,Trang 95 của giáo trình Day 07 nói gì cho M02?,,0,1,0,0,0.001,,{}
+simulate-2@20261128-015557,S048,dung_it,1,"Day 01 CP2, MiniLM và kNN khác vai trò thế nào? Cho mình một bước tự kiểm.",gpt-5.4-mini,1,1,1497,115,1.811,,"{""gpt-5.4-mini"": {""in"": 1497, ""out"": 115}}"
+simulate-2@20261128-015557,S049,dung_vua,1,"Day 01 CP2 phần Embedding, lúc gọi emb_model.encode thì bước này làm gì trước kh",gpt-5.4-mini,1,1,1499,88,1.613,,"{""gpt-5.4-mini"": {""in"": 1499, ""out"": 88}}"
+simulate-2@20261128-015557,S050,dung_vua,1,"Day 05 M2, khi hành động có hậu quả khó đảo thì cần thiết kế bước người duyệt nh",gpt-5.4-mini,1,1,648,29,1.143,,"{""gpt-5.4-mini"": {""in"": 648, ""out"": 29}}"

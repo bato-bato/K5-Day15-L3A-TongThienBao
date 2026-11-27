@@ -1,15 +1,23 @@
 # Chi phí khi dùng thật · CP4
 
-- [50 phiên mô phỏng](simulate-1.csv), seed 42, [bảng kết quả gốc](simulate-1-summary.md). Không ghi nhận lỗi kỹ thuật. Có phiên được xử lý trước khi cần gọi model.
-- Token đo trên `gpt-4o-mini`. Tỷ lệ đạt dùng để tính là **19/20 (95%)**, đọc từ [Lượt 2](../eval/run-2.csv). Tỷ lệ này đo theo câu benchmark.
-- [Cấu hình persona](personas.yaml): 175, 350 hoặc 700 người tham gia mỗi tháng. Quy mô tham chiếu từ [guide 4.2](../../02-guide.md#b4-2). Tỷ lệ tham gia và thói quen dùng là giả định.
-- Giá USD/triệu token theo [bảng BTC ngày 25/11/2026](../../further-reading/model-prices.md). `gpt-4o-mini` 0,15 vào và 0,60 ra. `gpt-6.2-sol` 2,00 vào và 10,00 ra. Dòng `gpt-6.2-sol` định giá lại cùng số token đã đo.
+Đo token riêng trên ba model, mỗi model 50 phiên, seed 42 và cùng kịch bản câu hỏi.
 
-| Model | Chi phí / phiên | Chi phí / tác vụ thành công | / tháng, thấp | / tháng, cơ sở | / tháng, cao | / người / tháng, cơ sở |
+| Model đo | Mô phỏng | Lần gọi model | Phiên lỗi |
+|---|---|---:|---:|
+| `gpt-4o-mini` | [simulate-1](simulate-1-summary.md) | 42 | 0/50 |
+| `gpt-5.4-mini` | [simulate-2](simulate-2-summary.md) | 42 | 0/50 |
+| `gpt-6.2-sol` | [simulate-3](simulate-3-summary.md) | 42 | 0/50 |
+
+- Tỷ lệ **19/20 (95%)** dùng để ước tính chi phí mỗi tác vụ thành công lấy từ [Lượt 2 trên GPT‑4o mini](../eval/run-2.csv). Tỷ lệ đạt riêng của hai model mới chưa được đo. Cột chi phí mỗi phiên dùng token thực đo của từng model.
+- [Cấu hình persona](personas.yaml) dùng 175, 350 hoặc 700 người tham gia mỗi tháng. Quy mô tham chiếu từ [guide 4.2](../../02-guide.md#b4-2). Tỷ lệ tham gia và thói quen dùng là giả định.
+- Giá mỗi triệu token áp theo [bảng Standard của BTC ngày 25/11/2026](../../further-reading/model-prices.md).
+
+| Model | Chi phí / phiên | Chi phí ước tính / tác vụ thành công | / tháng, thấp | / tháng, cơ sở | / tháng, cao | / người / tháng, cơ sở |
 |---|---:|---:|---:|---:|---:|---:|
 | gpt-4o-mini | $0.00014 | $0.00015 | $0.2108 | $0.4215 | $0.8431 | $0.0012 |
-| gpt-6.2-sol | $0.0020 | $0.0021 | $2.97 | $5.94 | $11.89 | $0.0170 |
+| gpt-5.4-mini | $0.00082 | $0.00086 | $1.22 | $2.44 | $4.87 | $0.0070 |
+| gpt-6.2-sol | $0.0022 | $0.0023 | $3.34 | $6.69 | $13.38 | $0.0191 |
 
-Chi phí mỗi tác vụ thành công được ước tính bằng chi phí trung bình mỗi phiên chia tỷ lệ đạt. Các kịch bản chỉ tính tiền token. Chưa tính hosting, lưu trữ và thời gian duyệt.
+Chi phí ước tính mỗi tác vụ thành công lấy chi phí trung bình mỗi phiên chia cho 95%. Các kịch bản chỉ tính token. Chi phí hosting, lưu trữ và thời gian duyệt nằm ngoài bảng.
 
-Ở kịch bản cơ sở, chi phí token khoảng **0,0012 USD/người/tháng** với `gpt-4o-mini`. Mức tiết kiệm **15,2 phút/người/tháng** theo §2 là giả định để kiểm tra qua pilot. Kết quả hiện tại ủng hộ thử phạm vi nhỏ sau khi xử lý ca từ chối còn trượt.
+Ở kịch bản cơ sở, GPT‑5.4 mini khoảng **0.0070 USD/người/tháng** và GPT‑6.2 Sol khoảng **0.0191 USD/người/tháng**. Mức tiết kiệm giả định là 15,2 phút/người/tháng theo §2 và cần kiểm tra qua pilot.

@@ -101,10 +101,10 @@ flowchart LR
 
 ## §8. Chi phí khi dùng thật *(guide 4.2)*
 
-- [50 phiên mô phỏng](cost/simulate-1.csv) đo token trên `gpt-4o-mini`. Tỷ lệ đạt 19/20 lấy từ Lượt 2.
-- Chi phí mỗi tác vụ thành công ước tính 0,00015 USD với `gpt-4o-mini` và 0,0021 USD khi áp bảng giá `gpt-6.2-sol` trên cùng số token.
-- Chi phí token `gpt-4o-mini` theo tháng lần lượt là 0,2108 USD, 0,4215 USD và 0,8431 USD cho 175, 350, 700 người. [Bảng chi phí](cost/cost-estimate.md).
-- Kịch bản cơ sở tốn 0,0012 USD/người/tháng so với giả định tiết kiệm 15,2 phút/người/tháng. Cần đo mức tiết kiệm qua thử nghiệm với học viên.
+- Đo riêng 50 phiên mỗi model bằng [GPT‑5.4 mini](cost/simulate-2.csv) và [GPT‑6.2 Sol](cost/simulate-3.csv). [GPT‑4o mini](cost/simulate-1.csv) là lượt tham chiếu.
+- Chi phí mỗi tác vụ thành công ước tính **0.00086 USD** với GPT‑5.4 mini và **0.0023 USD** với GPT‑6.2 Sol, cùng dùng tỷ lệ 19/20 từ benchmark GPT‑4o mini.
+- Ở kịch bản cơ sở 350 người, chi phí token theo tháng là **2.44 USD** với GPT‑5.4 mini và **6.69 USD** với GPT‑6.2 Sol. [Ba kịch bản và các giả định](cost/cost-estimate.md).
+- Giả định tiết kiệm 15,2 phút/người/tháng cần đo trên học viên.
 
 ## §9. Rủi ro & an toàn
 - Dữ liệu dùng cho luồng checkpoint gồm danh mục Lab và nguồn tài liệu. Stop khi yêu cầu vượt quyền hoặc dữ liệu thiếu căn cứ. Dữ liệu nghiên cứu Preclass chỉ xuất hiện dưới dạng số tổng hợp và ví dụ đã bỏ mã định danh.

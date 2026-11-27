@@ -27,7 +27,11 @@ prices:
     input: 0.15
     output: 0.60
     source: "Bảng Standard của BTC, further-reading/model-prices.md, 25/11/2026."
+  - model: gpt-5.4-mini
+    input: 0.75
+    output: 4.50
+    source: "Bảng Standard của BTC, further-reading/model-prices.md, 25/11/2026."
   - model: gpt-6.2-sol
     input: 2.00
     output: 10.00
-    source: "Bảng Standard của BTC, further-reading/model-prices.md, 25/11/2026. So giá trên cùng số token đo."
+    source: "Bảng Standard của BTC, further-reading/model-prices.md, 25/11/2026."
