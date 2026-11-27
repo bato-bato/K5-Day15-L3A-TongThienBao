@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { ChatBot } from './ChatBot.jsx';
 import { CourseTree } from './CourseTree.jsx';
 import { Mindmap } from './Mindmap.jsx';
 import './style.css';
@@ -320,6 +321,27 @@ function App() {
   const draft = edited ?? workspace?.[tab]?.[day] ?? EMPTY;
   const selectedNode = draft.nodes.find(n => n.id === selectedId) || null;
   const activeTitle = getDayShortTitle(workspace, day);
+
+  // Concept currently selected on canvas -> chatbot focus (KG concept_id from verified seed nodes)
+  const chatFocus = selectedNode?.source_ref?.concept_id
+    ? {
+        id: selectedNode.source_ref.concept_id,
+        day: selectedNode.source_ref.day ?? day,
+        label: (selectedNode.text || '').split('\n')[0].replace(/^\[[^\]]+\]\s*/, '').slice(0, 80),
+      }
+    : null;
+
+  // Citation chip click -> open that concept's node on the Mindmap of its day
+  function jumpToConcept(conceptId, targetDay) {
+    if (!targetDay) return;
+    const mapKey = `mindmaps/${targetDay}`;
+    const nodes = (edits[mapKey] ?? workspace?.mindmaps?.[targetDay] ?? EMPTY).nodes;
+    const target = nodes.find(n => n.source_ref?.concept_id === conceptId);
+    setTab('mindmaps');
+    if (view === 'lab') setView('mindmaps');
+    setDay(targetDay);
+    setSelectedId(target ? target.id : null);
+  }
 
   function selectDay(nextDay) {
     setDay(nextDay);
@@ -1535,6 +1557,8 @@ function App() {
           );
         })()}
       </main>
+
+      {workspace && <ChatBot day={day} focus={chatFocus} onJumpToConcept={jumpToConcept} />}
     </div>
   );
 }

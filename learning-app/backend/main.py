@@ -16,6 +16,7 @@ from graph_db import (
     list_lectures,
     traverse_subgraph,
 )
+from chat_engine import chat_turn
 from guardrails import check_input_guard
 from kg_store import ensure_kg_loaded, get_day_mindmap_seed, get_kg_summary, search_kg
 from lecture_extractor import extract_lecture_knowledge
@@ -73,6 +74,20 @@ class MapRequest(BaseModel):
     day: int | None = Field(default=None, ge=1, le=14)
     mode: Literal["level1", "level2", "level3", "graphrag"] = "graphrag"
     direction: Literal["both", "theory_to_practice", "practice_to_theory"] = "both"
+
+
+class ChatTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(max_length=4000)
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=2000)
+    history: list[ChatTurn] = Field(default_factory=list, max_length=20)
+    level: Literal["eli5", "standard", "deep"] = "standard"
+    day: int | None = Field(default=None, ge=1, le=14)
+    focus_id: str | None = Field(default=None, max_length=200)
+    prev_citation_ids: list[str] = Field(default_factory=list, max_length=8)
 
 
 class LectureIngestRequest(BaseModel):
@@ -258,6 +273,19 @@ def ai_lecture_to_lab_map(req: MapRequest) -> dict[str, Any]:
     if not req.query.strip():
         raise HTTPException(status_code=400, detail="Query không được rỗng")
     return map_lecture_to_lab(req.query, day=req.day, mode=req.mode, direction=req.direction)
+
+
+@app.post("/api/chat")
+def kg_rag_chat(req: ChatRequest) -> dict[str, Any]:
+    """KG-RAG tutor: explain concepts/lessons at eli5|standard|deep, grounded + cited on the GraphRAG DB."""
+    return chat_turn(
+        req.message,
+        history=[t.model_dump() for t in req.history],
+        level=req.level,
+        scope_day=req.day,
+        focus_id=req.focus_id,
+        prev_citation_ids=req.prev_citation_ids,
+    )
 
 
 @app.get("/api/graph/stats")

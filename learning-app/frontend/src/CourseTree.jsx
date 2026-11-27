@@ -242,7 +242,6 @@ export function getNodeTitle(node) {
         ? commaItems.slice(0, 4).map(it => truncateText(it, 36))
         : [truncateText(rest, 38)];
       groups.push({
-        label: shortenL2Label(label || `Ý ${groups.length + 1}`, groups.length + 1),
         label: label ? shortenL2Label(label) : inferTopicLabel(rest, parentTitle),
         leaves: fallbackItems,
       });
@@ -261,25 +260,20 @@ export function getNodeTitle(node) {
     });
 
     // Add provenance / code reference leaf if only 1 group exists
-    if (groups.length === 1 && node?.source_ref?.pdf_pages?.length) {
-      groups.push({
-        if(deduped.length === 1 && node?.source_ref?.pdf_pages?.length) {
-        deduped.push({
-          label: 'Nguồn PDF',
-          leaves: [`Ngày ${node.source_ref.day} · Tr.${node.source_ref.pdf_pages.join(', ')}`],
-        });
-      } else if (groups.length === 1 && node?.code_link?.file_path) {
-        groups.push({
-        } else if (deduped.length === 1 && node?.code_link?.file_path) {
-          deduped.push({
-            label: 'Code Lab',
-            leaves: [truncateText(node.code_link.file_path.split('/').slice(-2).join('/'), 36)],
-          });
-        }
+    if (deduped.length === 1 && node?.source_ref?.pdf_pages?.length) {
+      deduped.push({
+        label: 'Nguồn PDF',
+        leaves: [`Ngày ${node.source_ref.day} · Tr.${node.source_ref.pdf_pages.join(', ')}`],
+      });
+    } else if (deduped.length === 1 && node?.code_link?.file_path) {
+      deduped.push({
+        label: 'Code Lab',
+        leaves: [truncateText(node.code_link.file_path.split('/').slice(-2).join('/'), 36)],
+      });
+    }
 
-        return groups.slice(0, 3);
-        return deduped.slice(0, 3);
-      }
+    return deduped.slice(0, 3);
+  }
 
       function layoutSideBranches(branches, side, themes, startX, expandedIds, forceExpandAll) {
         const LEAF_W = 214;
