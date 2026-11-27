@@ -21,10 +21,14 @@ import json
 import os
 import re
 import unicodedata
+import urllib.error
+import urllib.request
 
 from tracing import model_call
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SHOW_RAW = False
+URL_CLAUDE = "https://api.anthropic.com/v1/messages"
 
 
 def load_env(path=os.path.join(ROOT, ".env")):
@@ -44,6 +48,8 @@ load_env()
 MODEL_PROVIDER = (os.environ.get("MODEL_PROVIDER") or "fake").strip().lower()
 MODEL_NAME = (os.environ.get("MODEL_NAME") or "").strip()
 API_KEY = (os.environ.get("API_KEY") or "").strip()
+OPENAI_BASE_URL = (os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1").strip().rstrip("/")
+OLLAMA_URL = (os.environ.get("OLLAMA_URL") or "http://localhost:11434/api/chat").strip()
 
 
 def mock_answer(user: str) -> str:
@@ -83,13 +89,86 @@ def terms(text: str) -> set:
     return set(re.findall(r"[^\W_]+", normalized)) - {"", "def", "todo"}
 
 
+def post_json(url: str, headers: dict, body: dict, timeout: int = 60) -> dict:
+    """Gửi POST JSON, trả về JSON phản hồi. Chỉ dùng thư viện chuẩn (urllib)."""
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(body).encode("utf-8"),
+        method="POST",
+        headers=dict({"Content-Type": "application/json"}, **headers),
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            data = json.loads(r.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        raise RuntimeError("HTTP %d: %s" % (e.code, e.read().decode("utf-8", "replace")[:300]))
+    if SHOW_RAW:
+        print(json.dumps(data, ensure_ascii=False, indent=2)[:3000])
+    return data
+
+
+def call_openai(system: str, user: str) -> dict:
+    messages = ([{"role": "system", "content": system}] if system else []) + [{"role": "user", "content": user}]
+    body = {"model": MODEL_NAME, "messages": messages, "temperature": 0.2}
+    if "json" in (system or "").lower():
+        body["response_format"] = {"type": "json_object"}
+    data = post_json(f"{OPENAI_BASE_URL}/chat/completions", {"Authorization": "Bearer " + API_KEY}, body)
+    u = data["usage"]
+    return {
+        "text": data["choices"][0]["message"]["content"] or "",
+        "tokens_in": int(u["prompt_tokens"]),
+        "tokens_out": int(u["completion_tokens"]),
+    }
+
+
+def call_claude(system: str, user: str) -> dict:
+    data = post_json(
+        URL_CLAUDE,
+        {"x-api-key": API_KEY, "anthropic-version": "2023-06-01"},
+        {
+            "model": MODEL_NAME,
+            "max_tokens": 1024,
+            "system": system or "",
+            "messages": [{"role": "user", "content": user}],
+        },
+    )
+    text = "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text")
+    u = data["usage"]
+    return {
+        "text": text,
+        "tokens_in": int(u["input_tokens"]),
+        "tokens_out": int(u["output_tokens"]),
+    }
+
+
+def call_ollama(system: str, user: str) -> dict:
+    messages = ([{"role": "system", "content": system}] if system else []) + [{"role": "user", "content": user}]
+    data = post_json(OLLAMA_URL, {}, {"model": MODEL_NAME, "messages": messages, "stream": False}, timeout=300)
+    return {
+        "text": data["message"]["content"] or "",
+        "tokens_in": int(data.get("prompt_eval_count", 0)),
+        "tokens_out": int(data.get("eval_count", 0)),
+    }
+
+
 @model_call
 def call_model(system: str, user: str) -> dict:
     if MODEL_PROVIDER == "fake":
         return {"text": mock_answer(user), "model": "fake", "tokens_in": 0, "tokens_out": 0}
-
-    # NHÓM VIẾT: gọi model thật ở đây (theo MODEL_PROVIDER, MODEL_NAME, API_KEY) rồi trả đúng 4 khoá.
-    # Ví dụ chép được cho từng nhà cung cấp: docs/connect-model.md mục 2.
-    raise NotImplementedError(
-        "chưa viết phần gọi model thật cho MODEL_PROVIDER=%s trong codebase/ai.py — xem docs/connect-model.md"
-        % MODEL_PROVIDER)
+    if MODEL_PROVIDER == "openai":
+        r = call_openai(system, user)
+    elif MODEL_PROVIDER == "anthropic":
+        r = call_claude(system, user)
+    elif MODEL_PROVIDER == "ollama":
+        r = call_ollama(system, user)
+    else:
+        raise NotImplementedError(
+            "chưa viết phần gọi model thật cho MODEL_PROVIDER=%s trong codebase/ai.py — xem docs/connect-model.md"
+            % MODEL_PROVIDER
+        )
+    return {
+        "text": r["text"],
+        "model": MODEL_NAME,
+        "tokens_in": int(r["tokens_in"]),
+        "tokens_out": int(r["tokens_out"]),
+    }
