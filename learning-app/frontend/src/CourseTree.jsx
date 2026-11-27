@@ -500,7 +500,7 @@ function computeSymmetricLayout({ mindmapsByDay, page, searchQuery, expandedIds 
         matchesSearch: true,
         subGroups: [{
           label: 'Gợi ý',
-          leaves: ['Chọn ngày khác ở thanh phân trang phía dưới', 'Hoặc dùng AI GraphRAG để tra cứu'],
+          leaves: ['Chọn ngày khác ở thanh phân trang phía dưới', 'Hoặc dùng ô tìm kiếm trên thanh tiêu đề'],
           matchesSearch: true,
         }],
       }];

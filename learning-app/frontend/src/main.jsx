@@ -9,7 +9,6 @@ import { checkpoint_views } from '../../../data/lab-mapping/knowledge-graph.json
 import './style.css';
 
 const DAYS = Array.from({ length: 14 }, (_, index) => index + 1);
-const QUICK_QUERIES = ['CP1', 'CP2', 'CP3', 'CP4', 'Lethal Trifecta', 'Cost-of-Pass', 'Rogan-Gladen', 'FTS5'];
 
 async function request(path, options) {
   const response = await fetch(path, options);
@@ -264,47 +263,6 @@ function parseStudySections(rawText) {
   return { title, tag, blocks };
 }
 
-const RELATION_LABELS = {
-  APPLIED_IN: { label: 'Áp dụng tại', cls: 'bg-indigo-100 text-indigo-800 border-indigo-200' },
-  IS_PART_OF: { label: 'Thuộc phần', cls: 'bg-sky-100 text-sky-800 border-sky-200' },
-  IMPLEMENTED_BY: { label: 'Cài đặt bởi', cls: 'bg-teal-100 text-teal-800 border-teal-200' },
-  WARNS_ABOUT: { label: 'Cảnh báo bẫy', cls: 'bg-rose-100 text-rose-800 border-rose-200' },
-  TRAP_IN: { label: 'Cảnh báo bẫy', cls: 'bg-rose-100 text-rose-800 border-rose-200' },
-  DEPENDS_ON: { label: 'Nền tảng của', cls: 'bg-amber-100 text-amber-800 border-amber-200' },
-  PREREQ_OF: { label: 'Nền tảng của', cls: 'bg-amber-100 text-amber-800 border-amber-200' },
-};
-
-function getRelationBadge(rel) {
-  const key = String(rel || '').toUpperCase();
-  if (RELATION_LABELS[key]) return RELATION_LABELS[key];
-  return {
-    label: String(rel || '').replace(/_/g, ' '),
-    cls: 'bg-purple-100 text-purple-800 border-purple-200',
-  };
-}
-
-function parseExplanationSummary(text) {
-  const raw = String(text || '').trim();
-  if (!raw) return null;
-
-  const hasStructured = /Kiến thức trọng tâm:|Mã nguồn đối chiếu:|GraphRAG mở rộng/i.test(raw);
-  if (!hasStructured) return { raw };
-
-  const headlineMatch = raw.match(/^(.*?)(?=\s*(?:Kiến thức trọng tâm:|Mã nguồn đối chiếu:|GraphRAG mở rộng))/i);
-  const headline = headlineMatch ? headlineMatch[1].replace(/\.$/, '').trim() : '';
-
-  const conceptsMatch = raw.match(/Kiến thức trọng tâm:\s*(.+?)(?=\.\s*(?:Mã nguồn đối chiếu:|GraphRAG mở rộng)|$)/i);
-  const concepts = conceptsMatch ? splitTopLevelCommas(conceptsMatch[1]) : [];
-
-  const codeMatch = raw.match(/Mã nguồn đối chiếu:\s*(.+?)(?=\.\s*GraphRAG mở rộng|$)/i);
-  const codeFiles = codeMatch ? splitTopLevelCommas(codeMatch[1]) : [];
-
-  const statsMatch = raw.match(/(GraphRAG mở rộng[^.]+)\.?/i);
-  const stats = statsMatch ? statsMatch[1].trim() : '';
-
-  return { headline, concepts, codeFiles, stats };
-}
-
 function NodeInspector({ selectedNode, day, className = '', titleId, onClose, onRelatedConcept, onOpenCheckpoint }) {
   const conceptId = selectedNode.source_ref?.concept_id;
   const [nodeGraph, setNodeGraph] = useState(null);
@@ -335,7 +293,6 @@ function NodeInspector({ selectedNode, day, className = '', titleId, onClose, on
   const appliedTargets = (gData?.nodes || []).filter(
     n => n.node_kind === 'checkpoint' || n.node_kind === 'code_symbol',
   ).slice(0, 4);
-  const topCommunity = gData?.communities?.[0] || null;
   const labCheckpoints = selectedNode.lab_topic?.checkpoints ?? [];
 
   return (
@@ -547,18 +504,13 @@ function NodeInspector({ selectedNode, day, className = '', titleId, onClose, on
           </div>
         )}
 
-        {/* Live GraphRAG Links: Applied Checkpoints, Code & Related Concepts */}
-        {(appliedTargets.length > 0 || relatedConcepts.length > 0 || topCommunity) && (
+        {/* Linked Checkpoints, Code & Related Concepts */}
+        {(appliedTargets.length > 0 || relatedConcepts.length > 0) && (
           <div className="bg-purple-50/60 border border-purple-200 rounded-xl p-3 space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="font-bold text-purple-950 text-[12px]">
-                Mạng tri thức GraphRAG (Lý thuyết ↔ Thực hành)
+                Liên kết Tri thức (Lý thuyết ↔ Thực hành)
               </span>
-              {topCommunity && (
-                <span className="px-2 py-0.5 rounded-full bg-white border border-purple-200 text-purple-700 text-[10px] font-semibold">
-                  {topCommunity.community_id}
-                </span>
-              )}
             </div>
 
             {appliedTargets.length > 0 && (
@@ -635,22 +587,6 @@ function App() {
   const [dayMenuOpen, setDayMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
-
-  const [mapperOpen, setMapperOpen] = useState(false);
-  const [mapQuery, setMapQuery] = useState('CP3');
-  const [mapScopeDay, setMapScopeDay] = useState(false);
-  const [mapMode, setMapMode] = useState('graphrag');
-  const [mapDirection, setMapDirection] = useState('both');
-  const [mapLoading, setMapLoading] = useState(false);
-  const [mapResult, setMapResult] = useState(null);
-  const [showAllPaths, setShowAllPaths] = useState(false);
-
-  const [ingestOpen, setIngestOpen] = useState(false);
-  const [ingestTitle, setIngestTitle] = useState('');
-  const [ingestDay, setIngestDay] = useState(14);
-  const [ingestContent, setIngestContent] = useState('');
-  const [ingestLoading, setIngestLoading] = useState(false);
-  const [ingestStatus, setIngestStatus] = useState(null);
 
   const searchInputRef = useRef(null);
   const searchBoxRef = useRef(null);
@@ -796,7 +732,6 @@ function App() {
     const normalized = nextView === 'lab' ? 'lab' : 'mindmap';
     setView(normalized);
     setSelectedId(null);
-    setMapperOpen(false);
     if (normalized === 'lab') {
       setFocusedCheckpoint(null);
     }
@@ -838,64 +773,6 @@ function App() {
       window.removeEventListener('mousedown', onClickOutside);
     };
   }, []);
-
-  async function runMapping(overrideQuery, targetDay = day) {
-    const q = (overrideQuery ?? mapQuery).trim();
-    if (!q) return;
-    if (overrideQuery !== undefined) setMapQuery(overrideQuery);
-    setMapLoading(true);
-    setShowAllPaths(false);
-    try {
-      const data = await request('/api/map', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: q,
-          day: mapScopeDay ? targetDay : null,
-          mode: mapMode,
-          direction: mapDirection,
-        }),
-      });
-      setMapResult(data);
-    } catch {
-      setMapResult({
-        blocked: true,
-        abstention: true,
-        explanation: 'Lỗi kết nối tới API /api/map.',
-        knowledge_refs: [],
-        code_refs: [],
-        trap_warnings: [],
-      });
-    } finally {
-      setMapLoading(false);
-    }
-  }
-
-  async function runIngest(event) {
-    event.preventDefault();
-    if (!ingestTitle.trim() || ingestContent.trim().length < 20) return;
-    setIngestLoading(true);
-    setIngestStatus(null);
-    try {
-      const res = await request('/api/lectures/ingest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: ingestTitle.trim(),
-          content: ingestContent.trim(),
-          day: Number(ingestDay) || 14,
-          source_file: 'ui_lecture.md',
-        }),
-      });
-      setIngestStatus({ ok: true, data: res });
-      setIngestTitle('');
-      setIngestContent('');
-    } catch {
-      setIngestStatus({ ok: false, message: 'Nạp lecture thất bại (kiểm tra nội dung >= 20 ký tự).' });
-    } finally {
-      setIngestLoading(false);
-    }
-  }
 
   const hasSearchQuery = searchQuery.trim().length > 0;
   const totalSearchMatches = searchResults.labHits.length + searchResults.conceptHits.length;
@@ -1046,19 +923,8 @@ function App() {
           {searchDropdownOpen && hasSearchQuery && (
             <div className="absolute left-0 top-full mt-1.5 w-[420px] max-h-[70vh] overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-2 space-y-2 text-xs">
               {totalSearchMatches === 0 ? (
-                <div className="px-3 py-4 text-center text-slate-500 space-y-2">
-                  <div>Không tìm thấy kết quả phù hợp cho “{searchQuery.trim()}”.</div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchDropdownOpen(false);
-                      setMapperOpen(true);
-                      runMapping(searchQuery.trim());
-                    }}
-                    className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold transition"
-                  >
-                    Tra cứu bằng AI GraphRAG →
-                  </button>
+                <div className="px-3 py-4 text-center text-slate-500">
+                  Không tìm thấy kết quả phù hợp cho “{searchQuery.trim()}”. Hãy thử từ khóa khác.
                 </div>
               ) : (
                 <>
@@ -1130,19 +996,8 @@ function App() {
           )}
         </div>
 
-        {/* Right: AI GraphRAG & Avatar (clean & identical across views) */}
+        {/* Right: Avatar (clean & identical across views) */}
         <div className="flex items-center space-x-2 shrink-0">
-          <button
-            type="button"
-            onClick={() => setMapperOpen(open => !open)}
-            className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition flex items-center gap-1.5"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M13 10V3L4 14h7v7l9-11h-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-            </svg>
-            AI GraphRAG
-          </button>
-
           <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-600 hidden sm:flex items-center justify-center text-white text-[11px] font-bold border border-white shadow-sm ring-1 ring-slate-200">
             AI
           </div>
@@ -1195,423 +1050,6 @@ function App() {
             }}
           />
         )}
-
-        {/* AI Lecture-to-Lab GraphRAG Mapper Drawer (Left) */}
-        {mapperOpen && (() => {
-          const summaryData = mapResult ? parseExplanationSummary(mapResult.explanation) : null;
-          const paths = mapResult?.subgraph?.paths || [];
-          const visiblePaths = showAllPaths ? paths : paths.slice(0, 5);
-
-          return (
-            <aside
-              className="fixed top-16 left-4 bottom-20 w-[min(470px,calc(100vw-2rem))] bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-2xl z-30 flex flex-col overflow-hidden"
-              aria-label="AI Lecture-to-Lab Mapper"
-            >
-              <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-blue-900 px-4 py-3 text-white flex items-center justify-between shrink-0">
-                <div>
-                  <div className="text-[13px] font-bold tracking-tight flex items-center gap-1.5">
-                    <span>⚡</span> AI GraphRAG Mapper
-                  </div>
-                  <div className="text-[10.5px] text-slate-300">
-                    Ánh xạ Lý thuyết ↔ Code Lab · Guardrails
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setMapperOpen(false)}
-                  className="text-white/80 hover:text-white px-2 py-0.5 rounded-lg hover:bg-white/15 text-base font-bold transition"
-                >
-                  ×
-                </button>
-              </div>
-
-              <div className="p-4 overflow-y-auto space-y-3.5 text-xs select-text">
-                <form className="flex gap-2" onSubmit={e => { e.preventDefault(); runMapping(); }}>
-                  <input
-                    type="text"
-                    value={mapQuery}
-                    onChange={e => setMapQuery(e.target.value)}
-                    className="flex-1 min-w-0 border border-slate-300 rounded-xl px-3 py-2 text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
-                    placeholder="Nhập Checkpoint, hàm hoặc khái niệm..."
-                  />
-                  <button
-                    type="submit"
-                    disabled={mapLoading}
-                    className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold disabled:opacity-50 shadow-sm shrink-0 transition"
-                  >
-                    {mapLoading ? 'Đang ánh xạ…' : 'Ánh xạ'}
-                  </button>
-                </form>
-
-                <div className="space-y-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Gợi ý nhanh
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {QUICK_QUERIES.map(q => (
-                      <button
-                        key={q}
-                        type="button"
-                        onClick={() => runMapping(q)}
-                        className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition ${
-                          mapQuery === q
-                            ? 'bg-blue-50 border-blue-300 text-blue-700 font-semibold'
-                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
-                        }`}
-                      >
-                        {q}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10.5px] font-semibold text-slate-500 shrink-0">Chế độ:</span>
-                    <div className="flex gap-1 bg-slate-200/70 p-0.5 rounded-lg">
-                      {[
-                        ['graphrag', 'Lv3 GraphRAG'],
-                        ['level2', 'Lv2 Hybrid'],
-                        ['level1', 'Lv1 Direct'],
-                      ].map(([id, label]) => (
-                        <button
-                          key={id}
-                          type="button"
-                          onClick={() => setMapMode(id)}
-                          className={`px-2 py-1 rounded-md text-[10.5px] font-semibold transition ${
-                            mapMode === id
-                              ? 'bg-white text-blue-700 shadow-xs'
-                              : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10.5px] font-semibold text-slate-500 shrink-0">Chiều:</span>
-                    <div className="flex gap-1 bg-slate-200/70 p-0.5 rounded-lg">
-                      {[
-                        ['both', '2 chiều'],
-                        ['theory_to_practice', 'Lý thuyết → Code'],
-                        ['practice_to_theory', 'Code → Lý thuyết'],
-                      ].map(([id, label]) => (
-                        <button
-                          key={id}
-                          type="button"
-                          onClick={() => setMapDirection(id)}
-                          className={`px-2 py-1 rounded-md text-[10.5px] font-semibold transition ${
-                            mapDirection === id
-                              ? 'bg-white text-indigo-700 shadow-xs'
-                              : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <label className="flex items-center gap-2 text-[11px] text-slate-600 pt-0.5 border-t border-slate-200/70">
-                    <input
-                      type="checkbox"
-                      checked={mapScopeDay}
-                      onChange={e => setMapScopeDay(e.target.checked)}
-                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    Chỉ tìm trong Ngày {day}
-                  </label>
-                </div>
-
-                {mapResult && (
-                  <div className="space-y-3">
-                    <div className={`px-3 py-2.5 rounded-xl border space-y-2 ${mapResult.blocked
-                      ? 'bg-red-50 text-red-800 border-red-200'
-                      : mapResult.abstention
-                        ? 'bg-amber-50 text-amber-800 border-amber-200'
-                        : 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                      }`}
-                    >
-                      <div className="font-bold text-[12px]">
-                        {mapResult.blocked
-                          ? '🛑 Input Guardrail: Đã chặn Prompt Injection'
-                          : mapResult.abstention
-                            ? '⚠️ INSUFFICIENT_EVIDENCE: Ngoài phạm vi tài liệu'
-                            : `✅ Source Verifier (${mapResult.mode || 'graphrag'}): Kiểm chứng 100%`}
-                      </div>
-                      {!mapResult.blocked && (
-                        <div className="flex flex-wrap gap-1.5 text-[10.5px] font-semibold">
-                          <span className="px-2 py-0.5 rounded-full bg-white/85 border border-current/15 text-slate-700">
-                            {mapResult.knowledge_refs?.length || 0} kiến thức
-                          </span>
-                          <span className="px-2 py-0.5 rounded-full bg-white/85 border border-current/15 text-slate-700">
-                            {mapResult.code_refs?.length || 0} code
-                          </span>
-                          {mapResult.subgraph && (
-                            <span className="px-2 py-0.5 rounded-full bg-white/85 border border-current/15 text-slate-700">
-                              {mapResult.subgraph.nodes?.length || 0} nút · {mapResult.subgraph.edges?.length || 0} cạnh
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {summaryData && (
-                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
-                        <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">
-                          Tóm tắt ánh xạ
-                        </div>
-                        {summaryData.raw ? (
-                          <p className="text-slate-700 leading-relaxed">{summaryData.raw}</p>
-                        ) : (
-                          <>
-                            {summaryData.headline && (
-                              <div className="font-bold text-slate-900 text-[12.5px]">
-                                {summaryData.headline}
-                              </div>
-                            )}
-                            {summaryData.concepts?.length > 0 && (
-                              <div className="space-y-1">
-                                <div className="text-[10px] font-semibold uppercase tracking-wider text-blue-700">
-                                  Kiến thức trọng tâm
-                                </div>
-                                <ul className="space-y-1">
-                                  {summaryData.concepts.map((item, idx) => (
-                                    <li key={idx} className="flex items-start gap-2 text-slate-700 leading-snug">
-                                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                                      <span>{item}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {summaryData.codeFiles?.length > 0 && (
-                              <div className="space-y-1 pt-1">
-                                <div className="text-[10px] font-semibold uppercase tracking-wider text-teal-700">
-                                  Mã nguồn đối chiếu
-                                </div>
-                                <div className="flex flex-wrap gap-1">
-                                  {summaryData.codeFiles.map((file, idx) => (
-                                    <code key={idx} className="px-2 py-0.5 rounded-md bg-white border border-teal-200 text-teal-900 font-mono text-[10.5px]">
-                                      {file}
-                                    </code>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                            {summaryData.stats && (
-                              <div className="text-[10.5px] text-slate-500 pt-1 border-t border-slate-200/70">
-                                {summaryData.stats}
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    )}
-
-                    {mapResult.trap_warnings?.length > 0 && (
-                      <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 rounded-xl p-3 text-rose-900 space-y-1.5">
-                        <div className="font-bold text-[11.5px] flex items-center gap-1.5">
-                          <span>⚠️</span> Cảnh báo Bẫy (Guardrails)
-                        </div>
-                        <ul className="space-y-1 text-[11.5px]">
-                          {mapResult.trap_warnings.map((w, i) => (
-                            <li key={i} className="flex items-start gap-1.5">
-                              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
-                              <span>{w}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {mapResult.knowledge_refs?.length > 0 && (
-                      <div className="bg-blue-50/50 border border-blue-200/80 rounded-xl p-3 space-y-2">
-                        <div className="font-bold text-slate-900 text-[12px]">
-                          Nút Tri thức Lecture ({mapResult.knowledge_refs.length})
-                        </div>
-                        <div className="space-y-2">
-                          {mapResult.knowledge_refs.map(k => (
-                            <div key={k.concept_id} className="bg-white border border-slate-200/90 rounded-xl p-2.5 space-y-1.5 shadow-2xs">
-                              <div className="flex items-start justify-between gap-2">
-                                <span className="font-bold text-slate-900 text-[12px] leading-snug">
-                                  {k.label}
-                                </span>
-                                <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-mono text-[10px] font-semibold shrink-0">
-                                  D{k.day}{k.pdf_pages?.length ? ` · Tr.${k.pdf_pages.join(',')}` : ''}
-                                </span>
-                              </div>
-                              <p className="text-slate-600 leading-relaxed text-[11.5px]">{k.summary}</p>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  jumpToConcept(k.concept_id, k.day);
-                                  setMapperOpen(false);
-                                }}
-                                className="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold text-[11px] transition"
-                              >
-                                Xem trên Mindmap →
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {mapResult.code_refs?.length > 0 && (
-                      <div className="bg-teal-50/60 border border-teal-200 rounded-xl p-3 space-y-2">
-                        <div className="font-bold text-teal-950 text-[12px]">
-                          Code Repo Đối chiếu ({mapResult.code_refs.length})
-                        </div>
-                        <div className="space-y-1.5">
-                          {mapResult.code_refs.map((c, i) => (
-                            <div key={i} className="bg-white border border-teal-200/80 rounded-lg px-2.5 py-2 flex items-center justify-between gap-2">
-                              <div className="min-w-0">
-                                <div className="font-mono font-bold text-[11px] text-slate-900 truncate">
-                                  {c.file_path}
-                                </div>
-                                {c.symbol && (
-                                  <span className="inline-block mt-0.5 px-1.5 py-0.5 rounded bg-teal-100 text-teal-900 font-mono text-[10px] font-semibold">
-                                    {c.symbol}()
-                                  </span>
-                                )}
-                              </div>
-                              <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-600 font-mono text-[10px] shrink-0">
-                                L{c.line_start}–L{c.line_end}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {mapResult.communities?.length > 0 && (
-                      <div className="bg-indigo-50/60 border border-indigo-200 rounded-xl p-3 space-y-2">
-                        <div className="font-bold text-indigo-950 text-[12px]">
-                          Graph Communities ({mapResult.communities.length})
-                        </div>
-                        <div className="space-y-1.5">
-                          {mapResult.communities.map(c => (
-                            <div
-                              key={c.community_id}
-                              title={c.summary}
-                              className="bg-white border border-indigo-200/80 rounded-lg px-2.5 py-1.5 flex items-start gap-2"
-                            >
-                              <span className="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800 font-mono text-[10px] font-bold shrink-0 mt-0.5">
-                                {c.community_id}
-                              </span>
-                              <span className="text-slate-800 font-medium text-[11.5px] leading-snug">
-                                {c.title}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {paths.length > 0 && (
-                      <div className="bg-purple-50/60 border border-purple-200 rounded-xl p-3 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="font-bold text-purple-950 text-[12px]">
-                            GraphRAG Multi-hop ({mapResult.subgraph.nodes?.length || 0} nút · {mapResult.subgraph.edges?.length || 0} cạnh)
-                          </div>
-                        </div>
-                        <div className="space-y-1.5">
-                          {visiblePaths.map((p, idx) => {
-                            const rel = getRelationBadge(p.relation);
-                            return (
-                              <div key={idx} className="bg-white border border-purple-200/80 rounded-lg p-2 space-y-1">
-                                <div className="font-semibold text-slate-800 text-[11.5px] leading-snug">
-                                  {p.from_label}
-                                </div>
-                                <div className="flex items-center gap-1.5 flex-wrap pl-1">
-                                  <span className="text-slate-400 text-[11px]">↳</span>
-                                  <span className={`px-1.5 py-0.5 rounded border text-[10px] font-semibold ${rel.cls}`}>
-                                    {rel.label}
-                                  </span>
-                                  <span className="font-semibold text-slate-900 text-[11.5px] leading-snug">
-                                    {p.to_label}
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                        {paths.length > 5 && (
-                          <button
-                            type="button"
-                            onClick={() => setShowAllPaths(v => !v)}
-                            className="w-full py-1.5 rounded-lg bg-white hover:bg-purple-100/60 border border-purple-200 text-purple-800 font-semibold text-[11px] transition"
-                          >
-                            {showAllPaths ? 'Thu gọn' : `Xem tất cả ${paths.length} liên kết`}
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <div className="pt-2 border-t border-slate-200 space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => setIngestOpen(o => !o)}
-                    className="w-full text-left px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200/70 font-semibold text-slate-700 transition"
-                  >
-                    {ingestOpen ? '▾ Ẩn nạp Lecture mới (Multi-Lecture)' : '▸ Nạp Lecture mới (Multi-Lecture GraphRAG)'}
-                  </button>
-                  {ingestOpen && (
-                    <form className="space-y-2" onSubmit={runIngest}>
-                      <div className="flex gap-1.5">
-                        <input
-                          type="text"
-                          value={ingestTitle}
-                          onChange={e => setIngestTitle(e.target.value)}
-                          placeholder="Tiêu đề Lecture..."
-                          className="flex-1 min-w-0 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs"
-                          required
-                        />
-                        <input
-                          type="number"
-                          min="1"
-                          max="14"
-                          value={ingestDay}
-                          onChange={e => setIngestDay(e.target.value)}
-                          className="w-16 border border-slate-300 rounded-lg px-2 py-1.5 text-xs"
-                        />
-                      </div>
-                      <textarea
-                        rows={3}
-                        value={ingestContent}
-                        onChange={e => setIngestContent(e.target.value)}
-                        placeholder="Dán nội dung Markdown (# Heading...) để trích Concept & nối Graph..."
-                        className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs"
-                        required
-                      />
-                      <button
-                        type="submit"
-                        disabled={ingestLoading}
-                        className="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                      >
-                        {ingestLoading ? 'Đang trích xuất & nối Graph…' : 'Nạp vào GraphRAG DB'}
-                      </button>
-                      {ingestStatus && (
-                        <div className={`px-2.5 py-1.5 rounded-lg font-medium ${ingestStatus.ok ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
-                          }`}
-                        >
-                          {ingestStatus.ok
-                            ? `✅ Đã nạp ${ingestStatus.data.lecture_id}: +${ingestStatus.data.nodes_added} nút, +${ingestStatus.data.edges_added} cạnh (${ingestStatus.data.cross_links_created} liên kết chéo).`
-                            : ingestStatus.message}
-                        </div>
-                      )}
-                    </form>
-                  )}
-                </div>
-              </div>
-            </aside>
-          );
-        })()}
       </main>
 
       <ChatBot
