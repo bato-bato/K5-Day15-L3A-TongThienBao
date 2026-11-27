@@ -43,7 +43,7 @@ function renderInline(text, citeMap, onCite, keyBase) {
           type="button"
           title={c ? `${c.label} · Ngày ${c.day} · tr.${(c.pdf_pages || []).join(',')}` : cite[1]}
           onClick={() => c && onCite(c)}
-          className="mx-0.5 align-baseline inline-flex items-center px-1 rounded bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-semibold hover:bg-blue-100"
+          className="mx-0.5 align-middle inline-flex items-center px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200/80 text-[10px] font-semibold hover:bg-indigo-100 transition"
         >
           {c ? `N${c.day}` : '↗'}
         </button>
@@ -67,7 +67,7 @@ function Markdown({ text, citations, onCite }) {
         i += 1;
       }
       blocks.push(
-        <div key={`t${i}`} className="overflow-x-auto my-1.5">
+        <div key={`t${i}`} className="overflow-x-auto my-2">
           <table className="text-[11px] border-collapse w-full">
             <tbody>
               {rows.map((r, ri) => (
@@ -88,20 +88,27 @@ function Markdown({ text, citations, onCite }) {
         i += 1;
       }
       blocks.push(
-        <ul key={`u${i}`} className="list-disc pl-4 space-y-0.5 my-1">
+        <ul key={`u${i}`} className="my-2 space-y-1.5 pl-4 list-disc marker:text-indigo-400 text-[12px] leading-[1.55] text-slate-700">
           {items.map((it, ii) => <li key={ii}>{renderInline(it, citeMap, onCite, `u${i}-${ii}`)}</li>)}
         </ul>,
       );
       continue;
     }
     if (/^>\s?/.test(line)) {
-      blocks.push(<blockquote key={`q${i}`} className="border-l-2 border-amber-400 pl-2 my-1 text-slate-600 italic">{renderInline(line.replace(/^>\s?/, ''), citeMap, onCite, `q${i}`)}</blockquote>);
+      blocks.push(
+        <blockquote key={`q${i}`} className="my-2.5 px-3 py-2 rounded-r-lg bg-amber-50/60 border-l-[3px] border-amber-400 text-[11.5px] leading-relaxed text-slate-600 italic">
+          {renderInline(line.replace(/^>\s?/, ''), citeMap, onCite, `q${i}`)}
+        </blockquote>,
+      );
     } else if (/^#{1,4}\s/.test(line)) {
-      blocks.push(<div key={`h${i}`} className="font-bold text-slate-900 mt-2">{renderInline(line.replace(/^#{1,4}\s/, ''), citeMap, onCite, `h${i}`)}</div>);
+      const headingClass = blocks.length === 0
+        ? 'text-[13px] font-bold text-slate-900 leading-snug pb-2 mb-2 border-b border-slate-100'
+        : 'text-[12.5px] font-bold text-slate-900 mt-2.5 mb-1';
+      blocks.push(<div key={`h${i}`} className={headingClass}>{renderInline(line.replace(/^#{1,4}\s/, ''), citeMap, onCite, `h${i}`)}</div>);
     } else if (line.trim()) {
       const isRecall = line.trim().startsWith('💡');
       blocks.push(
-        <p key={`p${i}`} className={isRecall ? 'mt-2 px-2 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900' : 'my-1'}>
+        <p key={`p${i}`} className={isRecall ? 'mt-2.5 px-2.5 py-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-[11.5px]' : 'my-1.5 text-[12px] leading-[1.6] text-slate-700'}>
           {renderInline(line, citeMap, onCite, `p${i}`)}
         </p>,
       );
@@ -261,14 +268,14 @@ export function ChatBot({ day, focus, onJumpToConcept }) {
             </div>
           ) : (
             <div key={idx} className="flex justify-start">
-              <div className={`max-w-[92%] px-3 py-2 rounded-2xl rounded-bl-sm border ${m.error ? 'bg-rose-50 border-rose-200 text-rose-800' : m.abstained ? 'bg-amber-50 border-amber-200 text-slate-700' : 'bg-white border-slate-200 text-slate-700'}`}>
+              <div className={`max-w-[92%] px-3.5 py-3 rounded-2xl rounded-bl-sm border shadow-sm ${m.error ? 'bg-rose-50 border-rose-200 text-rose-800' : m.abstained ? 'bg-amber-50 border-amber-200 text-slate-700' : 'bg-white border-slate-200 text-slate-700'}`}>
                 <Markdown text={m.content} citations={m.citations} onCite={c => onJumpToConcept?.(c.id, c.day)} />
 
                 {m.prerequisites?.length > 0 && (
-                  <div className="mt-2 flex flex-wrap items-center gap-1 text-[10.5px]">
+                  <div className="mt-2.5 pt-2 border-t border-slate-100 flex flex-wrap items-center gap-1.5 text-[11px]">
                     <span className="text-slate-500">🧱 Nên học trước:</span>
                     {m.prerequisites.map(p => (
-                      <button key={p.id} type="button" onClick={() => send(`${p.label} là gì?`)} className="px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100">
+                      <button key={p.id} type="button" onClick={() => send(`${p.label} là gì?`)} className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100 transition">
                         {p.label}
                       </button>
                     ))}
@@ -276,31 +283,31 @@ export function ChatBot({ day, focus, onJumpToConcept }) {
                 )}
 
                 {m.citations?.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
+                  <div className="mt-2.5 pt-2 border-t border-slate-100 space-y-1.5">
                     {m.citations.map(c => (
-                      <button key={c.id} type="button" onClick={() => onJumpToConcept?.(c.id, c.day)} className="w-full text-left flex items-center gap-1.5 text-[10.5px] text-slate-600 hover:text-indigo-700">
-                        <span className="shrink-0 px-1 rounded bg-blue-50 border border-blue-200 text-blue-700 font-semibold">N{c.day}</span>
-                        <span className="truncate">{c.label}</span>
-                        {c.pdf_pages?.length > 0 && <span className="shrink-0 text-slate-400">tr.{c.pdf_pages.join(',')}</span>}
+                      <button key={c.id} type="button" onClick={() => onJumpToConcept?.(c.id, c.day)} className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-indigo-50/70 border border-slate-200/70 text-[11px] text-slate-600 hover:text-indigo-700 transition">
+                        <span className="shrink-0 px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-[10px] font-semibold">N{c.day}</span>
+                        <span className="truncate font-medium">{c.label}</span>
+                        {c.pdf_pages?.length > 0 && <span className="ml-auto shrink-0 text-[10px] text-slate-400">tr.{c.pdf_pages.join(',')}</span>}
                       </button>
                     ))}
                   </div>
                 )}
 
                 {!m.error && (
-                  <div className="mt-2 flex flex-wrap gap-1">
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
                     {m.level !== 'eli5' && !m.abstained && (
-                      <button type="button" onClick={() => send('Giải thích đơn giản hơn', 'eli5')} className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 text-[10.5px]">🧒 Dễ hơn nữa</button>
+                      <button type="button" onClick={() => send('Giải thích đơn giản hơn', 'eli5')} className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 text-[10.5px] font-medium transition">🧒 Dễ hơn nữa</button>
                     )}
                     {(m.suggestions || []).filter(s => s !== 'Giải thích đơn giản hơn').map(s => (
-                      <button key={s} type="button" onClick={() => send(s)} className="px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 hover:border-indigo-300 hover:text-indigo-700 text-[10.5px] max-w-full truncate">
+                      <button key={s} type="button" onClick={() => send(s)} className="px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 hover:border-indigo-300 hover:text-indigo-700 text-[10.5px] max-w-full truncate transition">
                         {s}
                       </button>
                     ))}
                   </div>
                 )}
                 {m.llmUsed === false && !m.abstained && !m.error && (
-                  <div className="mt-1 text-[9.5px] text-slate-400">Chế độ offline · trích trực tiếp từ KG</div>
+                  <div className="mt-2 pt-1.5 border-t border-slate-100 text-[10px] text-slate-400">Chế độ offline · trích trực tiếp từ Knowledge Graph</div>
                 )}
               </div>
             </div>

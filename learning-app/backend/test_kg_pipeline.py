@@ -263,3 +263,15 @@ def test_chat_api_endpoint(monkeypatch):
         body = res.json()
         assert body["level"] == "eli5" and body["citations"]
         assert client.post("/api/chat", json={"message": "x", "level": "bogus"}).status_code == 422
+
+
+def test_chat_extractive_answer_formatted_cleanly(monkeypatch):
+    from chat_engine import chat_turn
+    monkeypatch.setenv("USE_REMOTE_LLM", "0")
+    r = chat_turn('Giải thích "Giai đoạn 2: Retrieval (16 kỹ thuật tìm kiếm lai, cấu trúc & đa nguồn)"')
+    assert not r["abstained"] and not r["blocked"]
+    ans = r["answer"]
+    assert "[PAT_D7_RETRIEVAL]" in ans
+    assert "- **2.1" in ans
+    assert "**Liên quan:**" not in ans
+    assert "Chế độ offline" not in ans

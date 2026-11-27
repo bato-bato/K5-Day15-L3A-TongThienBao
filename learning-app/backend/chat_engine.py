@@ -334,22 +334,58 @@ def call_llm(messages: list[dict[str, str]], intent: str) -> tuple[str | None, d
         return None, {"llm_used": False, "model": model, "reason": f"llm_error:{type(exc).__name__}"}
 
 
+def _format_summary_blocks(summary: str, simplify: bool = False) -> list[str]:
+    """Break dense KG summaries into clean intro + markdown bullet points."""
+    text = re.sub(r"\s+", " ", (summary or "").strip())
+    if not text:
+        return []
+
+    if len(re.findall(r"\(\d+(?:\.\d+)?\)\s", text)) >= 2:
+        chunks = re.split(r"(?=\(\d+(?:\.\d+)?\)\s)", text)
+        lines: list[str] = []
+        idx = 0
+        if chunks and not chunks[0].lstrip().startswith("("):
+            intro = chunks[0].strip().rstrip(",;")
+            if intro:
+                lines.append(intro)
+            idx = 1
+
+        numbered = chunks[idx:]
+        if simplify:
+            numbered = numbered[:2]
+        for chunk in numbered:
+            item = chunk.strip().rstrip(",;. ")
+            m = re.match(r"^\((\d+(?:\.\d+)?)\)\s*(.+)$", item)
+            if not m:
+                continue
+            num, rest = m.group(1), m.group(2).strip()
+            paren_match = re.match(r"^([^(:]+?)\s*\((.+)\)$", rest)
+            colon_match = re.match(r"^([^:]{2,50}):\s*(.+)$", rest)
+            if paren_match:
+                lines.append(f"- **{num} {paren_match.group(1).strip()}:** {paren_match.group(2).strip()}")
+            elif colon_match:
+                lines.append(f"- **{num} {colon_match.group(1).strip()}:** {colon_match.group(2).strip()}")
+            else:
+                lines.append(f"- **{num}** {rest}")
+        if lines:
+            return lines
+
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+    if simplify:
+        return [sentences[0]]
+    if len(sentences) >= 2:
+        return [sentences[0], "", *[f"- {s}" for s in sentences[1:]]]
+    return [text]
+
+
 def extractive_answer(intent: str, citable: list[dict[str, Any]], relations: dict[str, list[dict[str, Any]]]) -> str:
-    """Deterministic answer when no LLM is available: still grounded + cited, just less fluent."""
+    """Deterministic answer when no LLM is available: still grounded + cited, formatted cleanly."""
     main = citable[0]
-    first_sentence = re.split(r"(?<=[.!?])\s+", main["summary"])[0]
-    parts = [f"**{main['label']}** [{main['id']}]", "", f"👉 Ý chính: {first_sentence}"]
-    if intent != "simplify" and len(main["summary"]) > len(first_sentence):
-        parts.append(f"\nChi tiết: {main['summary']}")
+    parts = [f"### {main['label']} [{main['id']}]", ""]
+    parts.extend(_format_summary_blocks(main["summary"], simplify=(intent == "simplify")))
     quote = main.get("provenance", {}).get("key_quote")
     if quote:
-        parts.append(f'\n> "{quote}"')
-    if relations["prerequisites"]:
-        parts.append("\n**Nên nắm trước:** " + ", ".join(f"{n['label']} [{n['id']}]" for n in relations["prerequisites"][:3]))
-    others = [n for n in citable[1:4]]
-    if others:
-        parts.append("\n**Liên quan:** " + "; ".join(f"{n['label']} [{n['id']}]" for n in others))
-    parts.append("\n_(Chế độ offline: câu trả lời trích từ Knowledge Graph, chưa qua LLM diễn giải.)_")
+        parts.extend(["", f'> "{quote}"'])
     return "\n".join(parts)
 
 
