@@ -1,0 +1,155 @@
+:root {
+  font-family: Inter, system-ui, sans-serif;
+  color: #202020;
+  background: #fff;
+  font-synthesis: none;
+  --line: #e7e7e7;
+  --muted: #626262;
+  --toolbar-height: 48px;
+  --dock-bottom: max(16px, env(safe-area-inset-bottom));
+  --dock-shadow: 0 1px 2px #00000012, 0 3px 9px #00000012;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, textarea, select { font: inherit; }
+button { cursor: pointer; color: inherit; }
+button:disabled { cursor: default; opacity: .45; }
+:focus-visible { outline: 2px solid #575757; outline-offset: -2px; }
+
+.shell {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  height: 100vh;
+  height: 100dvh;
+}
+
+main { position: relative; min-height: 0; display: grid; padding-top: var(--toolbar-height); }
+.save-area, .map-tools {
+  position: absolute;
+  top: 0;
+  height: var(--toolbar-height);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.save-area { right: 16px; z-index: 1; color: var(--muted); font-size: 12px; }
+.map-tools { left: 16px; }
+.save-area button, .map-tools button, .load-state button {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #fff;
+  min-height: 30px;
+  padding: 4px 10px;
+  color: #202020;
+  font-size: 13px;
+}
+.save-area button:hover:enabled, .map-tools button:hover:enabled, .load-state button:hover {
+  background: #f4f4f4;
+}
+
+.map-panel { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); min-height: 0; }
+.map-scroll {
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+.map-scroll { overflow: auto; }
+.map-board {
+  position: relative;
+  width: max(100%, 4260px);
+  height: max(100%, 4190px);
+  background: radial-gradient(#d8d8d8 1px, transparent 1px) 0 0 / 20px 20px #fafafa;
+  cursor: grab;
+}
+.map-board:active { cursor: grabbing; }
+.connections {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  stroke: #989898;
+  stroke-width: 1.5;
+}
+.node {
+  position: absolute;
+  display: grid;
+  gap: 5px;
+  width: 164px;
+  padding: 6px;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  background: #fff;
+  cursor: default;
+}
+.node:focus-within { z-index: 1; border-color: #777; }
+.node-top { display: flex; align-items: center; gap: 4px; }
+.drag-handle { color: var(--muted); cursor: grab; user-select: none; touch-action: none; padding: 4px 2px; }
+.drag-handle:active { cursor: grabbing; }
+.node textarea, .node select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 4px;
+  background: #fff;
+  color: inherit;
+  font-size: 12px;
+}
+.node textarea { resize: none; }
+.remove { flex: none; width: 20px; padding: 0; border: 0; background: transparent; color: var(--muted); }
+.remove:hover { background: #f4f4f4; }
+
+.load-state { display: grid; justify-items: center; align-content: center; color: var(--muted); }
+
+.navigation {
+  position: fixed;
+  z-index: 5;
+  inset: auto 0 var(--dock-bottom);
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding-inline: 10px;
+  pointer-events: none;
+}
+.tabs, .days { display: flex; align-items: center; pointer-events: auto; }
+.tabs {
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: var(--dock-shadow);
+}
+.tabs button, .days button { border-radius: 999px; color: var(--muted); }
+.tabs button {
+  min-height: 34px;
+  border: 0;
+  padding: 0 15px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 550;
+}
+.tabs button:hover, .days button:hover { background: #f1f1f1; }
+.tabs button[aria-pressed="true"] { background: #ebebeb; color: #202020; font-weight: 650; }
+.days {
+  width: max-content;
+  max-width: 100%;
+  gap: 6px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 4px 5px 8px;
+}
+.days button {
+  flex: 0 0 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: #fff;
+  box-shadow: var(--dock-shadow);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.days button[aria-current] { border-color: #252525; background: #252525; color: #fff; font-weight: 650; }
+.days button[aria-current]:focus-visible { outline-color: #fff; }
