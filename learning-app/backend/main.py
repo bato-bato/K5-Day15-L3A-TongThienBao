@@ -86,6 +86,7 @@ class ChatRequest(BaseModel):
     history: list[ChatTurn] = Field(default_factory=list, max_length=20)
     level: Literal["eli5", "standard", "deep"] = "standard"
     day: int | None = Field(default=None, ge=1, le=14)
+    lab_id: str | None = Field(default=None, max_length=64)
     focus_id: str | None = Field(default=None, max_length=200)
     prev_citation_ids: list[str] = Field(default_factory=list, max_length=8)
 
@@ -305,6 +306,7 @@ def kg_rag_chat(req: ChatRequest, request: Request, response: Response) -> dict[
         level=req.level,
         scope_day=req.day,
         focus_id=req.focus_id,
+        lab_id=req.lab_id,
         prev_citation_ids=req.prev_citation_ids,
     )
 

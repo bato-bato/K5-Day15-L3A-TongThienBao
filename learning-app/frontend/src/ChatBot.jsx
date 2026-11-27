@@ -8,18 +8,18 @@ const LEVELS = [
 const STORAGE_KEY = 'kg_tutor_chat_v1';
 const MAX_HISTORY = 6;
 
-function loadStored() {
+function loadStored(key) {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = sessionStorage.getItem(key);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
 }
 
-function saveStored(messages) {
+function saveStored(key, messages) {
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-30)));
+    sessionStorage.setItem(key, JSON.stringify(messages.slice(-30)));
   } catch {
     /* storage unavailable: chat still works in-memory */
   }
@@ -119,9 +119,10 @@ function Markdown({ text, citations, onCite }) {
 }
 
 /* ---------------------------------- component ---------------------------------- */
-export function ChatBot({ day, focus, onJumpToConcept }) {
+export function ChatBot({ day, focus, labId, onJumpToConcept }) {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState(loadStored);
+  const storageKey = labId ? STORAGE_KEY + "/" + labId : STORAGE_KEY;
+  const [messages, setMessages] = useState(() => loadStored(storageKey));
   const [input, setInput] = useState('');
   const [level, setLevel] = useState('standard');
   const [scopeDay, setScopeDay] = useState(false);
@@ -129,7 +130,7 @@ export function ChatBot({ day, focus, onJumpToConcept }) {
   const listRef = useRef(null);
   const inputRef = useRef(null);
 
-  useEffect(() => saveStored(messages), [messages]);
+  useEffect(() => saveStored(storageKey, messages), [storageKey, messages]);
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, loading]);
@@ -154,6 +155,7 @@ export function ChatBot({ day, focus, onJumpToConcept }) {
           history,
           level: overrideLevel || level,
           day: scopeDay ? day : null,
+          lab_id: labId,
           focus_id: focus?.id || null,
           prev_citation_ids: (lastBot?.citations || []).map(c => c.id).slice(0, 4),
         }),

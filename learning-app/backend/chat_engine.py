@@ -18,6 +18,8 @@ import logging
 import os
 import re
 import time
+from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -431,6 +433,25 @@ def suggest_followups(intent: str, level: str, citable: list[dict[str, Any]], re
 
 
 # ---------------------------------------------------------------- orchestrator
+@lru_cache(maxsize=1)
+def lab_materials():
+    directory = Path(__file__).resolve().parents[2] / "data" / "lab-mapping"
+    labs = json.loads((directory / "labs.json").read_text(encoding="utf-8"))["labs"]
+    graph = json.loads((directory / "knowledge-graph.json").read_text(encoding="utf-8"))
+    concepts = {node["id"]: node["definition"] for node in graph["graph"]["nodes"]}
+    materials = {}
+    for lab in labs:
+        materials[lab["id"]] = [lab["title"], lab["overview"], lab["overview_example"],
+                                *[cp["label"] + " · " + cp["title"] for cp in lab["checkpoints"]]]
+        for cp in lab["checkpoints"]:
+            guide = graph["checkpoint_views"][cp["id"]]
+            materials[cp["id"]] = [cp["label"] + " · " + cp["title"], guide["explanation"],
+                                   cp["requirement"], cp["expected_deliverable"], guide["self_check"],
+                                   *[concepts[key] for key in guide["concept_ids"]],
+                                   *[item["explanation"] for item in guide["code_guides"]]]
+    return materials
+
+
 def chat_turn(
     message: str,
     history: list[dict[str, str]] | None = None,
@@ -438,6 +459,7 @@ def chat_turn(
     scope_day: int | None = None,
     focus_id: str | None = None,
     prev_citation_ids: list[str] | None = None,
+    lab_id: str | None = None,
 ) -> dict[str, Any]:
     t0 = time.perf_counter()
     msg = sanitize_text(message or "")
@@ -468,7 +490,10 @@ def chat_turn(
     r = retrieve(msg, intent, level, scope_day, focus_id, prev_citation_ids or [])
     context, citable, relations = pack_context(r)
 
-    if not citable:
+    material = lab_materials().get(lab_id) if lab_id else None
+    if material:
+        context = "Bài Lab đang mở (ưu tiên khi trả lời):\n" + "\n".join(material) + "\n\n" + context
+    if not citable and not material:
         answer = (
             "Mình chưa tìm thấy nội dung này trong giáo trình 14 ngày nên không muốn đoán. "
             "Bạn thử hỏi bằng tên khái niệm cụ thể (ví dụ: *RAG*, *Token Economy*, *Lethal Trifecta*) "
@@ -482,7 +507,12 @@ def chat_turn(
         messages = build_messages(msg, clean_history, intent, level, context, relations)
         answer, meta = call_llm(messages, intent)
         if not answer:
-            answer = extractive_answer(intent, citable, relations)
+            if material:
+                words = set(tokenize_text(msg))
+                passages = sorted(material[1:], key=lambda text: len(words.intersection(tokenize_text(text))), reverse=True)
+                answer = material[0] + "\n\n" + "\n\n".join(passages[:2])
+            else:
+                answer = extractive_answer(intent, citable, relations)
         out_guard = check_output_guard(answer)
         answer = out_guard["text"]
         if out_guard["blocked"]:

@@ -17,6 +17,9 @@
   "labs": [
     {
       "id": "day01",
+      "overview": "Bạn cho máy đọc tin nhắn và đoán đó là tin rác hay tin bình thường. Sau đó, bạn xem cách lọc nào đoán đúng nhiều hơn trên cùng một bộ tin nhắn.",
+      "overview_example": "Máy nên xếp “Bạn đã trúng thưởng, bấm vào đây!” vào tin rác và “Chiều nay học lúc 3 giờ nhé” vào tin bình thường.",
+      "overview_diagram": {"caption": "Cách máy phân loại một tin nhắn", "stages": [["Tin nhắn SMS"], ["Đếm từ rồi phân loại", "Học đặc trưng bằng MLP", "Tạo vector rồi tìm tin gần nhất", "Hỏi mô hình ngôn ngữ"], ["Dự đoán: tin rác hoặc tin thường"], ["So với nhãn đúng"]]},
       "day": 1,
       "title": "AI Foundation · Lọc SMS spam/ham",
       "work_mode": "individual",
@@ -291,6 +294,9 @@
     },
     {
       "id": "day02",
+      "overview": "Nhóm chọn một khó khăn có thật và tìm hiểu ai gặp khó, họ thường làm gì và vì sao cần giải quyết.",
+      "overview_example": "Nếu nghĩ học viên khó tìm bài để nộp, hãy hỏi về lần nộp gần nhất: họ đã tìm ở đâu và mắc ở bước nào?",
+      "overview_diagram": {"caption": "Từ quan sát đến bài toán của nhóm", "stages": [["Mỗi người ghi vấn đề gặp được"], ["Nhóm chọn một vấn đề"], ["Tìm bằng chứng từ người dùng"], ["Chốt vấn đề và lý do chọn"]]},
       "day": 2,
       "title": "Discovery & Problem Framing",
       "work_mode": "mixed",
@@ -583,6 +589,9 @@
     },
     {
       "id": "day03",
+      "overview": "Bạn hướng dẫn một trợ lý AI cách tìm thông tin bằng công cụ. Nhóm dùng 10 câu hỏi để xem lời hướng dẫn mới giúp trợ lý trả lời tốt hơn ở đâu.",
+      "overview_example": "Khi được hỏi “Con số này lấy từ đâu?”, trợ lý cần tìm được tài liệu và chỉ ra đoạn chứa con số đó.",
+      "overview_diagram": {"caption": "Cách trợ lý tìm câu trả lời", "stages": [["Câu hỏi nghiên cứu"], ["Trợ lý chọn công cụ"], ["Công cụ trả kết quả"], ["Trợ lý trả lời dựa trên kết quả"]]},
       "day": 3,
       "title": "Prompt Engineering & Tool Calling · Research Agent",
       "work_mode": "group",
@@ -877,6 +886,9 @@
     },
     {
       "id": "day04",
+      "overview": "Bạn làm cho trợ lý AI biết kiểm tra từng bước trước khi trả lời một câu hỏi về trạng thái. Khi trợ lý trả lời sai, bạn xem lại các bước nó đã làm để tìm chỗ cần sửa.",
+      "overview_example": "Nếu công cụ chưa trả về trạng thái, hãy xem nhật ký để biết trợ lý đã thử lại hay đã báo nhầm là hoàn tất.",
+      "overview_diagram": {"caption": "Một vòng điều tra trạng thái", "stages": [["Nhận yêu cầu kiểm tra"], ["Chọn và gọi công cụ"], ["Đọc kết quả và ghi nhật ký"], ["Đủ căn cứ: trả lời", "Thiếu căn cứ: kiểm tra tiếp trong giới hạn"]]},
       "day": 4,
       "title": "ReAct Loop · Status Investigation Agent",
       "work_mode": "individual",
@@ -1216,6 +1228,9 @@
     },
     {
       "id": "day05",
+      "overview": "Nhóm thiết kế cách ứng dụng phản hồi khi AI gặp khó. Bạn quyết định việc nào AI được tự làm và lúc nào người dùng cần xác nhận.",
+      "overview_example": "AI có thể soạn sẵn email. Trước khi gửi, ứng dụng cho người dùng xem người nhận và nội dung rồi bấm xác nhận.",
+      "overview_diagram": {"caption": "Quyết định ai thực hiện hành động", "stages": [["Người dùng đưa yêu cầu"], ["Xét rủi ro nếu AI làm sai"], ["Rủi ro thấp: AI thực hiện", "Cần phê duyệt: người dùng xác nhận", "Thiếu dữ kiện: hỏi lại"]]},
       "day": 5,
       "title": "AI Product UX & Autonomy",
       "work_mode": "group",
@@ -1389,6 +1404,9 @@
     },
     {
       "id": "day06",
+      "overview": "Bạn chuẩn bị tài liệu để máy có thể tìm lại đúng đoạn khi có người hỏi. Bạn thử vài cách chia và tìm đoạn rồi so sánh kết quả.",
+      "overview_example": "Với câu “Đổi hàng trong bao lâu?”, hãy kiểm tra xem kết quả có chứa đúng đoạn ghi thời hạn đổi hàng.",
+      "overview_diagram": {"caption": "Từ tài liệu đến kết quả tìm kiếm", "stages": [["Đọc và làm sạch tài liệu"], ["Chia đoạn và lập chỉ mục"], ["Tìm đoạn cho câu hỏi thử"], ["Kiểm tra có tìm đúng đoạn"]]},
       "day": 6,
       "title": "Data Ingestion Engineering",
       "work_mode": "individual",
@@ -1698,6 +1716,9 @@
     },
     {
       "id": "day07",
+      "overview": "Bạn dùng tài liệu đã chuẩn bị ở Ngày 06 để làm trợ lý hỏi đáp. Bạn kiểm tra cả câu trả lời lẫn đoạn tài liệu mà trợ lý dùng làm căn cứ.",
+      "overview_example": "Nếu trợ lý trả lời “Được đổi trong 7 ngày”, bạn mở đoạn được dẫn để xem tài liệu có thực sự ghi 7 ngày hay không.",
+      "overview_diagram": {"caption": "Đường đi của một câu hỏi", "stages": [["Người dùng hỏi"], ["Tìm các đoạn liên quan"], ["Đưa đoạn đã chọn cho AI"], ["Trả lời kèm nguồn để đối chiếu"]]},
       "day": 7,
       "title": "Retrieval & Context Engineering · Agentic RAG",
       "work_mode": "individual",
@@ -1922,6 +1943,9 @@
     },
     {
       "id": "day08",
+      "overview": "Nhóm thử ba cách tổ chức cùng một công việc cho LogiX-VN. Bạn xem mỗi cách giao việc, xin xác nhận và tiếp tục công việc sau sự cố như thế nào.",
+      "overview_example": "Nếu hệ thống dừng sau khi đã ghi nhận một yêu cầu, lúc chạy lại nó cần nhận ra yêu cầu cũ để tránh xử lý hai lần.",
+      "overview_diagram": {"caption": "Cách chọn kiến trúc cho LogiX-VN", "stages": [["Cùng một công việc"], ["Chạy kiến trúc thứ nhất", "Chạy kiến trúc thứ hai", "Chạy kiến trúc thứ ba"], ["Thử bàn giao và phục hồi"], ["So kết quả để chọn kiến trúc"]]},
       "day": 8,
       "title": "From Workflows to Agents · LogiX-VN",
       "work_mode": "group",
@@ -2219,6 +2243,9 @@
     },
     {
       "id": "day09",
+      "overview": "Bạn chuẩn bị các tình huống thử để tìm xem LogiX-VN thường sai ở bước nào. Khi có phiên bản mới, bạn dùng lại các tình huống đó để phát hiện lỗi quay lại.",
+      "overview_example": "Nếu bản cũ hỏi mã đơn khi thiếu thông tin còn bản mới tự đoán mã, tình huống thử phải phát hiện được thay đổi này.",
+      "overview_diagram": {"caption": "Từ lần chạy sai đến ca kiểm tra", "stages": [["Chạy tình huống thử"], ["Đọc nhật ký để tìm bước sai"], ["Ghi loại lỗi và cách chấm"], ["Thử lại khi có phiên bản mới"]]},
       "day": 9,
       "title": "Evaluation & Failure Analysis · LogiX-VN",
       "work_mode": "individual",
@@ -2599,6 +2626,9 @@
     },
     {
       "id": "day10",
+      "overview": "Nhóm quyết định sản phẩm đã sẵn sàng cho một đợt dùng thử nhỏ chưa. Trước khi chạy thử, cả nhóm thống nhất kết quả nào được xem là đạt.",
+      "overview_example": "Giả sử nhóm đặt mục tiêu xử lý đúng ít nhất 9 trong 10 yêu cầu. Nếu chỉ đúng 8, nhóm cần ghi rõ lỗi nào phải sửa trước khi cho người dùng thử.",
+      "overview_diagram": {"caption": "Quyết định cho dùng thử", "stages": [["Chốt tiêu chí trước khi đo"], ["Chạy thử và ghi kết quả"], ["Đối chiếu với tiêu chí"], ["Đạt: cho dùng thử", "Chưa đạt: ghi lỗi cần sửa"]]},
       "day": 10,
       "title": "From PoC to Pilot · Gate 1",
       "work_mode": "group",
@@ -2862,6 +2892,9 @@
     },
     {
       "id": "day11",
+      "overview": "Bạn đặt quy tắc để trợ lý AI xử lý yêu cầu có dữ liệu nhạy cảm và biết lúc nào cần người duyệt. Sau đó, bạn kiểm tra xem các quy tắc có hoạt động như dự kiến.",
+      "overview_example": "Khi có người hỏi email riêng của học viên, hãy kiểm tra xem trợ lý có giữ kín địa chỉ đó và giải thích được lý do hay không.",
+      "overview_diagram": {"caption": "Các lớp bảo vệ quanh trợ lý", "stages": [["Kiểm tra yêu cầu đầu vào"], ["Xử lý trong phạm vi cho phép"], ["Kiểm tra kết quả đầu ra"], ["Trả kết quả phù hợp", "Chuyển người duyệt khi cần"]]},
       "day": 11,
       "title": "Controlled Agent Security · Guardrails & HITL",
       "work_mode": "individual",
@@ -3093,6 +3126,9 @@
     },
     {
       "id": "day12",
+      "overview": "Nhóm làm dự án Quán Ăn Chợ Nổi qua bốn giai đoạn, từ lúc ghi yêu cầu đến khi bàn giao phiên bản chạy được. Đề chi tiết của từng giai đoạn nằm trên Lab Board.",
+      "overview_example": "Chọn một yêu cầu ở giai đoạn đầu, tìm bài kiểm tra tương ứng rồi chỉ ra phiên bản nào đã vượt qua bài kiểm tra đó.",
+      "overview_diagram": {"caption": "Lần theo một yêu cầu đến bản phát hành", "stages": [["Yêu cầu ban đầu"], ["Bài kiểm tra tương ứng"], ["Kết quả trên phiên bản cụ thể"], ["Bằng chứng bàn giao"]]},
       "day": 12,
       "title": "AI SDLC · Quán Ăn Chợ Nổi",
       "work_mode": "group",
@@ -3316,6 +3352,9 @@
     },
     {
       "id": "day13",
+      "overview": "Nhóm tính xem mỗi công việc AI làm thành công tốn bao nhiêu tiền. Từ đó, nhóm lên kế hoạch dùng thử và chọn các số liệu cần theo dõi.",
+      "overview_example": "Giả sử chạy 10 yêu cầu tốn tổng cộng 20.000 đồng và 8 yêu cầu thành công. Chi phí cho mỗi yêu cầu thành công là 2.500 đồng.",
+      "overview_diagram": {"caption": "Chi phí của một việc thành công", "stages": [["Tổng chi phí: 20.000 đồng"], ["Chia cho 8 yêu cầu thành công"], ["2.500 đồng cho mỗi lần thành công"]]},
       "day": 13,
       "title": "Định giá agent và lập kế hoạch pilot · Gate 2a",
       "work_mode": "group",
@@ -3566,6 +3605,9 @@
     },
     {
       "id": "day14",
+      "overview": "Bạn đưa ứng dụng đang chạy trên máy mình lên môi trường để người khác dùng. Sau đó, bạn đo tốc độ phản hồi và tập tìm nguyên nhân khi ứng dụng gặp lỗi.",
+      "overview_example": "Nếu cùng một yêu cầu chạy nhanh trên máy bạn nhưng chậm sau khi triển khai, hãy so thời gian phản hồi và xem nhật ký của lần chạy chậm.",
+      "overview_diagram": {"caption": "Cách kiểm tra ứng dụng sau triển khai", "stages": [["Chạy trên máy cá nhân"], ["Đóng gói và triển khai"], ["Gửi yêu cầu thử và đo thời gian"], ["Xem nhật ký để tìm chỗ chậm"]]},
       "day": 14,
       "title": "Deployment, Benchmark & Observability",
       "work_mode": "individual",

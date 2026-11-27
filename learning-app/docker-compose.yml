@@ -14,10 +14,13 @@ services:
       USE_REMOTE_EMBEDDINGS: ${USE_REMOTE_EMBEDDINGS:-0}
     volumes:
       - learning_data:/data
+      - ../data/lab-mapping:/app/data/lab-mapping:ro
     restart: unless-stopped
 
   frontend:
-    build: ./frontend
+    build:
+      context: ..
+      dockerfile: learning-app/frontend/Dockerfile
     ports:
       - "5173:80"
     depends_on:

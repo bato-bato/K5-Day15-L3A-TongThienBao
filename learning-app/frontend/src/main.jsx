@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChatBot } from './ChatBot.jsx';
 import { CourseTree } from './CourseTree.jsx';
+import { LabGuide } from './LabGuide.jsx';
 import { Mindmap } from './Mindmap.jsx';
 import './style.css';
 
 const EMPTY = { nodes: [] };
-const TABS = { mindmaps: 'Mindmap (KG)', lab: 'Lab Mapping' };
+const TABS = { mindmaps: 'Mindmap (KG)', lab: 'Lab' };
 const DAYS = Array.from({ length: 14 }, (_, index) => index + 1);
 const QUICK_QUERIES = ['CP1', 'CP2', 'CP3', 'CP4', 'Lethal Trifecta', 'Cost-of-Pass', 'Rogan-Gladen', 'FTS5'];
 
@@ -290,6 +291,7 @@ function App() {
   const [saving, setSaving] = useState({});
   const [messages, setMessages] = useState({});
   const [selectedId, setSelectedId] = useState(null);
+  const [labCheckpoint, setLabCheckpoint] = useState(null);
 
   const [dayMenuOpen, setDayMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -338,7 +340,7 @@ function App() {
     const nodes = (edits[mapKey] ?? workspace?.mindmaps?.[targetDay] ?? EMPTY).nodes;
     const target = nodes.find(n => n.source_ref?.concept_id === conceptId);
     setTab('mindmaps');
-    if (view === 'lab') setView('mindmaps');
+    if (tab === 'lab') setView('mindmaps');
     setDay(targetDay);
     setSelectedId(target ? target.id : null);
   }
@@ -350,12 +352,9 @@ function App() {
 
   function switchView(nextView) {
     setView(nextView);
-    if (nextView === 'tree') {
-      setTab('mindmaps');
-    } else if (nextView === 'lab') {
-      setTab('lab');
-    }
+    setTab(nextView === 'lab' ? 'lab' : 'mindmaps');
     setSelectedId(null);
+    setMapperOpen(false);
   }
 
   async function load() {
@@ -566,17 +565,18 @@ function App() {
               </svg>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-slate-800 tracking-tight text-sm hidden sm:inline">Sơ đồ Mindmap AI</span>
-              <span className="bg-blue-100 text-blue-700 text-[10px] font-semibold px-1.5 py-0.5 rounded border border-blue-200">
-                AI Mindmap
-              </span>
+              <span className="font-bold text-slate-800 tracking-tight text-sm hidden sm:inline">AI20K</span>
             </div>
           </div>
+          <nav className="workspace-view-tabs" aria-label="Khu vực học">
+            <button type="button" aria-current={tab === 'mindmaps' ? 'page' : undefined} onClick={() => switchView('tree')}>Mindmap</button>
+            <button type="button" aria-current={tab === 'lab' ? 'page' : undefined} onClick={() => switchView('lab')}>Lab</button>
+          </nav>
 
           <div className="h-4 w-px bg-slate-300 mx-1 hidden sm:block" />
 
           {/* Active Topic / Day Selector Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+          {view !== 'lab' && <div className="relative hidden md:block" ref={dropdownRef}>
             <button
               type="button"
               onClick={() => setDayMenuOpen(o => !o)}
@@ -584,7 +584,7 @@ function App() {
             >
               <span className={`w-2 h-2 rounded-full ${view === 'tree' ? 'bg-blue-600' : 'bg-purple-500'}`} />
               <span className="truncate max-w-[230px] sm:max-w-[280px]">
-                {view === 'tree'
+                {tab === 'mindmaps'
                   ? `D${day} · Mindmap: ${activeTitle}`
                   : `D${day} · Lab: ${activeTitle}`}
               </span>
@@ -633,11 +633,11 @@ function App() {
                 </div>
               </div>
             )}
-          </div>
+          </div>}
         </div>
 
         {/* Center: Search Quick Action */}
-        <div className="hidden lg:flex items-center">
+        {view !== 'lab' && <div className="hidden lg:flex items-center">
           <form
             className="relative"
             onSubmit={e => {
@@ -673,10 +673,10 @@ function App() {
               </span>
             )}
           </form>
-        </div>
+        </div>}
 
         {/* Right: Canvas Controls, Save, Export, AI GraphRAG, Avatar */}
-        <div className="flex items-center space-x-2">
+        {view !== 'lab' && <div className="flex items-center space-x-2">
           <button
             type="button"
             onClick={() => setShowGrid(g => !g)}
@@ -741,12 +741,23 @@ function App() {
           <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-600 hidden sm:flex items-center justify-center text-white text-[11px] font-bold border border-white shadow-sm ring-1 ring-slate-200">
             AI
           </div>
-        </div>
+        </div>}
       </header>
 
       {/* MainWorkspace */}
       <main className="flex-1 relative overflow-hidden flex" aria-label={`${TABS[tab]} · Ngày ${day}`}>
-        {!workspace ? (
+        {view === 'lab' ? (
+          <LabGuide
+            day={day}
+            onDayChange={selectDay}
+            selection={labCheckpoint}
+            onSelect={setLabCheckpoint}
+            workspace={workspace}
+            loadError={loadError}
+            onRetry={load}
+            onJumpToConcept={jumpToConcept}
+          />
+        ) : !workspace ? (
           <section className="flex-1 flex flex-col items-center justify-center gap-3 text-sm text-slate-500">
             {loadError ? (
               <>
@@ -785,7 +796,7 @@ function App() {
             }}
             onOpenMapper={() => setMapperOpen(open => !open)}
             onSwitchView={switchView}
-            onSwitchContentTab={t => { setTab(t); setSelectedId(null); }}
+            onSwitchContentTab={t => switchView(t === 'lab' ? 'lab' : 'tree')}
           />
         ) : (
           <Mindmap
@@ -802,7 +813,7 @@ function App() {
             day={day}
             tab={tab}
             onSwitchDay={selectDay}
-            onSwitchTab={t => { setTab(t); setView(t); setSelectedId(null); }}
+            onSwitchTab={t => switchView(t === 'lab' ? 'lab' : 'mindmaps')}
             onSwitchView={switchView}
           />
         )}
@@ -1558,7 +1569,7 @@ function App() {
         })()}
       </main>
 
-      {workspace && <ChatBot day={day} focus={chatFocus} onJumpToConcept={jumpToConcept} />}
+      {workspace && view !== 'lab' && <ChatBot day={day} focus={chatFocus} onJumpToConcept={jumpToConcept} />}
     </div>
   );
 }

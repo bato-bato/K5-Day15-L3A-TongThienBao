@@ -1,0 +1,14 @@
+**
+!learning-app/
+!learning-app/frontend/
+!learning-app/frontend/package.json
+!learning-app/frontend/package-lock.json
+!learning-app/frontend/index.html
+!learning-app/frontend/vite.config.js
+!learning-app/frontend/nginx.conf
+!learning-app/frontend/src/
+!learning-app/frontend/src/**
+!data/
+!data/lab-mapping/
+!data/lab-mapping/labs.json
+!data/lab-mapping/knowledge-graph.json
