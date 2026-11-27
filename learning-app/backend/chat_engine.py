@@ -23,7 +23,14 @@ from typing import Any
 import httpx
 
 from graph_db import get_all_graph_nodes, traverse_subgraph
-from guardrails import check_input_guard, spotlight
+from guardrails import (
+    check_input_guard,
+    check_output_guard,
+    redact_sensitive_data,
+    sanitize_chat_history,
+    sanitize_text,
+    spotlight,
+)
 from kg_builder import nfc
 from semantic_engine import hybrid_search, tokenize_text
 
@@ -433,16 +440,27 @@ def chat_turn(
     prev_citation_ids: list[str] | None = None,
 ) -> dict[str, Any]:
     t0 = time.perf_counter()
-    msg = nfc(message or "")
+    msg = sanitize_text(message or "")
     level = level if level in LEVELS else "standard"
     guard = check_input_guard(msg)
     if guard["blocked"]:
+        logger.warning(json.dumps({"event": "chat_blocked", "rules": len(guard["matched_rules"])}, ensure_ascii=False))
         return {
             "answer": f"⚠️ Mình không thể xử lý yêu cầu này: {guard['reason']}",
             "blocked": True, "abstained": True, "intent": None, "level": level,
             "citations": [], "prerequisites": [], "suggestions": [],
+            "security": {
+                "input_guard": "blocked",
+                "output_guard": "skipped",
+                "redacted_types": [],
+                "history_sanitized": 0,
+            },
+            "sanitized_message": None,
             "trace": {"guard": guard["matched_rules"], "latency_ms": round((time.perf_counter() - t0) * 1000)},
         }
+
+    msg, input_redacted = redact_sensitive_data(msg)
+    clean_history, history_dropped = sanitize_chat_history(history or [], MAX_HISTORY_TURNS)
 
     intent = detect_intent(msg)
     if intent == "simplify":
@@ -459,16 +477,23 @@ def chat_turn(
         meta: dict[str, Any] = {"llm_used": False, "reason": "no_grounding"}
         valid, rejected = [], []
         abstained = True
+        out_guard: dict[str, Any] = {"blocked": False, "text": answer, "redacted_types": [], "flags": []}
     else:
-        messages = build_messages(msg, history or [], intent, level, context, relations)
+        messages = build_messages(msg, clean_history, intent, level, context, relations)
         answer, meta = call_llm(messages, intent)
         if not answer:
             answer = extractive_answer(intent, citable, relations)
-        answer, valid, rejected = verify_citations(answer, {n["id"] for n in citable})
-        abstained = False
+        out_guard = check_output_guard(answer)
+        answer = out_guard["text"]
+        if out_guard["blocked"]:
+            valid, rejected = [], []
+            abstained = True
+        else:
+            answer, valid, rejected = verify_citations(answer, {n["id"] for n in citable})
+            abstained = False
 
     by_id = {n["id"]: n for n in citable}
-    cite_ids = valid or [n["id"] for n in citable[:2]]
+    cite_ids = [] if out_guard["blocked"] else (valid or [n["id"] for n in citable[:2]])
     citations = [
         {
             "id": cid,
@@ -480,23 +505,35 @@ def chat_turn(
         }
         for cid in cite_ids if cid in by_id
     ]
+    all_redacted = sorted(set(input_redacted + out_guard["redacted_types"]))
+    security = {
+        "input_guard": "redacted" if input_redacted else "passed",
+        "output_guard": "blocked" if out_guard["blocked"] else ("redacted" if out_guard["redacted_types"] else "passed"),
+        "redacted_types": all_redacted,
+        "history_sanitized": history_dropped,
+    }
     trace = {
         **meta,
         "cleaned_query": r["cleaned_query"],
         "seeds": [{"id": s, "reason": r["seed_reason"].get(s)} for s in r["seeds"]],
         "context_chars": len(context),
         "rejected_citations": rejected,
+        "input_redacted": input_redacted,
+        "history_dropped": history_dropped,
+        "output_flags": out_guard["flags"],
         "latency_ms": round((time.perf_counter() - t0) * 1000),
     }
     logger.info(json.dumps({"event": "chat_turn", "intent": intent, "level": level, "msg_len": len(msg), **{k: v for k, v in trace.items() if k != "cleaned_query"}}, ensure_ascii=False))
     return {
         "answer": answer,
-        "blocked": False,
+        "blocked": out_guard["blocked"],
         "abstained": abstained,
         "intent": intent,
         "level": level,
         "citations": citations,
-        "prerequisites": [{"id": n["id"], "label": n["label"], "day": n["day"]} for n in relations["prerequisites"][:3]],
-        "suggestions": suggest_followups(intent, level, citable, relations),
+        "prerequisites": [] if out_guard["blocked"] else [{"id": n["id"], "label": n["label"], "day": n["day"]} for n in relations["prerequisites"][:3]],
+        "suggestions": [] if out_guard["blocked"] else suggest_followups(intent, level, citable, relations),
+        "security": security,
+        "sanitized_message": msg if input_redacted else None,
         "trace": trace,
     }

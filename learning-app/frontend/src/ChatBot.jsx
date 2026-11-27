@@ -158,19 +158,35 @@ export function ChatBot({ day, focus, onJumpToConcept }) {
           prev_citation_ids: (lastBot?.citations || []).map(c => c.id).slice(0, 4),
         }),
       });
+      if (res.status === 429) {
+        const errBody = await res.json().catch(() => ({}));
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          error: true,
+          content: `⏳ ${errBody.detail || 'Bạn đang gửi quá nhanh. Vui lòng đợi vài giây rồi thử lại nhé.'}`,
+        }]);
+        return;
+      }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: data.answer,
-        citations: data.citations,
-        prerequisites: data.prerequisites,
-        suggestions: data.suggestions,
-        level: data.level,
-        intent: data.intent,
-        abstained: data.abstained,
-        llmUsed: data.trace?.llm_used,
-      }]);
+      setMessages(prev => {
+        const updated = data.sanitized_message
+          ? prev.map((m, i) => (i === prev.length - 1 && m.role === 'user' ? { ...m, content: data.sanitized_message } : m))
+          : prev;
+        return [...updated, {
+          role: 'assistant',
+          content: data.answer,
+          citations: data.citations,
+          prerequisites: data.prerequisites,
+          suggestions: data.suggestions,
+          level: data.level,
+          intent: data.intent,
+          blocked: data.blocked,
+          abstained: data.abstained,
+          security: data.security,
+          llmUsed: data.trace?.llm_used,
+        }];
+      });
     } catch (err) {
       setMessages(prev => [...prev, { role: 'assistant', error: true, content: `Không gọi được Gia sư AI (${err.message}). Thử lại sau nhé.` }]);
     } finally {
@@ -268,7 +284,17 @@ export function ChatBot({ day, focus, onJumpToConcept }) {
             </div>
           ) : (
             <div key={idx} className="flex justify-start">
-              <div className={`max-w-[92%] px-3.5 py-3 rounded-2xl rounded-bl-sm border shadow-sm ${m.error ? 'bg-rose-50 border-rose-200 text-rose-800' : m.abstained ? 'bg-amber-50 border-amber-200 text-slate-700' : 'bg-white border-slate-200 text-slate-700'}`}>
+              <div className={`max-w-[92%] px-3.5 py-3 rounded-2xl rounded-bl-sm border shadow-sm ${m.error || m.blocked ? 'bg-rose-50 border-rose-200 text-rose-900' : m.abstained ? 'bg-amber-50 border-amber-200 text-slate-700' : 'bg-white border-slate-200 text-slate-700'}`}>
+                {m.blocked && (
+                  <div className="mb-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-100 border border-rose-200 text-rose-800 text-[10.5px] font-semibold">
+                    🛡️ Guardrail đã chặn yêu cầu không an toàn
+                  </div>
+                )}
+                {m.security?.redacted_types?.length > 0 && (
+                  <div className="mb-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-[10.5px]">
+                    🔒 Đã tự động ẩn thông tin nhạy cảm trước khi xử lý
+                  </div>
+                )}
                 <Markdown text={m.content} citations={m.citations} onCite={c => onJumpToConcept?.(c.id, c.day)} />
 
                 {m.prerequisites?.length > 0 && (

@@ -9,8 +9,12 @@ Implements:
 """
 from __future__ import annotations
 
+import math
 import re
+import threading
+import time
 import unicodedata
+from collections import defaultdict, deque
 from typing import Any
 
 INJECTION_PATTERNS = [
@@ -21,20 +25,70 @@ INJECTION_PATTERNS = [
     re.compile(r"bỏ\s+qua\s+(toàn\s+bộ\s+)?(chỉ\s+dẫn|hướng\s+dẫn)\s+(trước|gốc)", re.IGNORECASE),
     re.compile(r"tiết\s+lộ\s+system\s+prompt", re.IGNORECASE),
     re.compile(r"xóa\s+(cơ\s+sở\s+dữ\s+liệu|database)", re.IGNORECASE),
+    # System prompt exfiltration
+    re.compile(r"(show|print|dump|output|repeat|leak)\s+(me\s+)?(your\s+|the\s+)?(system\s+prompt|hidden\s+instructions?|developer\s+message)", re.IGNORECASE),
+    re.compile(r"(in\s+ra|hiển\s+thị|cho\s+(tôi|mình)\s+xem|đọc\s+lại)\s+(system\s+prompt|chỉ\s+dẫn\s+hệ\s+thống|prompt\s+gốc)", re.IGNORECASE),
+    # Jailbreak / persona hijack
+    re.compile(r"(you\s+are\s+now|act\s+as|pretend\s+(to\s+be|you\s+are))\s+(dan|an?\s+unrestricted|jailbroken|root|admin|system)", re.IGNORECASE),
+    re.compile(r"(developer|god|jailbreak)\s+mode", re.IGNORECASE),
+    re.compile(r"(quên\s+(hết|toàn\s+bộ)|hãy\s+đóng\s+vai)\s+(chỉ\s+dẫn|quy\s+tắc|hacker|admin|không\s+giới\s+hạn)", re.IGNORECASE),
+    # Delimiter / role spoofing
+    re.compile(r"<\s*/?\s*(system|kg_context|untrusted_user_question|untrusted_history)\s*>", re.IGNORECASE),
+    re.compile(r"(?m)^\s*(system|developer)\s*:\s*", re.IGNORECASE),
+    # Secret / env exfiltration
+    re.compile(r"(print|show|dump|read|reveal|cat|echo)\s+.{0,40}(\.env|api[_\s-]?key|secret[_\s-]?key|openai_api_key|llm_api_key)", re.IGNORECASE),
+]
+
+ZERO_WIDTH_BIDI_RE = re.compile(r"[\u200b-\u200f\u202a-\u202e\u2060\ufeff]")
+CTRL_CHARS_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+DELIMITER_TAG_RE = re.compile(
+    r"<(/?(?:kg_context|untrusted_[a-z_]+|system|assistant|user|instruction|prompt)\b[^>]*)>",
+    re.IGNORECASE,
+)
+
+PII_SECRET_PATTERNS: list[tuple[str, re.Pattern[str], str]] = [
+    ("api_key", re.compile(r"sk-[A-Za-z0-9_-]{20,}"), "[REDACTED_SECRET]"),
+    ("api_key", re.compile(r"AIza[0-9A-Za-z_-]{30,}"), "[REDACTED_SECRET]"),
+    ("api_key", re.compile(r"gh[pousr]_[A-Za-z0-9]{20,}"), "[REDACTED_SECRET]"),
+    ("api_key", re.compile(r"AKIA[0-9A-Z]{16}"), "[REDACTED_SECRET]"),
+    ("api_key", re.compile(r"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"), "[REDACTED_SECRET]"),
+    ("email", re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"), "[REDACTED_EMAIL]"),
+    ("phone_vn", re.compile(r"(?<!\d)(?:\+84|0)(?:3|5|7|8|9)\d{8}(?!\d)"), "[REDACTED_PHONE]"),
+    ("national_id", re.compile(r"(?<!\d)0\d{11}(?!\d)"), "[REDACTED_ID]"),
+]
+
+OUTPUT_LEAK_PATTERNS = [
+    re.compile(r"<\s*/?\s*(kg_context|untrusted_user_question|untrusted_history)\s*>", re.IGNORECASE),
+    re.compile(r"Nội dung trong <untrusted_\*>", re.IGNORECASE),
+    re.compile(r"\b(OPENAI_API_KEY|LLM_API_KEY)\b"),
+]
+DANGEROUS_HTML_PATTERNS = [
+    re.compile(r"<script\b[^>]*>.*?</script>", re.IGNORECASE | re.DOTALL),
+    re.compile(r"<iframe\b[^>]*>.*?</iframe>", re.IGNORECASE | re.DOTALL),
+    re.compile(r"javascript\s*:", re.IGNORECASE),
 ]
 
 MAX_QUERY_CHARS = 2000
 
 
+def sanitize_text(text: str) -> str:
+    """Normalize NFC and strip zero-width/bidi/control characters used to obfuscate injections."""
+    normalized = unicodedata.normalize("NFC", text or "")
+    normalized = ZERO_WIDTH_BIDI_RE.sub("", normalized)
+    return CTRL_CHARS_RE.sub("", normalized)
+
+
 def spotlight(text: str, tag: str) -> str:
     """Wrap untrusted user/repo/note payload in XML delimiters to prevent Context Bleed (Day 4 & 11)."""
-    clean = unicodedata.normalize("NFC", text).replace(f"</{tag}>", f"&lt;/{tag}&gt;")
+    clean = sanitize_text(text)
+    clean = DELIMITER_TAG_RE.sub(r"&lt;\1&gt;", clean)
+    clean = clean.replace(f"</{tag}>", f"&lt;/{tag}&gt;")
     return f"<{tag}>\n{clean}\n</{tag}>"
 
 
 def check_input_guard(text: str) -> dict[str, Any]:
     """Screen input query for length limits and direct/indirect prompt injection patterns."""
-    normalized = unicodedata.normalize("NFC", text or "").strip()
+    normalized = sanitize_text(text).strip()
     if not normalized:
         return {"blocked": True, "reason": "Empty query", "matched_rules": ["empty_input"]}
     if len(normalized) > MAX_QUERY_CHARS:
@@ -57,6 +111,109 @@ def check_input_guard(text: str) -> dict[str, Any]:
         }
 
     return {"blocked": False, "reason": "OK", "matched_rules": []}
+
+
+def redact_sensitive_data(text: str) -> tuple[str, list[str]]:
+    """Mask API keys, tokens, and PII before sending to LLM, logging, or returning to client."""
+    out = sanitize_text(text)
+    detected: set[str] = set()
+    for kind, pattern, replacement in PII_SECRET_PATTERNS:
+        out, count = pattern.subn(replacement, out)
+        if count > 0:
+            detected.add(kind)
+    return out, sorted(detected)
+
+
+def sanitize_chat_history(history: list[dict[str, str]], max_turns: int = 6) -> tuple[list[dict[str, str]], int]:
+    """Filter poisoned turns and redact sensitive data from conversation history."""
+    clean: list[dict[str, str]] = []
+    dropped = 0
+    for turn in (history or [])[-max_turns:]:
+        role = turn.get("role")
+        if role not in ("user", "assistant"):
+            continue
+        raw_content = sanitize_text(turn.get("content", ""))[:1200]
+        if not raw_content.strip():
+            continue
+        redacted, _ = redact_sensitive_data(raw_content)
+        guard = check_input_guard(redacted)
+        if guard["blocked"]:
+            dropped += 1
+            continue
+        clean.append({"role": role, "content": redacted})
+    return clean, dropped
+
+
+def check_output_guard(text: str) -> dict[str, Any]:
+    """Screen assistant output for system-prompt leakage, leaked secrets/PII, and unsafe HTML."""
+    cleaned, redacted_types = redact_sensitive_data(text or "")
+    flags: list[str] = []
+
+    for pattern in OUTPUT_LEAK_PATTERNS:
+        if pattern.search(cleaned):
+            flags.append("prompt_leakage")
+            return {
+                "blocked": True,
+                "text": "⚠️ Phản hồi đã bị chặn bởi Output Guardrail để bảo vệ cấu hình hệ thống. Bạn vui lòng hỏi lại về nội dung bài học nhé.",
+                "redacted_types": redacted_types,
+                "flags": flags,
+            }
+
+    before_xss = cleaned
+    for pattern in DANGEROUS_HTML_PATTERNS:
+        cleaned = pattern.sub("", cleaned)
+    if cleaned != before_xss:
+        flags.append("xss_stripped")
+
+    return {
+        "blocked": False,
+        "text": cleaned.strip(),
+        "redacted_types": redacted_types,
+        "flags": flags,
+    }
+
+
+class SlidingWindowRateLimiter:
+    """Thread-safe in-memory sliding-window rate limiter keyed by workspace/client."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._hits: dict[str, deque[float]] = defaultdict(deque)
+        self._ops = 0
+
+    def check(self, key: str, max_requests: int, window_seconds: int) -> tuple[bool, int]:
+        now = time.monotonic()
+        cutoff = now - max(1, window_seconds)
+        with self._lock:
+            self._ops += 1
+            if self._ops % 100 == 0:
+                stale = [k for k, dq in self._hits.items() if not dq or dq[-1] <= cutoff]
+                for k in stale:
+                    del self._hits[k]
+
+            dq = self._hits[key]
+            while dq and dq[0] <= cutoff:
+                dq.popleft()
+
+            if len(dq) >= max(1, max_requests):
+                retry_after = max(1, math.ceil(dq[0] + window_seconds - now))
+                return False, retry_after
+
+            dq.append(now)
+            return True, 0
+
+    def clear(self) -> None:
+        with self._lock:
+            self._hits.clear()
+            self._ops = 0
+
+
+chat_rate_limiter = SlidingWindowRateLimiter()
+
+
+def reset_rate_limiter() -> None:
+    """Reset the shared chat rate limiter (primarily for isolated tests)."""
+    chat_rate_limiter.clear()
 
 
 def verify_mapping(
