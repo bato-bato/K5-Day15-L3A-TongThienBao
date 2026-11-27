@@ -2320,7 +2320,7 @@
         "step-budget",
         "agent-trace"
       ],
-      "self_check": "Làm sao phân biệt hết giới hạn bước với hoàn thành bình thường?",
+      "self_check": "Mở mục cuối của trace. Đối chiếu số vòng đã chạy với giới hạn bước và kiểm tra agent có trả kết quả cuối hay dừng vì hết lượt.",
       "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L30-L35",
       "code_guides": [
         {
@@ -2674,7 +2674,7 @@
         "grounding",
         "step-budget"
       ],
-      "self_check": "ID nguồn hợp lệ chứng minh điều gì, và bạn còn phải kiểm gì?",
+      "self_check": "Mở đoạn nguồn được trích. Kiểm tra ID của đoạn có trong context đã đưa cho model và nội dung đoạn có thực sự hỗ trợ khẳng định trong câu trả lời.",
       "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L8",
       "code_guides": [
         {
@@ -3022,7 +3022,7 @@
         "acceptance-threshold",
         "quality-gate"
       ],
-      "self_check": "Ngưỡng nào khiến nhóm phải đổi từ tiếp tục sang dừng?",
+      "self_check": "So thời điểm chốt tiêu chí (commit hoặc bản đã ký) với thời điểm bắt đầu eval. Ngưỡng phải được ghi trước khi có kết quả để tránh điều chỉnh theo điểm nhìn thấy.",
       "lab_source_url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L13-L19",
       "code_guides": []
     },

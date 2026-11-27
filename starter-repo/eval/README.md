@@ -55,3 +55,5 @@ Số câu đạt trong bảng dùng để rà cách áp dụng tiêu chí cho ou
 | Lượt | Run ID | Model | Cấu hình | Đạt / tổng | thuong | kho | tu_choi | Trích dẫn / lỗi kỹ thuật | Chi tiết |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | `run-1@20261127-232931` | `gpt-4o-mini` | `MODEL_PROVIDER=openai`, `temperature=0.2`, `response_format=json_object` (khi system yêu cầu JSON) | `16/20` (80%) | `8/11` | `6/6` | `2/3` | 0 nguồn bịa · 0 lỗi kỹ thuật | [run-1.csv](run-1.csv) · [report.md](report.md) |
+
+| 2 | `run-2@20261128-014840` | `gpt-4o-mini` | `MODEL_PROVIDER=openai`, temperature mặc định, JSON khi system yêu cầu | `19/20` (95%) | `11/11` | `6/6` | `2/3` | 0 nguồn bịa trong bộ câu · 0 lỗi kỹ thuật | [run-2.csv](run-2.csv) · [report.md](report.md) |

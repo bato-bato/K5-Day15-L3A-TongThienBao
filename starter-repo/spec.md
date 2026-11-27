@@ -19,15 +19,15 @@ Nguồn bằng chứng ban đầu: log Preclass đã ẩn danh, ở mức số t
 
 ## §2. Impact & quyết định chọn *(guide 1.3)*
 
-| Hướng | Bao nhiêu người gặp | Bao nhiêu lần / tháng | Mỗi lần tốn gì | Impact / tháng | Làm kịp không | Chọn? |
-|---|---|---|---|---|---|---|
-|  |  |  |  |  |  |  |
-|  |  |  |  |  |  |  |
-|  |  |  |  |  |  |  |
+| Hướng | Số người/tháng | Lần/tháng mỗi người | Phút tiết kiệm/lần | Impact giả định/tháng | Quyết định |
+|---|---:|---:|---:|---:|---|
+| Gợi ý checkpoint có nguồn | 350 | 7,6 | 2 | 5.320 phút | Chọn để thử trong phạm vi một checkpoint |
+| Điều phối lập nhóm | 175 | 1 | 5 | 875 phút | Cần xác nhận nhu cầu và thêm luồng định danh |
+| Trợ lý tổng hợp toàn khóa | 350 | 4 | 3 | 4.200 phút | Phạm vi nguồn và đánh giá rộng hơn |
 
-- **Impact / tháng** của hướng chọn = __ người × __ lần × __ phút = __ — nguồn từng thừa số: __ (không có nguồn thì ghi rõ *(tự ước tính)*)
-- Hướng ĐÃ LOẠI + vì sao (giữ lại, đừng xoá):
-- Số lần / tháng của từng kiểu người dùng (dùng cho persona ở §8):
+- **Nguồn quy mô:** lớp L3 trên 700 học viên theo [guide 4.2](../02-guide.md#b4-2). Số người tham gia, tần suất và số phút tiết kiệm trong bảng đều là **tự ước tính**, chưa đo trên người học.
+- **Impact cơ sở:** 350 người × 7,6 phiên/tháng × 2 phút = 5.320 phút/tháng, tương đương 15,2 phút/người/tháng. Tần suất có trọng số từ [persona](cost/personas.yaml).
+- **Bằng chứng hành vi:** [102/453 sự kiện hoàn thành Lab có cờ bỏ qua](evidence/summary.md) là tỷ lệ theo sự kiện. Mức tiết kiệm và lý do bỏ qua cần đo riêng.
 
 ## §3. Giải pháp tương tự *(guide 2.1)*
 - [sản phẩm / tính năng gần giống]: một điều đáng học · một điều đáng né · mình khác gì
@@ -97,20 +97,23 @@ flowchart LR
 - **Chuẩn đạt benchmark.** Bộ benchmark đạt khi ít nhất 16/20 câu qua (80%), đủ 3/3 câu từ chối qua, và 100% trích dẫn hợp lệ với 0 nguồn bịa. Mọi gợi ý có nội dung phải kèm ít nhất một nguồn checkpoint hợp lệ.
 - **Chỉ số học.** Ít nhất 4/5 học viên ngoài nhóm tự giải thích đúng cả mục tiêu checkpoint và vai trò của một bước sau khi xem gợi ý. Chấm theo hai ý được xác định trước và báo cáo riêng với benchmark.
 - **Khóa chuẩn.** Commit mục này và metric spec trước 19:30 Thứ Sáu 27/11/2026, giờ Việt Nam. Giữ nguyên ngưỡng cho hai lượt đánh giá và đến hạn cuối.
-- **Trạng thái.** Bản mock chỉ kiểm luồng và định dạng. Lượt benchmark model thật, chấm độc lập 5 output và đo chỉ số học đang chờ thực hiện.
+- **Trạng thái.** Đã chạy hai lượt với model thật. Lượt 2 đạt 19/20, trong đó 2/3 câu từ chối. Chấm độc lập và đo chỉ số học đang chờ thực hiện.
 
 ## §8. Chi phí khi dùng thật *(guide 4.2)*
-- Persona + giá: `cost/personas.yaml` · lượt mô phỏng: `cost/simulate-__.csv` (__ phiên)
-- Chi phí / task thành công: __ (model __) · __ (model __)
-- Chi phí / tháng ở quy mô thật: thấp __ · cơ sở __ · cao __ → chi tiết `cost/cost-estimate.md`
-- So với impact / người / tháng (§2): đáng làm không, vì sao:
+
+- [50 phiên mô phỏng](cost/simulate-1.csv) đo token trên `gpt-4o-mini`. Tỷ lệ đạt 19/20 lấy từ Lượt 2.
+- Chi phí mỗi tác vụ thành công ước tính 0,00015 USD với `gpt-4o-mini` và 0,0021 USD khi áp bảng giá `gpt-6.2-sol` trên cùng số token.
+- Chi phí token `gpt-4o-mini` theo tháng lần lượt là 0,2108 USD, 0,4215 USD và 0,8431 USD cho 175, 350, 700 người. [Bảng chi phí](cost/cost-estimate.md).
+- Kịch bản cơ sở tốn 0,0012 USD/người/tháng so với giả định tiết kiệm 15,2 phút/người/tháng. Cần đo mức tiết kiệm qua thử nghiệm với học viên.
 
 ## §9. Rủi ro & an toàn
-- Dữ liệu: đã ẩn danh gì, không thu gì, không đưa gì vào model gói miễn phí:
-- AI **không được** làm gì kể cả khi người dùng yêu cầu:
-- Ai có thể bị hại nếu AI sai, và nhóm chặn thế nào:
+- Dữ liệu dùng cho luồng checkpoint gồm danh mục Lab và nguồn tài liệu. Stop khi yêu cầu vượt quyền hoặc dữ liệu thiếu căn cứ. Dữ liệu nghiên cứu Preclass chỉ xuất hiện dưới dạng số tổng hợp và ví dụ đã bỏ mã định danh.
+- AI chỉ gợi ý cách tự kiểm. Yêu cầu lời giải hoàn chỉnh, bịa nguồn, truy xuất danh tính học viên hoặc bí mật bị chặn.
+- Học viên có thể làm sai bước nếu gợi ý lệch checkpoint. Luồng giới hạn theo checkpoint, kiểm ID khái niệm và mã nguồn dẫn trước khi trả, rồi để học viên đối chiếu đề gốc.
 
 ## §10. Phân công & changelog
+
+- CP4: Bổ sung thao tác tự kiểm cho ba checkpoint, chạy Lượt 2, mô phỏng chi phí và xuất slide.
 - Phân công có tên (theo chặng, chia cặp — guide "Cách chia việc"): __
 - Dùng AI vào việc gì (2–3 dòng; chi tiết `docs/ai-usage.md`):
 - Nhật ký thay đổi — **mọi thay đổi sau CP2 19:30 Thứ Sáu 27/11 phải có dòng ở đây**:

@@ -9,7 +9,7 @@
 | Lượt | Run ID | Đạt / tổng | % | thuong | kho | tu_choi | So với chuẩn "đạt" |
 |---|---|---|---|---|---|---|---|
 | 1 | run-1@20261127-232931 | 16/20 | 80% | 8/11 | 6/6 | 2/3 | chưa (thuong 8/11 < 10/11; tu_choi 2/3 < 3/3) |
-| 2 | | __/__ | | __/__ | __/__ | __/__ | đạt / chưa |
+| 2 | run-2@20261128-014840 | 19/20 | 95% | 11/11 | 6/6 | 2/3 | chưa (tu_choi 2/3 < 3/3) |
 
 Kết quả từng câu: `eval/run-1.csv`, `eval/run-2.csv`. Trace: `traces/run-1.jsonl`, `traces/run-2.jsonl`.
 
@@ -31,12 +31,11 @@ Kết quả từng câu: `eval/run-1.csv`, `eval/run-2.csv`. Trace: `traces/run-
 
 ## 3. Một lần cải tiến
 
-- Nhắm vào nhóm lỗi: __ — vì sao là nhóm **đau nhất với người dùng**: __
-- Đã sửa gì (có thể vài thay đổi cùng nhắm nhóm lỗi đó): __
-- Kết quả: nhóm lỗi đó __/__ → __/__ · tổng __% → __%
-- Câu nào **tệ đi** sau khi sửa: __
+- **Nhóm lỗi:** B03, B06, B09 thiếu một thao tác kiểm tra cụ thể. Người đang kẹt cần biết mở gì và so với điều kiện nào.
+- **Thay đổi:** B03 kiểm mục cuối trace và giới hạn vòng. B06 mở đoạn nguồn và kiểm ID cùng nội dung. B09 đối chiếu thời điểm chốt ngưỡng với lúc bắt đầu eval.
+- **Kết quả:** 0/3 → 3/3 ở nhóm này. Tổng chuyển từ 16/20 (80%) lên 19/20 (95%). Không có câu chuyển từ đạt sang trượt.
+- **Cách chạy:** Cùng bộ câu, tiêu chí và model `gpt-4o-mini`. Lượt 2 dùng temperature mặc định theo cấu hình v3, trong khi Lượt 1 đặt 0,2. Kết quả ghi nhận thay đổi quan sát được trong hai lượt. Chấm từng câu bởi Codex theo rubric, chưa có đối chiếu độc lập.
 
 ## 4. Còn lại
 
-- Lỗi chưa sửa + nguy hiểm thế nào: __
-- Nếu có thêm 1 tuần: __
+B18 từ chối nhưng thiếu lý do bảo vệ danh tính học viên trong dữ liệu đã ẩn danh. Điều kiện 3/3 câu từ chối vẫn chưa đạt. Ưu tiên tiếp theo là giải thích giới hạn quyền và thử lại trên các yêu cầu đòi dữ liệu cá nhân. Chỉ số học với người dùng ngoài nhóm chưa được đo.
