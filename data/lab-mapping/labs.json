@@ -1,0 +1,4067 @@
+{
+  "schema_version": 1,
+  "course": "AI20K K5",
+  "summary": {
+    "labs": 14,
+    "checkpoints": 77,
+    "evidence_records": 165,
+    "verified_in_template": 148
+  },
+  "semantics": {
+    "commit_sha": "Commit repo nguồn. Khi xử lý bài nộp, dùng commit repo học viên.",
+    "lecture_topics": "Khái niệm ứng viên. Slide gợi ý lấy từ notebook và cần đối chiếu Lecture.",
+    "evidence": "Locator và trạng thái từ repo nguồn. Bằng chứng của học viên phải đọc lại từ repo đã nhập.",
+    "verified_in_template": "File tồn tại trong commit nguồn và locator được kiểm tra nếu có.",
+    "sample_checks": "Kỳ vọng gợi ý chỉ dùng khi chấm hoặc rà soát."
+  },
+  "labs": [
+    {
+      "id": "day01",
+      "day": 1,
+      "title": "AI Foundation · Lọc SMS spam/ham",
+      "work_mode": "individual",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab",
+      "commit_sha": "e3b548168b0093ca9b0f7e75a35a1929ea1f48c8",
+      "checkpoints": [
+        {
+          "id": "day01-cp1",
+          "label": "CP1",
+          "title": "Bag-of-Words và Logistic Regression",
+          "requirement": "Chạy phần chuẩn bị dữ liệu và hoàn thành vector hóa, huấn luyện và đánh giá mô hình NumPy.",
+          "expected_deliverable": "Notebook đã làm và các kiểm tra phần 1, kèm giải thích bước cập nhật trọng số.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 5,
+            "line_end": 11,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L5-L11"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Bag-of-Words",
+              "Logistic regression",
+              "Gradient descent",
+              "Precision và recall"
+            ],
+            "slide_hints": {
+              "numbers": [
+                4,
+                6
+              ],
+              "source_url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb",
+              "verified_against_lecture": false
+            }
+          },
+          "evidence": [
+            {
+              "id": "day01-cp1-e01",
+              "kind": "notebook",
+              "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "notebook_cell",
+                "cell_id": "54fa4ee2",
+                "symbols": [
+                  "vectorize"
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+            },
+            {
+              "id": "day01-cp1-e02",
+              "kind": "notebook",
+              "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "notebook_cell",
+                "cell_id": "dfd682b5",
+                "symbols": [
+                  "train_logreg"
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+            }
+          ]
+        },
+        {
+          "id": "day01-cp2",
+          "label": "CP2",
+          "title": "Deep Learning và Embedding",
+          "requirement": "So sánh MLP học đặc trưng với encoder có sẵn và dùng cosine, kNN trên vector.",
+          "expected_deliverable": "Notebook qua kiểm tra phần 2–3, có các hàng so sánh MLP và embedding.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 13,
+            "line_end": 19,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L13-L19"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "MLP",
+              "Embedding",
+              "Encoder tiền huấn luyện",
+              "Cosine similarity",
+              "kNN",
+              "Overfitting"
+            ],
+            "slide_hints": {
+              "numbers": [
+                6,
+                9,
+                14,
+                15
+              ],
+              "source_url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb",
+              "verified_against_lecture": false
+            }
+          },
+          "evidence": [
+            {
+              "id": "day01-cp2-e01",
+              "kind": "notebook",
+              "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "notebook_cell",
+                "cell_id": "6ee9d295",
+                "symbols": [
+                  "emb_model.encode"
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+            },
+            {
+              "id": "day01-cp2-e02",
+              "kind": "notebook",
+              "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "notebook_cell",
+                "cell_id": "718508a7",
+                "symbols": [
+                  "cosine_similarity",
+                  "top_k_similar"
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+            },
+            {
+              "id": "day01-cp2-e03",
+              "kind": "notebook",
+              "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "notebook_cell",
+                "cell_id": "cb4be31f",
+                "symbols": [
+                  "knn_predict"
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+            },
+            {
+              "id": "day01-cp2-e04",
+              "kind": "notebook",
+              "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "notebook_cell",
+                "cell_id": "b008ac1d",
+                "symbols": [
+                  "build_mlp"
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+            }
+          ]
+        },
+        {
+          "id": "day01-cp3",
+          "label": "CP3",
+          "title": "LLM, so sánh và nộp",
+          "requirement": "Phân loại SMS bằng prompt, đo chi phí và so các phương pháp theo F1, độ trễ và ca khó.",
+          "expected_deliverable": "Notebook, báo cáo cá nhân, JSON kết quả và ảnh tính tay theo hướng dẫn nộp.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 21,
+            "line_end": 27,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md#L21-L27"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Zero-shot và few-shot",
+              "Structured parsing",
+              "Chi phí token",
+              "F1",
+              "Pareto"
+            ],
+            "slide_hints": {
+              "numbers": [
+                16,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30
+              ],
+              "source_url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb",
+              "verified_against_lecture": false
+            }
+          },
+          "evidence": [
+            {
+              "id": "day01-cp3-e01",
+              "kind": "notebook",
+              "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "notebook_cell",
+                "cell_id": "c62adf28",
+                "symbols": [
+                  "build_classification_prompt",
+                  "parse_label"
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/src/day01_spam_ml_dl_embedding_llm.ipynb"
+            },
+            {
+              "id": "day01-cp3-e02",
+              "kind": "report",
+              "path": "report/individual/MSSV_HoTen.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/report/individual/MSSV_HoTen.md"
+            },
+            {
+              "id": "day01-cp3-e03",
+              "kind": "notebook",
+              "path": "report/individual/day01_lab.ipynb",
+              "state": "expected_generated",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            },
+            {
+              "id": "day01-cp3-e04",
+              "kind": "report",
+              "path": "report/individual/lab1_report.json",
+              "state": "expected_generated",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            }
+          ]
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/CHECKPOINTS.md"
+      },
+      "notes": "CP2 có cả MLP và Embedding. Ca mẫu tập trung vào Embedding.",
+      "submission_path_rules": [
+        {
+          "path": "report/individual/day01_lab.ipynb",
+          "kind": "learner_notebook",
+          "priority": 1
+        },
+        {
+          "path": "src/day01_spam_ml_dl_embedding_llm.ipynb",
+          "kind": "template_notebook",
+          "priority": 2
+        }
+      ],
+      "submission_instructions": "https://github.com/VinUni-AI20k/K5-L3-Day-01-AI-Foundation-Lab/blob/e3b548168b0093ca9b0f7e75a35a1929ea1f48c8/SUBMISSION.md"
+    },
+    {
+      "id": "day02",
+      "day": 2,
+      "title": "Discovery & Problem Framing",
+      "work_mode": "mixed",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming",
+      "commit_sha": "354e210608aba861c696c1434835497831aa7efd",
+      "checkpoints": [
+        {
+          "id": "day02-cp0",
+          "label": "CP0",
+          "title": "Đọc bài mẫu",
+          "requirement": "Đọc ví dụ để nhận diện một bài toán và dấu hiệu một quyết định có căn cứ.",
+          "expected_deliverable": "Ghi nhận cách nối bằng chứng với quyết định trong ví dụ.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 18,
+            "line_end": 24,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L18-L24"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Discovery",
+              "Bằng chứng vấn đề"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day02-cp0-e01",
+              "kind": "document",
+              "path": "docs/02-deliverable-example.md",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/docs/02-deliverable-example.md"
+            }
+          ]
+        },
+        {
+          "id": "day02-cp1",
+          "label": "CP1",
+          "title": "Quét vấn đề",
+          "requirement": "Ghi ít nhất năm vấn đề quan sát được với người dùng và tình huống cụ thể.",
+          "expected_deliverable": "Mục 2 báo cáo cá nhân có danh sách vấn đề.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 26,
+            "line_end": 39,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L26-L39"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Quan sát",
+              "Pain discovery"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day02-cp1-e01",
+              "kind": "report",
+              "path": "report/individual/MSSV_HoTen.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/report/individual/MSSV_HoTen.md"
+            }
+          ]
+        },
+        {
+          "id": "day02-cp2",
+          "label": "CP2",
+          "title": "Ba Problem Card và quy trình nháp",
+          "requirement": "Chọn ba ứng viên, viết Problem Card và phác quy trình hiện tại.",
+          "expected_deliverable": "Mục 3 báo cáo cá nhân có card và quy trình nháp.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 41,
+            "line_end": 60,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L41-L60"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Problem Card",
+              "Bottleneck",
+              "Quy trình hiện tại"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day02-cp2-e01",
+              "kind": "report",
+              "path": "report/individual/MSSV_HoTen.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/report/individual/MSSV_HoTen.md"
+            },
+            {
+              "id": "day02-cp2-e02",
+              "kind": "document",
+              "path": "docs/01-worksheet.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/docs/01-worksheet.md"
+            }
+          ]
+        },
+        {
+          "id": "day02-cp3",
+          "label": "CP3",
+          "title": "Hội tụ nhóm",
+          "requirement": "Tổng hợp ứng viên giữa các thành viên và chọn một bài toán để kiểm chứng.",
+          "expected_deliverable": "Mục 2 báo cáo nhóm ghi lựa chọn và lý do.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 62,
+            "line_end": 75,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L62-L75"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Hội tụ",
+              "Ưu tiên theo bằng chứng"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day02-cp3-e01",
+              "kind": "report",
+              "path": "report/team/group_report.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/report/team/group_report.md"
+            }
+          ]
+        },
+        {
+          "id": "day02-cp4",
+          "label": "CP4",
+          "title": "Kiểm chứng và nghiên cứu giải pháp",
+          "requirement": "Thu bằng chứng thực, kiểm lại giả định và xem các giải pháp hiện có.",
+          "expected_deliverable": "Mục 3 báo cáo nhóm ghi nguồn, phát hiện và khoảng trống.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 77,
+            "line_end": 91,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L77-L91"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Kiểm chứng giả thuyết",
+              "Giải pháp thay thế"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day02-cp4-e01",
+              "kind": "report",
+              "path": "report/team/group_report.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/report/team/group_report.md"
+            }
+          ]
+        },
+        {
+          "id": "day02-cp5",
+          "label": "CP5",
+          "title": "Quy trình trước và sau",
+          "requirement": "Vẽ hai quy trình, chỉ ra điểm nghẽn và viết Problem Statement v0.",
+          "expected_deliverable": "Mục 4–5 báo cáo nhóm có quy trình và phát biểu vấn đề.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 93,
+            "line_end": 113,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L93-L113"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "As-is và to-be",
+              "Problem Statement"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day02-cp5-e01",
+              "kind": "report",
+              "path": "report/team/group_report.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/report/team/group_report.md"
+            }
+          ]
+        },
+        {
+          "id": "day02-cp6",
+          "label": "CP6",
+          "title": "Mức can thiệp và quyết định",
+          "requirement": "Chọn Rule, Workflow hoặc Agent theo bằng chứng, chốt Problem Statement v1 và hướng xử lý.",
+          "expected_deliverable": "Mục 6–8 báo cáo nhóm có mức can thiệp, lý do và quyết định.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 115,
+            "line_end": 132,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L115-L132"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Rule",
+              "Workflow",
+              "Agent",
+              "Mức can thiệp"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day02-cp6-e01",
+              "kind": "report",
+              "path": "report/team/group_report.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/report/team/group_report.md"
+            }
+          ]
+        },
+        {
+          "id": "day02-cp7",
+          "label": "CP7",
+          "title": "Reflection cá nhân",
+          "requirement": "Ghi điều học được, đóng góp cá nhân và cách đã dùng AI.",
+          "expected_deliverable": "Mục 4–6 báo cáo cá nhân đã điền.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 134,
+            "line_end": 140,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md#L134-L140"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Reflection",
+              "Truy vết đóng góp"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day02-cp7-e01",
+              "kind": "report",
+              "path": "report/individual/MSSV_HoTen.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/report/individual/MSSV_HoTen.md"
+            }
+          ]
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5-L3-Day02-DiscoveryProblemFraming/blob/354e210608aba861c696c1434835497831aa7efd/CHECKPOINTS.md"
+      }
+    },
+    {
+      "id": "day03",
+      "day": 3,
+      "title": "Prompt Engineering & Tool Calling · Research Agent",
+      "work_mode": "group",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval",
+      "commit_sha": "c68da4cdb50c118c9f00622bd72e6cd7afc57b18",
+      "checkpoints": [
+        {
+          "id": "day03-cp1",
+          "label": "CP1",
+          "title": "Setup và baseline v0",
+          "requirement": "Chạy starter với provider thật, giữ prompt và tool declaration gốc để có baseline.",
+          "expected_deliverable": "Run v0, version log và phần phân tích lỗi baseline.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 5,
+            "line_end": 11,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L5-L11"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Baseline",
+              "Tool routing",
+              "Provider error"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day03-cp1-e01",
+              "kind": "code",
+              "path": "starter_v0/run_eval.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/starter_v0/run_eval.py"
+            },
+            {
+              "id": "day03-cp1-e02",
+              "kind": "document",
+              "path": "starter_v0/artifacts/system_prompt.md",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/starter_v0/artifacts/system_prompt.md"
+            },
+            {
+              "id": "day03-cp1-e03",
+              "kind": "report",
+              "path": "starter_v0/runs/<run-v0>.json",
+              "state": "expected_generated",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path_pattern"
+              },
+              "url": null
+            }
+          ]
+        },
+        {
+          "id": "day03-cp2",
+          "label": "CP2",
+          "title": "Cải tiến prompt và tool declaration",
+          "requirement": "Thử ba phiên bản, mỗi phiên bản thay đổi một giả thuyết và chạy lại base eval.",
+          "expected_deliverable": "Run v1–v3 và version log gồm hash, giả thuyết và metric.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 13,
+            "line_end": 19,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L13-L19"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Prompt engineering",
+              "Tool schema",
+              "Controlled comparison"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day03-cp2-e01",
+              "kind": "document",
+              "path": "starter_v0/artifacts/system_prompt.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/starter_v0/artifacts/system_prompt.md"
+            },
+            {
+              "id": "day03-cp2-e02",
+              "kind": "configuration",
+              "path": "starter_v0/artifacts/tools.yaml",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/starter_v0/artifacts/tools.yaml"
+            },
+            {
+              "id": "day03-cp2-e03",
+              "kind": "report",
+              "path": "starter_v0/artifacts/version_log.csv",
+              "state": "expected_generated",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/starter_v0/artifacts/version_log.csv"
+            }
+          ]
+        },
+        {
+          "id": "day03-cp3",
+          "label": "CP3",
+          "title": "Tool mới và unit test",
+          "requirement": "Đăng ký ít nhất một tool và kiểm trường hợp đúng, đầu vào xấu và nhánh lỗi.",
+          "expected_deliverable": "Tool, tài liệu contract và tối thiểu ba unit test.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 21,
+            "line_end": 27,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L21-L27"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Tool contract",
+              "Input validation",
+              "Unit test"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day03-cp3-e01",
+              "kind": "document",
+              "path": "starter_v0/tools/README.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/starter_v0/tools/README.md"
+            },
+            {
+              "id": "day03-cp3-e02",
+              "kind": "code",
+              "path": "starter_v0/tests/test_tools_todo.py",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/starter_v0/tests/test_tools_todo.py"
+            },
+            {
+              "id": "day03-cp3-e03",
+              "kind": "code",
+              "path": "starter_v0/tools/<tool>/tool.py",
+              "state": "expected_learner",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path_pattern"
+              },
+              "url": null
+            }
+          ]
+        },
+        {
+          "id": "day03-cp4",
+          "label": "CP4",
+          "title": "Eval nhóm 10 ca",
+          "requirement": "Tạo 5 ca một lượt và 5 ca nhiều lượt, có ca đi qua tool mới.",
+          "expected_deliverable": "Bộ ca nhóm và kết quả eval.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 29,
+            "line_end": 35,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L29-L35"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Multi-turn evaluation",
+              "Expected tool calls",
+              "Coverage"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day03-cp4-e01",
+              "kind": "configuration",
+              "path": "starter_v0/data/eval_group.json",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/starter_v0/data/eval_group.json"
+            },
+            {
+              "id": "day03-cp4-e02",
+              "kind": "code",
+              "path": "starter_v0/run_eval.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/starter_v0/run_eval.py"
+            },
+            {
+              "id": "day03-cp4-e03",
+              "kind": "report",
+              "path": "report/team/group_report.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/report/team/group_report.md"
+            }
+          ]
+        },
+        {
+          "id": "day03-cp5",
+          "label": "CP5",
+          "title": "UI và dùng thử",
+          "requirement": "Đưa agent lên UI, ghi tối thiểu ba hội thoại và hoàn thiện báo cáo.",
+          "expected_deliverable": "UI, transcript, link dùng thử và báo cáo.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 37,
+            "line_end": 43,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md#L37-L43"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "User testing",
+              "Clarification",
+              "Human approval"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day03-cp5-e01",
+              "kind": "code",
+              "path": "starter_v0/chat.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/starter_v0/chat.py"
+            },
+            {
+              "id": "day03-cp5-e02",
+              "kind": "report",
+              "path": "starter_v0/transcripts/<run>.transcript.json",
+              "state": "expected_generated",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path_pattern"
+              },
+              "url": null
+            },
+            {
+              "id": "day03-cp5-e03",
+              "kind": "report",
+              "path": "report/team/group_report.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/report/team/group_report.md"
+            }
+          ]
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5-L3-DAY03-ResearchAgentToolEval/blob/c68da4cdb50c118c9f00622bd72e6cd7afc57b18/CHECKPOINTS.md"
+      }
+    },
+    {
+      "id": "day04",
+      "day": 4,
+      "title": "ReAct Loop · Status Investigation Agent",
+      "work_mode": "individual",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent",
+      "commit_sha": "147982becd7097cc7930ea09589acb97389e84f4",
+      "checkpoints": [
+        {
+          "id": "day04-cp1",
+          "label": "CP1",
+          "title": "Cài đặt và khám phá tool",
+          "requirement": "Cấu hình provider và đọc đầu ra của hai tool trạng thái.",
+          "expected_deliverable": "Repo cá nhân chạy thử tool thành công.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 16,
+            "line_end": 21,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L16-L21"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Tool outputs",
+              "Giới hạn dữ liệu nguồn"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day04-cp1-e01",
+              "kind": "code",
+              "path": "status_tools.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/status_tools.py"
+            }
+          ]
+        },
+        {
+          "id": "day04-cp2",
+          "label": "CP2",
+          "title": "Agent loop",
+          "requirement": "Hoàn thành vòng lặp nhận tool call, ghi tool result vào hội thoại và tiếp tục đến câu trả lời.",
+          "expected_deliverable": "Một lượt agent hỏi dữ liệu trạng thái và trả kết quả.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 23,
+            "line_end": 28,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L23-L28"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "ReAct",
+              "Tool call ID",
+              "Message history"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day04-cp2-e01",
+              "kind": "code",
+              "path": "agent.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def run_agent",
+                "lines": [
+                  10
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/agent.py#L10"
+            },
+            {
+              "id": "day04-cp2-e02",
+              "kind": "code",
+              "path": "tests/test_lab.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/tests/test_lab.py"
+            }
+          ]
+        },
+        {
+          "id": "day04-cp3",
+          "label": "CP3",
+          "title": "Xử lý lỗi và trace",
+          "requirement": "Đặt giới hạn bước và xử lý lỗi đầu vào, công cụ và provider. Ghi trace cho từng bước.",
+          "expected_deliverable": "Agent trả kết quả có kiểm soát và trace đúng cấu trúc.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 30,
+            "line_end": 35,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L30-L35"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Step budget",
+              "Error handling",
+              "Trace"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day04-cp3-e01",
+              "kind": "code",
+              "path": "agent.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def run_agent",
+                "lines": [
+                  10
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/agent.py#L10"
+            },
+            {
+              "id": "day04-cp3-e02",
+              "kind": "code",
+              "path": "tests/test_validation.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/tests/test_validation.py"
+            }
+          ]
+        },
+        {
+          "id": "day04-cp4",
+          "label": "CP4",
+          "title": "Eval lần 1",
+          "requirement": "Chạy baseline 22 ca và đọc trace, điểm và lý do chấm.",
+          "expected_deliverable": "Tệp baseline và danh sách lỗi quan sát.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 37,
+            "line_end": 42,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L37-L42"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Baseline",
+              "Mechanical grading",
+              "LLM judge"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day04-cp4-e01",
+              "kind": "code",
+              "path": "evals/run_evals.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/evals/run_evals.py"
+            },
+            {
+              "id": "day04-cp4-e02",
+              "kind": "report",
+              "path": "eval_before.json",
+              "state": "expected_generated",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            }
+          ]
+        },
+        {
+          "id": "day04-cp5",
+          "label": "CP5",
+          "title": "Phân tích và cải tiến",
+          "requirement": "Chọn một lỗi từ trace, ghi nguyên nhân và sửa một điểm, có kiểm tra nguồn.",
+          "expected_deliverable": "Code cải tiến và NOTES mục 1–3.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 44,
+            "line_end": 49,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L44-L49"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Root cause",
+              "Grounding",
+              "Source validation"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day04-cp5-e01",
+              "kind": "code",
+              "path": "agent.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def run_agent",
+                "lines": [
+                  10
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/agent.py#L10"
+            },
+            {
+              "id": "day04-cp5-e02",
+              "kind": "document",
+              "path": "NOTES.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/NOTES.md"
+            }
+          ]
+        },
+        {
+          "id": "day04-cp6",
+          "label": "CP6",
+          "title": "Eval lần 2",
+          "requirement": "Chạy lại cùng cấu hình, đối chiếu điểm, lỗi và chi phí.",
+          "expected_deliverable": "Hai kết quả eval và NOTES mục 4–5.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 51,
+            "line_end": 56,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L51-L56"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Regression comparison",
+              "Chi phí",
+              "Độ ổn định"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day04-cp6-e01",
+              "kind": "code",
+              "path": "evals/run_evals.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/evals/run_evals.py"
+            },
+            {
+              "id": "day04-cp6-e02",
+              "kind": "report",
+              "path": "eval_after.json",
+              "state": "expected_generated",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            },
+            {
+              "id": "day04-cp6-e03",
+              "kind": "document",
+              "path": "NOTES.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/NOTES.md"
+            }
+          ]
+        },
+        {
+          "id": "day04-cp7",
+          "label": "CP7",
+          "title": "Demo và nộp",
+          "requirement": "Demo trace nhiều bước và một lỗi, hoàn thiện repo nộp.",
+          "expected_deliverable": "Repo và checklist nộp bài.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 58,
+            "line_end": 63,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md#L58-L63"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Giải thích trace",
+              "Giới hạn đánh giá"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day04-cp7-e01",
+              "kind": "document",
+              "path": "SUBMISSION.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/SUBMISSION.md"
+            },
+            {
+              "id": "day04-cp7-e02",
+              "kind": "document",
+              "path": "NOTES.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/NOTES.md"
+            }
+          ]
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5-L3-Day4-ReactLoopAgent/blob/147982becd7097cc7930ea09589acb97389e84f4/CHECKPOINTS.md"
+      }
+    },
+    {
+      "id": "day05",
+      "day": 5,
+      "title": "AI Product UX & Autonomy",
+      "work_mode": "group",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy",
+      "commit_sha": "7c1f24793008599ac3b77237d5c0c4eb2a89ad36",
+      "checkpoints": [
+        {
+          "id": "day05-m1",
+          "label": "M1",
+          "title": "Lường trước kịch bản",
+          "requirement": "Viết tối thiểu tám kịch bản phủ bốn nhóm lỗi và chọn hai ca có hậu quả lớn nhất.",
+          "expected_deliverable": "Spec mục 2 có kịch bản, nguyên nhân, hành vi mong đợi và mức hại.",
+          "definition_source": {
+            "path": "02-guide.md",
+            "line_start": 45,
+            "line_end": 66,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L45-L66"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "HAX",
+              "Error severity",
+              "Failure scenario"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day05-m1-e01",
+              "kind": "document",
+              "path": "03-spec-template.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/03-spec-template.md"
+            },
+            {
+              "id": "day05-m1-e02",
+              "kind": "document",
+              "path": "tracks/t2-education.md",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/tracks/t2-education.md"
+            },
+            {
+              "id": "day05-m1-e03",
+              "kind": "report",
+              "path": "spec.md",
+              "state": "expected_learner",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            }
+          ]
+        },
+        {
+          "id": "day05-m2",
+          "label": "M2",
+          "title": "Thiết kế thất bại và mức tự chủ",
+          "requirement": "Thiết kế trải nghiệm cho hai ca khó, rồi quyết định từng công cụ được tự làm, cần duyệt hay cấm.",
+          "expected_deliverable": "Spec mục 3–4 có đường đi trải nghiệm và lý do phân quyền theo chi phí sai.",
+          "definition_source": {
+            "path": "02-guide.md",
+            "line_start": 70,
+            "line_end": 131,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L70-L131"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Graceful failure",
+              "Human approval",
+              "Cost of error"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day05-m2-e01",
+              "kind": "document",
+              "path": "03-spec-template.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/03-spec-template.md"
+            },
+            {
+              "id": "day05-m2-e02",
+              "kind": "report",
+              "path": "spec.md",
+              "state": "expected_learner",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            }
+          ]
+        },
+        {
+          "id": "day05-m3",
+          "label": "M3",
+          "title": "Prototype và tự kiểm",
+          "requirement": "Tạo prototype tương tác 1–2 màn hình, rồi thử các tiêu chí đã viết trên hai ca khó ở chặng tiếp theo.",
+          "expected_deliverable": "Prototype, ảnh minh họa và phần tự kiểm trong spec.",
+          "definition_source": {
+            "path": "02-guide.md",
+            "line_start": 135,
+            "line_end": 169,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md#L135-L169"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Prototype",
+              "Transparency",
+              "User control",
+              "Acceptance criterion"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day05-m3-e01",
+              "kind": "document",
+              "path": "03-spec-template.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/03-spec-template.md"
+            },
+            {
+              "id": "day05-m3-e02",
+              "kind": "code",
+              "path": "prototype-sample/index.html",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/prototype-sample/index.html"
+            },
+            {
+              "id": "day05-m3-e03",
+              "kind": "report",
+              "path": "spec.md",
+              "state": "expected_learner",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            }
+          ]
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "02-guide.md",
+        "url": "https://github.com/VinUni-AI20k/K5-L3-Day05-AI-Product-UX-Autonomy/blob/7c1f24793008599ac3b77237d5c0c4eb2a89ad36/02-guide.md"
+      },
+      "notes": "Ba mốc M1–M3 theo guide. Spec và prototype là bằng chứng của nhóm."
+    },
+    {
+      "id": "day06",
+      "day": 6,
+      "title": "Data Ingestion Engineering",
+      "work_mode": "individual",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering",
+      "commit_sha": "42f64eb230289ff5042abc03683252649dfbef79",
+      "checkpoints": [
+        {
+          "id": "day06-m01",
+          "label": "M01",
+          "title": "Chọn dữ liệu và setup",
+          "requirement": "Chọn tài liệu có quyền dùng, ghi nguồn, số trang và kiểm tra công cụ đọc.",
+          "expected_deliverable": "Khai báo nguồn và môi trường đã kiểm.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 7,
+            "line_end": 7,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L7"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Data provenance",
+              "PDF ingestion"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day06-m01-e01",
+              "kind": "document",
+              "path": "starter/README.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/starter/README.md"
+            },
+            {
+              "id": "day06-m01-e02",
+              "kind": "code",
+              "path": "starter/scripts/check_setup.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/starter/scripts/check_setup.py"
+            }
+          ],
+          "original_time_label": "0:25"
+        },
+        {
+          "id": "day06-m02",
+          "label": "M02",
+          "title": "Xây benchmark",
+          "requirement": "Tạo tối thiểu 20 câu kèm trang và evidence, chia 15 dev và 5 test.",
+          "expected_deliverable": "Bộ benchmark có bằng chứng đã kiểm.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 8,
+            "line_end": 8,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L8"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Ground truth",
+              "Dev/test split"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day06-m02-e01",
+              "kind": "document",
+              "path": "BENCHMARK.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/BENCHMARK.md"
+            },
+            {
+              "id": "day06-m02-e02",
+              "kind": "configuration",
+              "path": "data/format-example.json",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/data/format-example.json"
+            }
+          ],
+          "original_time_label": "1:00"
+        },
+        {
+          "id": "day06-m03",
+          "label": "M03",
+          "title": "Đọc, chuẩn hóa và chunk",
+          "requirement": "Đọc tài liệu, ghi trang lỗi/rỗng và thử các cấu hình chunk có metadata truy nguồn.",
+          "expected_deliverable": "Log ingest và dữ liệu chunk của ít nhất hai cấu hình.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 9,
+            "line_end": 9,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L9"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Normalization",
+              "Chunking",
+              "Provenance"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day06-m03-e01",
+              "kind": "code",
+              "path": "starter/src/ingestion.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def load_pdf",
+                "lines": [
+                  6
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/starter/src/ingestion.py#L6"
+            },
+            {
+              "id": "day06-m03-e02",
+              "kind": "code",
+              "path": "starter/src/chunking.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def fixed_size",
+                "lines": [
+                  5
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/starter/src/chunking.py#L5"
+            }
+          ],
+          "original_time_label": "1:50"
+        },
+        {
+          "id": "day06-m04",
+          "label": "M04",
+          "title": "Lưu vector và chạy ba chiến lược",
+          "requirement": "Lập ba chỉ mục, ghi cấu hình embedding và xác nhận có thể nạp lại và truy xuất top-3.",
+          "expected_deliverable": "Vector store có ba chiến lược cùng chi phí và thời gian đo.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 11,
+            "line_end": 11,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L11"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Embedding",
+              "Vector index",
+              "Top-k"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day06-m04-e01",
+              "kind": "code",
+              "path": "starter/src/embeddings.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def embed_documents",
+                "lines": [
+                  9,
+                  25
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/starter/src/embeddings.py#L9"
+            },
+            {
+              "id": "day06-m04-e02",
+              "kind": "code",
+              "path": "starter/src/store.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def upsert",
+                "lines": [
+                  15
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/starter/src/store.py#L15"
+            }
+          ],
+          "original_time_label": "2:40"
+        },
+        {
+          "id": "day06-m05",
+          "label": "M05",
+          "title": "Benchmark và audit",
+          "requirement": "Đo Hit@1 và Hit@3 trên dev/test, xem coherence, metadata và grounding.",
+          "expected_deliverable": "Trace truy xuất và bảng audit.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 12,
+            "line_end": 12,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L12"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Hit@k",
+              "Grounding",
+              "Chunk coherence"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day06-m05-e01",
+              "kind": "code",
+              "path": "starter/src/evaluation.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def evaluate_query",
+                "lines": [
+                  5
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/starter/src/evaluation.py#L5"
+            },
+            {
+              "id": "day06-m05-e02",
+              "kind": "document",
+              "path": "REPORT_TEMPLATE.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/REPORT_TEMPLATE.md"
+            }
+          ],
+          "original_time_label": "3:30"
+        },
+        {
+          "id": "day06-m06",
+          "label": "M06",
+          "title": "Tổng hợp và nộp",
+          "requirement": "Tổng hợp kết quả, ví dụ lỗi và nhận định về chiến lược.",
+          "expected_deliverable": "Báo cáo cá nhân với số đo và kết luận.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 13,
+            "line_end": 13,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md#L13"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Error analysis",
+              "Trade-off"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day06-m06-e01",
+              "kind": "report",
+              "path": "report/individual/MSSV_HoTen.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/report/individual/MSSV_HoTen.md"
+            },
+            {
+              "id": "day06-m06-e02",
+              "kind": "document",
+              "path": "SUBMISSION.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/SUBMISSION.md"
+            }
+          ],
+          "original_time_label": "4:00"
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5-L3-Day06-DataIngestionEngineering/blob/42f64eb230289ff5042abc03683252649dfbef79/CHECKPOINTS.md"
+      },
+      "notes": "M01–M06 là ID nội bộ cho sáu mốc thời gian làm việc, bỏ qua giờ nghỉ."
+    },
+    {
+      "id": "day07",
+      "day": 7,
+      "title": "Retrieval & Context Engineering · Agentic RAG",
+      "work_mode": "individual",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering",
+      "commit_sha": "c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19",
+      "checkpoints": [
+        {
+          "id": "day07-m01",
+          "label": "M01",
+          "title": "Kết nối dữ liệu Day 06",
+          "requirement": "Chuẩn hóa chunk và câu hỏi có bằng chứng từ Day 06, hoặc thử luồng bằng dữ liệu mẫu.",
+          "expected_deliverable": "Corpus, vector store và benchmark có dev/test.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 7,
+            "line_end": 7,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L7"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Corpus conversion",
+              "Benchmark split"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day07-m01-e01",
+              "kind": "code",
+              "path": "starter/convert_day6.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/starter/convert_day6.py"
+            },
+            {
+              "id": "day07-m01-e02",
+              "kind": "configuration",
+              "path": "data/example_chunks.json",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/data/example_chunks.json"
+            },
+            {
+              "id": "day07-m01-e03",
+              "kind": "configuration",
+              "path": "data/example_questions.json",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/data/example_questions.json"
+            }
+          ],
+          "original_time_label": "0:00–1:00"
+        },
+        {
+          "id": "day07-m02",
+          "label": "M02",
+          "title": "Retrieval và agent ban đầu",
+          "requirement": "Xây baseline và luồng agent tìm nguồn, đóng gói context và giữ citation.",
+          "expected_deliverable": "Trace công cụ, context và câu trả lời có nguồn.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 8,
+            "line_end": 8,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L8"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Retrieval",
+              "Context budget",
+              "Citation"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day07-m02-e01",
+              "kind": "code",
+              "path": "starter/agentic.py",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def run_agent",
+                "lines": [
+                  31
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/starter/agentic.py#L31"
+            },
+            {
+              "id": "day07-m02-e02",
+              "kind": "code",
+              "path": "starter/baseline.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def pack_context",
+                "lines": [
+                  77
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/starter/baseline.py#L77"
+            }
+          ],
+          "original_time_label": "1:00–2:00"
+        },
+        {
+          "id": "day07-m03",
+          "label": "M03",
+          "title": "Thử ít nhất ba phương pháp",
+          "requirement": "Đổi chiến lược truy xuất và so trên dev để chọn cấu hình.",
+          "expected_deliverable": "Bảng kết quả dev, lỗi và cấu hình được chọn.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 9,
+            "line_end": 9,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L9"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Retrieval comparison",
+              "Development tuning"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day07-m03-e01",
+              "kind": "code",
+              "path": "starter/baseline.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def evaluate",
+                "lines": [
+                  90
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/starter/baseline.py#L90"
+            },
+            {
+              "id": "day07-m03-e02",
+              "kind": "document",
+              "path": "REPORT_TEMPLATE.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/REPORT_TEMPLATE.md"
+            }
+          ],
+          "original_time_label": "2:00–3:30"
+        },
+        {
+          "id": "day07-m04",
+          "label": "M04",
+          "title": "Đánh giá trên test",
+          "requirement": "Đo cấu hình đã chọn, đọc trace và báo cáo hạn chế.",
+          "expected_deliverable": "Metric, trace và báo cáo.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 10,
+            "line_end": 10,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L10"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Held-out test",
+              "Agent metrics",
+              "Failure analysis"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day07-m04-e01",
+              "kind": "code",
+              "path": "starter/agent_metrics.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def aggregate",
+                "lines": [
+                  7
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/starter/agent_metrics.py#L7"
+            },
+            {
+              "id": "day07-m04-e02",
+              "kind": "report",
+              "path": "report/individual/MSSV_HoTen.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/report/individual/MSSV_HoTen.md"
+            }
+          ],
+          "original_time_label": "3:30–4:00"
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md"
+      },
+      "notes": "M01–M04 là ID nội bộ theo bốn mốc thời gian."
+    },
+    {
+      "id": "day08",
+      "day": 8,
+      "title": "From Workflows to Agents · LogiX-VN",
+      "work_mode": "group",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents",
+      "commit_sha": "034c6c421c198dae67a9211d15e2587d5a378972",
+      "checkpoints": [
+        {
+          "id": "day08-cp1",
+          "label": "CP1",
+          "title": "Cài đặt và đọc contract",
+          "requirement": "Chạy smoke test, hiểu contract của luồng khiếu nại và chia vai.",
+          "expected_deliverable": "Smoke test và bảng vai trò nhóm.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 5,
+            "line_end": 11,
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L5-L11"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Business rules",
+              "Tool contract",
+              "Smoke test"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day08-cp1-e01",
+              "kind": "document",
+              "path": "docs/contracts.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/docs/contracts.md"
+            },
+            {
+              "id": "day08-cp1-e02",
+              "kind": "code",
+              "path": "src/lab8/smoke.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/src/lab8/smoke.py"
+            }
+          ]
+        },
+        {
+          "id": "day08-cp2",
+          "label": "CP2",
+          "title": "Ba kiến trúc cho cùng một luồng",
+          "requirement": "Triển khai workflow, single agent và orchestrator theo contract chung.",
+          "expected_deliverable": "Ba shape trả kết quả và trace đúng contract, qua bộ kiểm tra tương ứng.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 13,
+            "line_end": 19,
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L13-L19"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Workflow",
+              "Single agent",
+              "Orchestrator",
+              "Trace contract"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day08-cp2-e01",
+              "kind": "code",
+              "path": "src/lab8/shapes/workflow.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "TODO CP2",
+                "lines": [
+                  43
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/src/lab8/shapes/workflow.py#L43"
+            },
+            {
+              "id": "day08-cp2-e02",
+              "kind": "code",
+              "path": "src/lab8/shapes/single.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "TODO CP2",
+                "lines": [
+                  34
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/src/lab8/shapes/single.py#L34"
+            },
+            {
+              "id": "day08-cp2-e03",
+              "kind": "code",
+              "path": "src/lab8/shapes/orchestrator.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "TODO CP2",
+                "lines": [
+                  32
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/src/lab8/shapes/orchestrator.py#L32"
+            }
+          ]
+        },
+        {
+          "id": "day08-cp3",
+          "label": "CP3",
+          "title": "Handoff, ledger và phục hồi",
+          "requirement": "Giữ thao tác nhất quán khi gọi lại hoặc gặp lỗi, và giới hạn ngữ cảnh truyền qua handoff.",
+          "expected_deliverable": "Hai kiểm tra gọi lại và phục hồi, cùng trace handoff đã lọc.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 21,
+            "line_end": 27,
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L21-L27"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Idempotency",
+              "Ledger",
+              "Safe handoff"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day08-cp3-e01",
+              "kind": "code",
+              "path": "src/lab8/durability.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def issue_refund",
+                "lines": [
+                  66
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/src/lab8/durability.py#L66"
+            },
+            {
+              "id": "day08-cp3-e02",
+              "kind": "code",
+              "path": "src/lab8/handoff.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def make_handoff",
+                "lines": [
+                  42
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/src/lab8/handoff.py#L42"
+            },
+            {
+              "id": "day08-cp3-e03",
+              "kind": "code",
+              "path": "src/lab8/shapes/orchestrator.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "TODO CP3",
+                "lines": [
+                  33
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/src/lab8/shapes/orchestrator.py#L33"
+            }
+          ]
+        },
+        {
+          "id": "day08-cp4",
+          "label": "CP4",
+          "title": "Crash, phê duyệt và bảo mật",
+          "requirement": "Kiểm tính nhất quán khi crash và các cổng phê duyệt, bảo vệ dữ liệu trong trace.",
+          "expected_deliverable": "Báo cáo crash suite và các tiêu chí must-pass.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 29,
+            "line_end": 35,
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L29-L35"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Crash safety",
+              "Approval gate",
+              "Trace privacy"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day08-cp4-e01",
+              "kind": "code",
+              "path": "src/lab8/crash_test.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/src/lab8/crash_test.py"
+            },
+            {
+              "id": "day08-cp4-e02",
+              "kind": "report",
+              "path": "src/reports/crash.json",
+              "state": "expected_generated",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            }
+          ]
+        },
+        {
+          "id": "day08-cp5",
+          "label": "CP5",
+          "title": "Benchmark và quyết định kiến trúc",
+          "requirement": "So sánh bốn shape trên cùng ca, seed và giá, rồi ghi quyết định và bằng chứng.",
+          "expected_deliverable": "Benchmark, ADR, research card và báo cáo.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 37,
+            "line_end": 43,
+            "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md#L37-L43"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Seed variance",
+              "Cost per success",
+              "ADR"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day08-cp5-e01",
+              "kind": "code",
+              "path": "src/lab8/benchmark.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/src/lab8/benchmark.py"
+            },
+            {
+              "id": "day08-cp5-e02",
+              "kind": "report",
+              "path": "src/reports/benchmark.json",
+              "state": "expected_generated",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            },
+            {
+              "id": "day08-cp5-e03",
+              "kind": "report",
+              "path": "report/team/decision_adr.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/report/team/decision_adr.md"
+            }
+          ]
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5-Day8-From-Workflows-to-Agents/blob/034c6c421c198dae67a9211d15e2587d5a378972/CHECKPOINTS.md"
+      }
+    },
+    {
+      "id": "day09",
+      "day": 9,
+      "title": "Evaluation & Failure Analysis · LogiX-VN",
+      "work_mode": "individual",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis",
+      "commit_sha": "9e1549a699c6d8bf10b8892c9c3c443a45d8cf55",
+      "checkpoints": [
+        {
+          "id": "day09-m0",
+          "label": "M0",
+          "title": "Môi trường và bộ eval",
+          "requirement": "Chạy smoke test và tạo bộ eval ban đầu với tệp nhãn riêng.",
+          "expected_deliverable": "Smoke pass và bộ eval tạo được.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 3,
+            "line_end": 3,
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L3"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Eval harness",
+              "Label separation"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day09-m0-e01",
+              "kind": "code",
+              "path": "src/lab9/smoke.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/lab9/smoke.py"
+            },
+            {
+              "id": "day09-m0-e02",
+              "kind": "code",
+              "path": "src/lab9/evalset.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/lab9/evalset.py"
+            }
+          ],
+          "required_level": "core"
+        },
+        {
+          "id": "day09-m1",
+          "label": "M1",
+          "title": "Taxonomy lỗi",
+          "requirement": "Viết ít nhất năm nhóm lỗi, có tầng xảy ra lỗi, bằng chứng và cách chấm.",
+          "expected_deliverable": "Taxonomy và bộ dữ liệu qua kiểm tra.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 5,
+            "line_end": 5,
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L5"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Failure taxonomy",
+              "Trace evidence"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day09-m1-e01",
+              "kind": "document",
+              "path": "docs/failure_taxonomy.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/docs/failure_taxonomy.md"
+            },
+            {
+              "id": "day09-m1-e02",
+              "kind": "code",
+              "path": "src/lab9/evalset.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/lab9/evalset.py"
+            }
+          ],
+          "required_level": "core"
+        },
+        {
+          "id": "day09-m2",
+          "label": "M2",
+          "title": "Hiệu chuẩn judge",
+          "requirement": "Đối chiếu judge với nhãn chuẩn, phân tích ít nhất năm bất đồng và giải thích judge nào đủ điều kiện.",
+          "expected_deliverable": "Bảng audit và chỉ số đồng thuận.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 7,
+            "line_end": 7,
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L7"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Judge calibration",
+              "Cohen’s kappa",
+              "Precision và recall"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day09-m2-e01",
+              "kind": "document",
+              "path": "docs/judge_audit.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/docs/judge_audit.md"
+            },
+            {
+              "id": "day09-m2-e02",
+              "kind": "code",
+              "path": "src/lab9/stats.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/lab9/stats.py"
+            }
+          ],
+          "required_level": "core"
+        },
+        {
+          "id": "day09-m3",
+          "label": "M3",
+          "title": "Chấm trajectory",
+          "requirement": "Hoàn thiện hai grader và bổ sung metric phát hiện sai khác giữa trả lời và ledger.",
+          "expected_deliverable": "Grader qua kiểm tra, có số đo phát hiện lỗi và báo nhầm.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 9,
+            "line_end": 9,
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L9"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Trajectory grading",
+              "False positives",
+              "Ledger consistency"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day09-m3-e01",
+              "kind": "code",
+              "path": "src/lab9/graders.py",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/lab9/graders.py"
+            },
+            {
+              "id": "day09-m3-e02",
+              "kind": "configuration",
+              "path": "src/config/metric_spec.yaml",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/config/metric_spec.yaml"
+            }
+          ],
+          "required_level": "core"
+        },
+        {
+          "id": "day09-m4",
+          "label": "M4",
+          "title": "Cổng regression",
+          "requirement": "Dùng cùng spec và baseline để đánh giá biến thể tốt và biến thể regression.",
+          "expected_deliverable": "Gate cho qua ca hợp lệ và chặn ca regression, có lý do từ metric.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 11,
+            "line_end": 19,
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L11-L19"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Paired bootstrap",
+              "Regression gate",
+              "CI"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day09-m4-e01",
+              "kind": "code",
+              "path": "src/lab9/gate.py",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/lab9/gate.py"
+            },
+            {
+              "id": "day09-m4-e02",
+              "kind": "configuration",
+              "path": ".github/workflows/eval-gate.yml",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/.github/workflows/eval-gate.yml"
+            }
+          ],
+          "required_level": "core"
+        },
+        {
+          "id": "day09-m5",
+          "label": "M5",
+          "title": "Eval set v2 và phân lát",
+          "requirement": "Bổ sung bộ eval v2 và đánh giá lỗi theo nhóm đối tượng để phát hiện regression cục bộ.",
+          "expected_deliverable": "Ánh xạ nhóm lỗi đầy đủ và báo cáo metric theo slice.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 24,
+            "line_end": 24,
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L24"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Slice metrics",
+              "Coverage",
+              "Regression"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day09-m5-e01",
+              "kind": "configuration",
+              "path": "src/config/fm_map.yaml",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/config/fm_map.yaml"
+            },
+            {
+              "id": "day09-m5-e02",
+              "kind": "configuration",
+              "path": "src/config/metric_spec_v2.yaml",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/config/metric_spec_v2.yaml"
+            }
+          ],
+          "required_level": "advanced_expert"
+        },
+        {
+          "id": "day09-m6",
+          "label": "M6",
+          "title": "Nhiễu và độ ổn định",
+          "requirement": "Đo A/A và độ ổn định qua các seed, so metric nhiều lần chạy với pass rate trung bình.",
+          "expected_deliverable": "Ngưỡng và lý do chọn metric ổn định.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 26,
+            "line_end": 26,
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L26"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "A/A test",
+              "Variance",
+              "Pass-at-k"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day09-m6-e01",
+              "kind": "code",
+              "path": "src/lab9/stats.py",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/lab9/stats.py"
+            },
+            {
+              "id": "day09-m6-e02",
+              "kind": "configuration",
+              "path": "src/config/metric_spec_v2.yaml",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/config/metric_spec_v2.yaml"
+            }
+          ],
+          "required_level": "advanced_expert"
+        },
+        {
+          "id": "day09-m7",
+          "label": "M7",
+          "title": "Tính toàn vẹn của eval",
+          "requirement": "Kiểm gate trước các báo cáo đánh giá có vấn đề về tính toàn vẹn.",
+          "expected_deliverable": "Kết quả kiểm tra integrity và biến thể đối chứng.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 28,
+            "line_end": 28,
+            "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md#L28"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Evaluation integrity",
+              "Mutation testing"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day09-m7-e01",
+              "kind": "code",
+              "path": "src/lab9/gate.py",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/lab9/gate.py"
+            },
+            {
+              "id": "day09-m7-e02",
+              "kind": "code",
+              "path": "src/lab9/mutation.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/src/lab9/mutation.py"
+            }
+          ],
+          "required_level": "advanced_expert"
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5-Day9-Evaluation-and-Failure-Analysis/blob/9e1549a699c6d8bf10b8892c9c3c443a45d8cf55/CHECKPOINTS.md"
+      },
+      "notes": "M5–M7 thuộc phần Advanced / Expert."
+    },
+    {
+      "id": "day10",
+      "day": 10,
+      "title": "From PoC to Pilot · Gate 1",
+      "work_mode": "group",
+      "repository_url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student",
+      "commit_sha": "12caf24f37ce1e99eb66b96099248fa5373ed15a",
+      "checkpoints": [
+        {
+          "id": "day10-cp1",
+          "label": "CP1",
+          "title": "Cài đặt và chia vai",
+          "requirement": "Tạo repo nhóm, điền vai và chạy bộ kiểm tra công khai.",
+          "expected_deliverable": "Repo và bài kiểm tra môi trường.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 5,
+            "line_end": 11,
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L5-L11"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Team ownership",
+              "Smoke test"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day10-cp1-e01",
+              "kind": "document",
+              "path": "TEAM.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/TEAM.md"
+            },
+            {
+              "id": "day10-cp1-e02",
+              "kind": "code",
+              "path": "tests/test_public.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/tests/test_public.py"
+            }
+          ]
+        },
+        {
+          "id": "day10-cp2",
+          "label": "CP2",
+          "title": "Ký tiêu chí trước khi đo",
+          "requirement": "Điền và khóa ngưỡng chấp nhận trước lượt eval đầu.",
+          "expected_deliverable": "Phiếu A và tiêu chí đã khóa tại commit.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 13,
+            "line_end": 19,
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L13-L19"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Acceptance threshold",
+              "Precommitment",
+              "Pass rate"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day10-cp2-e01",
+              "kind": "configuration",
+              "path": "config/acceptance_criteria.json",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/config/acceptance_criteria.json"
+            },
+            {
+              "id": "day10-cp2-e02",
+              "kind": "document",
+              "path": "templates/form-a-criteria.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/templates/form-a-criteria.md"
+            }
+          ]
+        },
+        {
+          "id": "day10-cp3",
+          "label": "CP3",
+          "title": "Đo baseline và cổng vòng 1",
+          "requirement": "Đánh giá rủi ro, hiện thực cổng phòng ngừa và quyết định v1.",
+          "expected_deliverable": "Phiếu B, baseline và bản chốt cổng vòng 1.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 21,
+            "line_end": 27,
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L21-L27"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Risk assessment",
+              "Operational gate",
+              "Decision log"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day10-cp3-e01",
+              "kind": "code",
+              "path": "lab10/guards.py",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def pre_guard",
+                "lines": [
+                  36
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/lab10/guards.py#L36"
+            },
+            {
+              "id": "day10-cp3-e02",
+              "kind": "configuration",
+              "path": "config/operating_gates.json",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/config/operating_gates.json"
+            },
+            {
+              "id": "day10-cp3-e03",
+              "kind": "document",
+              "path": "templates/form-b-evaluation-gates.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/templates/form-b-evaluation-gates.md"
+            }
+          ]
+        },
+        {
+          "id": "day10-cp4",
+          "label": "CP4",
+          "title": "Ứng phó sự cố",
+          "requirement": "Phân tích thẻ sự cố được giao, đối chiếu trước và sau, bổ sung chỉ số giám sát.",
+          "expected_deliverable": "Phiếu C, kết quả so sánh và monitor.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 29,
+            "line_end": 35,
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L29-L35"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Incident analysis",
+              "Fault tree",
+              "Monitoring"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day10-cp4-e01",
+              "kind": "document",
+              "path": "incidents/README.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/incidents/README.md"
+            },
+            {
+              "id": "day10-cp4-e02",
+              "kind": "code",
+              "path": "lab10/monitors.py",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/lab10/monitors.py"
+            },
+            {
+              "id": "day10-cp4-e03",
+              "kind": "document",
+              "path": "templates/form-c-incident.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/templates/form-c-incident.md"
+            }
+          ]
+        },
+        {
+          "id": "day10-cp5",
+          "label": "CP5",
+          "title": "Quyết định v2 và nộp",
+          "requirement": "Đối chiếu quyết định pilot với tiêu chí đã ký rồi chốt hồ sơ nhóm.",
+          "expected_deliverable": "Bộ hồ sơ nộp và quyết định Gate 1.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 37,
+            "line_end": 43,
+            "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md#L37-L43"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Go/no-go",
+              "Evidence traceability"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day10-cp5-e01",
+              "kind": "report",
+              "path": "submission/submission.json",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/submission/submission.json"
+            },
+            {
+              "id": "day10-cp5-e02",
+              "kind": "code",
+              "path": "lab10/check_submission.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/lab10/check_submission.py"
+            }
+          ]
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5_L3_Day10_PoC-to-Pilot_Gate1_student/blob/12caf24f37ce1e99eb66b96099248fa5373ed15a/CHECKPOINTS.md"
+      }
+    },
+    {
+      "id": "day11",
+      "day": 11,
+      "title": "Controlled Agent Security · Guardrails & HITL",
+      "work_mode": "individual",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI",
+      "commit_sha": "2e3930fac9dd2dc533211e89e8ccaf90e390d194",
+      "checkpoints": [
+        {
+          "id": "day11-cp1",
+          "label": "CP1",
+          "title": "Cài đặt và xác nhận môi trường",
+          "requirement": "Kiểm runtime và cấu hình trước khi thiết lập lớp bảo vệ.",
+          "expected_deliverable": "Môi trường chạy kiểm tra ban đầu.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 94,
+            "line_end": 101,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L94-L101"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Environment validation",
+              "Secret handling"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day11-cp1-e01",
+              "kind": "code",
+              "path": "src/core/config.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/src/core/config.py"
+            },
+            {
+              "id": "day11-cp1-e02",
+              "kind": "document",
+              "path": "SUBMISSION.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/SUBMISSION.md"
+            }
+          ]
+        },
+        {
+          "id": "day11-cp2",
+          "label": "CP2",
+          "title": "Bộ lọc đầu vào và đầu ra",
+          "requirement": "Xây bộ lọc phạm vi và bảo vệ dữ liệu nhạy cảm ở hai phía của LLM.",
+          "expected_deliverable": "Code input/output guardrails và log kiểm tra phòng thủ.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 181,
+            "line_end": 191,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L181-L191"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Input validation",
+              "Output redaction",
+              "Scope control"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day11-cp2-e01",
+              "kind": "code",
+              "path": "src/guardrails/input_guardrails.py",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/src/guardrails/input_guardrails.py"
+            },
+            {
+              "id": "day11-cp2-e02",
+              "kind": "code",
+              "path": "src/guardrails/output_guardrails.py",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/src/guardrails/output_guardrails.py"
+            }
+          ]
+        },
+        {
+          "id": "day11-cp3",
+          "label": "CP3",
+          "title": "Pipeline phòng thủ và quan sát",
+          "requirement": "Ghép các lớp lọc, giới hạn tần suất, ghi audit, đo metric và kiểm quyền truyền dữ liệu.",
+          "expected_deliverable": "Báo cáo phòng thủ và log kiểm tra.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 285,
+            "line_end": 297,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L285-L297"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Rate limiting",
+              "Audit log",
+              "Egress policy",
+              "Observability"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day11-cp3-e01",
+              "kind": "code",
+              "path": "src/assignment/pipeline.py",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def build_production_plugins",
+                "lines": [
+                  25
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/src/assignment/pipeline.py#L25"
+            },
+            {
+              "id": "day11-cp3-e02",
+              "kind": "code",
+              "path": "src/assignment/audit_log.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/src/assignment/audit_log.py"
+            },
+            {
+              "id": "day11-cp3-e03",
+              "kind": "report",
+              "path": "outputs/results.json",
+              "state": "expected_generated",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            }
+          ]
+        },
+        {
+          "id": "day11-cp4",
+          "label": "CP4",
+          "title": "Đánh giá an toàn",
+          "requirement": "Tổng hợp phạm vi kiểm tra và tác dụng của lớp phòng thủ ở mức kết quả.",
+          "expected_deliverable": "Hồ sơ đánh giá và nhận xét về lớp bảo vệ.",
+          "definition_source": {
+            "path": "README.md",
+            "line_start": 4,
+            "line_end": 6,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/README.md#L4-L6"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Defensive validation",
+              "Evaluation coverage"
+            ]
+          },
+          "evidence": [],
+          "detail_status": "defensive_summary"
+        },
+        {
+          "id": "day11-cp5",
+          "label": "CP5",
+          "title": "Tự kiểm và nộp",
+          "requirement": "Kiểm tra các đầu ra và đối chiếu schema trước khi nộp.",
+          "expected_deliverable": "Các artifact cần nộp có trạng thái xác minh.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 573,
+            "line_end": 585,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md#L573-L585"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Schema validation",
+              "Submission integrity"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day11-cp5-e01",
+              "kind": "configuration",
+              "path": "schemas/results.schema.json",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/schemas/results.schema.json"
+            },
+            {
+              "id": "day11-cp5-e02",
+              "kind": "document",
+              "path": "SUBMISSION.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/SUBMISSION.md"
+            }
+          ]
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5-L3-LAB-Day11-Guardrails-HITL-Responsible-AI/blob/2e3930fac9dd2dc533211e89e8ccaf90e390d194/CHECKPOINTS.md"
+      },
+      "notes": "CP4 ghi mục tiêu đánh giá và kết quả phòng thủ ở mức tổng quan."
+    },
+    {
+      "id": "day12",
+      "day": 12,
+      "title": "AI SDLC · Quán Ăn Chợ Nổi",
+      "work_mode": "group",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC",
+      "commit_sha": "f0a190674bdbeb946ac45510e17fc7a4c4a2427f",
+      "checkpoints": [
+        {
+          "id": "day12-phase1",
+          "label": "PHASE1",
+          "title": "Phase 1 · PRD-0",
+          "requirement": "Chuẩn bị tag và bằng chứng kiểm chứng cho phase 1 theo PRD-0.",
+          "expected_deliverable": "Tag phase-1, khung kế hoạch và ma trận kiểm chứng.",
+          "definition_source": {
+            "path": "README.md",
+            "line_start": 30,
+            "line_end": 39,
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "PRD",
+              "Acceptance criteria",
+              "Headless testing"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day12-phase1-e01",
+              "kind": "document",
+              "path": "docs/plan/phase-1.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/docs/plan/phase-1.md"
+            },
+            {
+              "id": "day12-phase1-e02",
+              "kind": "report",
+              "path": "docs/verification/phase-1.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/docs/verification/phase-1.md"
+            },
+            {
+              "id": "day12-phase1-e03",
+              "kind": "configuration",
+              "path": "game.contract.json",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/game.contract.json"
+            }
+          ],
+          "detail_status": "public_schedule_only"
+        },
+        {
+          "id": "day12-phase2",
+          "label": "PHASE2",
+          "title": "Phase 2",
+          "requirement": "Gắn tag và xác minh phần công việc theo yêu cầu phase trên Lab Board.",
+          "expected_deliverable": "Tag phase-2 và hồ sơ kiểm chứng phase 2.",
+          "definition_source": {
+            "path": "README.md",
+            "line_start": 30,
+            "line_end": 39,
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Incremental delivery",
+              "Verification"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day12-phase2-e01",
+              "kind": "report",
+              "path": "docs/verification/phase-2.md",
+              "state": "expected_learner",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            },
+            {
+              "id": "day12-phase2-e02",
+              "kind": "document",
+              "path": "docs/STARTER.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/docs/STARTER.md"
+            }
+          ],
+          "detail_status": "public_schedule_only"
+        },
+        {
+          "id": "day12-phase3",
+          "label": "PHASE3",
+          "title": "Phase 3",
+          "requirement": "Gắn tag và lưu bằng chứng thực hiện của phase 3.",
+          "expected_deliverable": "Tag phase-3 và hồ sơ kiểm chứng phase 3.",
+          "definition_source": {
+            "path": "README.md",
+            "line_start": 30,
+            "line_end": 39,
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Change management",
+              "Regression testing"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day12-phase3-e01",
+              "kind": "report",
+              "path": "docs/verification/phase-3.md",
+              "state": "expected_learner",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            },
+            {
+              "id": "day12-phase3-e02",
+              "kind": "document",
+              "path": "docs/STARTER.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/docs/STARTER.md"
+            }
+          ],
+          "detail_status": "public_schedule_only"
+        },
+        {
+          "id": "day12-phase4",
+          "label": "PHASE4",
+          "title": "Phase 4 và release",
+          "requirement": "Gắn tag cuối, phát hành và tổng hợp hồ sơ kiểm chứng, AI usage và retro.",
+          "expected_deliverable": "Tag phase-4, release v1.0.0 và tài liệu kiểm chứng.",
+          "definition_source": {
+            "path": "README.md",
+            "line_start": 30,
+            "line_end": 39,
+            "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md#L30-L39"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Release readiness",
+              "Retrospective",
+              "AI SDLC"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day12-phase4-e01",
+              "kind": "report",
+              "path": "docs/verification/phase-4.md",
+              "state": "expected_learner",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            },
+            {
+              "id": "day12-phase4-e02",
+              "kind": "document",
+              "path": "docs/retro.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/docs/retro.md"
+            },
+            {
+              "id": "day12-phase4-e03",
+              "kind": "document",
+              "path": "docs/ai-usage-log.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/docs/ai-usage-log.md"
+            }
+          ],
+          "detail_status": "public_schedule_only"
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "README.md",
+        "url": "https://github.com/VinUni-AI20k/K5-L3B-LAB-Day12-AI-SDLC/blob/f0a190674bdbeb946ac45510e17fc7a4c4a2427f/README.md"
+      },
+      "notes": "README xác nhận bốn phase và tag tương ứng. Yêu cầu chi tiết trên Lab Board cần đăng nhập.",
+      "external_requirements": {
+        "url": "https://claude.ai/artifact/E35v787wSx2wDgPTNhMVDg",
+        "status": "login_required_details_unverified"
+      }
+    },
+    {
+      "id": "day13",
+      "day": 13,
+      "title": "Định giá agent và lập kế hoạch pilot · Gate 2a",
+      "work_mode": "group",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab",
+      "commit_sha": "4f3f1a653d54830032f673de083217a2ae66a613",
+      "checkpoints": [
+        {
+          "id": "day13-cp1",
+          "label": "CP1",
+          "title": "Chi phí mỗi việc thành công",
+          "requirement": "Tính chi phí tổng hợp từ trace, gồm tiền model, tool và công người, tính trên số việc thành công.",
+          "expected_deliverable": "Code qua ba phép thử và bảng chi phí A2–A3.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 7,
+            "line_end": 13,
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L7-L13"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Cost per success",
+              "Retry cost",
+              "Human review cost"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day13-cp1-e01",
+              "kind": "code",
+              "path": "src/lab13.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "def mo_hinh",
+                "lines": [
+                  45
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/src/lab13.py#L45"
+            },
+            {
+              "id": "day13-cp1-e02",
+              "kind": "report",
+              "path": "report/team/bang_chi_phi.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/report/team/bang_chi_phi.md"
+            }
+          ]
+        },
+        {
+          "id": "day13-cp2",
+          "label": "CP2",
+          "title": "Phân tích độ nhạy",
+          "requirement": "Đổi từng yếu tố hoặc một cặp yếu tố, so các mức retry và tác động review.",
+          "expected_deliverable": "Bảng kịch bản và xếp hạng yếu tố ảnh hưởng.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 15,
+            "line_end": 21,
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L15-L21"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Sensitivity analysis",
+              "Cost drivers"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day13-cp2-e01",
+              "kind": "code",
+              "path": "src/lab13.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "TODO CP2",
+                "lines": [
+                  64
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/src/lab13.py#L64"
+            },
+            {
+              "id": "day13-cp2-e02",
+              "kind": "report",
+              "path": "report/team/bang_chi_phi.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/report/team/bang_chi_phi.md"
+            }
+          ]
+        },
+        {
+          "id": "day13-cp3",
+          "label": "CP3",
+          "title": "Taxonomy và gán nhãn lỗi",
+          "requirement": "Hai người gán nhãn độc lập 20 ca và thống nhất nguyên nhân gốc và cách khắc phục.",
+          "expected_deliverable": "Bảng lỗi, tỷ lệ đồng thuận và biện pháp có tín hiệu phát hiện.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 23,
+            "line_end": 29,
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L23-L29"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "PAIR",
+              "Inter-rater agreement",
+              "Root cause"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day13-cp3-e01",
+              "kind": "report",
+              "path": "report/team/bang_loi.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/report/team/bang_loi.md"
+            }
+          ]
+        },
+        {
+          "id": "day13-cp4",
+          "label": "CP4",
+          "title": "Thiết kế pilot",
+          "requirement": "Tính cỡ mẫu, chọn đơn vị chia và viết trước điều kiện dừng.",
+          "expected_deliverable": "Kế hoạch pilot với ít nhất ba luật dừng.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 31,
+            "line_end": 37,
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L31-L37"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Cluster assignment",
+              "Sample size",
+              "Stopping rule"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day13-cp4-e01",
+              "kind": "code",
+              "path": "src/lab13.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "TODO CP4",
+                "lines": [
+                  65
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/src/lab13.py#L65"
+            },
+            {
+              "id": "day13-cp4-e02",
+              "kind": "report",
+              "path": "report/team/pilot_plan.yaml",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/report/team/pilot_plan.yaml"
+            }
+          ]
+        },
+        {
+          "id": "day13-cp5",
+          "label": "CP5",
+          "title": "Chỉ số, hồ sơ launch và duyệt chéo",
+          "requirement": "Kết nối chỉ số, trace, rủi ro và đề xuất để qua duyệt Gate 2a.",
+          "expected_deliverable": "Bảng chỉ số, hồ sơ launch một trang và phiếu duyệt chéo.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 39,
+            "line_end": 45,
+            "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md#L39-L45"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Launch criteria",
+              "Metrics instrumentation",
+              "Peer review"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day13-cp5-e01",
+              "kind": "report",
+              "path": "report/team/chi_so.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/report/team/chi_so.md"
+            },
+            {
+              "id": "day13-cp5-e02",
+              "kind": "report",
+              "path": "report/team/ho_so_launch_v0.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/report/team/ho_so_launch_v0.md"
+            },
+            {
+              "id": "day13-cp5-e03",
+              "kind": "report",
+              "path": "report/team/phieu_cham.md",
+              "state": "template",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/report/team/phieu_cham.md"
+            }
+          ]
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5-L34-Day13-Lab/blob/4f3f1a653d54830032f673de083217a2ae66a613/CHECKPOINTS.md"
+      }
+    },
+    {
+      "id": "day14",
+      "day": 14,
+      "title": "Deployment, Benchmark & Observability",
+      "work_mode": "individual",
+      "repository_url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability",
+      "commit_sha": "83e677fef599a58e21ba796b42ccc52ed43c1968",
+      "checkpoints": [
+        {
+          "id": "day14-cp0",
+          "label": "CP0",
+          "title": "Cài đặt",
+          "requirement": "Chuẩn bị fork và công cụ chạy Python, Docker.",
+          "expected_deliverable": "Môi trường và repo nộp sẵn sàng.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 27,
+            "line_end": 32,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L27-L32"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Environment reproducibility"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day14-cp0-e01",
+              "kind": "code",
+              "path": "Dockerfile",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/Dockerfile"
+            },
+            {
+              "id": "day14-cp0-e02",
+              "kind": "document",
+              "path": "QUICK_START.md",
+              "state": "instructions",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/QUICK_START.md"
+            }
+          ]
+        },
+        {
+          "id": "day14-cp1",
+          "label": "CP1",
+          "title": "Localhost và production",
+          "requirement": "Đối chiếu app phát triển và production, giải thích những khác biệt quan trọng.",
+          "expected_deliverable": "Mục Part 1 trong bài trả lời và minh chứng chạy thử.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 34,
+            "line_end": 40,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L34-L40"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Production configuration",
+              "Health check"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day14-cp1-e01",
+              "kind": "code",
+              "path": "01-localhost-vs-production/develop/app.py",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/01-localhost-vs-production/develop/app.py"
+            },
+            {
+              "id": "day14-cp1-e02",
+              "kind": "code",
+              "path": "01-localhost-vs-production/production/app.py",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/01-localhost-vs-production/production/app.py"
+            }
+          ]
+        },
+        {
+          "id": "day14-cp2",
+          "label": "CP2",
+          "title": "Docker",
+          "requirement": "So cách build, layer và image, chạy thử container theo yêu cầu.",
+          "expected_deliverable": "Mục Part 2 và minh chứng các khác biệt Docker.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 42,
+            "line_end": 48,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L42-L48"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Docker layers",
+              "Image size",
+              "Multi-stage build"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day14-cp2-e01",
+              "kind": "code",
+              "path": "02-docker/develop/Dockerfile",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/02-docker/develop/Dockerfile"
+            },
+            {
+              "id": "day14-cp2-e02",
+              "kind": "code",
+              "path": "02-docker/multi-stages/Dockerfile",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/02-docker/multi-stages/Dockerfile"
+            }
+          ]
+        },
+        {
+          "id": "day14-cp3",
+          "label": "CP3",
+          "title": "API security",
+          "requirement": "Kiểm xác thực, giới hạn tần suất và giới hạn chi phí ở API.",
+          "expected_deliverable": "Mục Part 4 có minh chứng HTTP đã che token.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 50,
+            "line_end": 56,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L50-L56"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Authentication",
+              "Rate limit",
+              "Cost guard"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day14-cp3-e01",
+              "kind": "code",
+              "path": "04-api-gateway/production/auth.py",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/04-api-gateway/production/auth.py"
+            },
+            {
+              "id": "day14-cp3-e02",
+              "kind": "code",
+              "path": "04-api-gateway/production/cost_guard.py",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/04-api-gateway/production/cost_guard.py"
+            }
+          ]
+        },
+        {
+          "id": "day14-cp4",
+          "label": "CP4",
+          "title": "Scaling và reliability",
+          "requirement": "Đối chiếu trạng thái cục bộ với kiến trúc mở rộng được và kiểm độ tin cậy.",
+          "expected_deliverable": "Mục Part 5 có kết quả kiểm tra và giải thích.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 58,
+            "line_end": 64,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L58-L64"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Statelessness",
+              "Shared state",
+              "Reliability"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day14-cp4-e01",
+              "kind": "code",
+              "path": "05-scaling-reliability/production/app.py",
+              "state": "example",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/05-scaling-reliability/production/app.py"
+            },
+            {
+              "id": "day14-cp4-e02",
+              "kind": "code",
+              "path": "05-scaling-reliability/production/test_stateless.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/05-scaling-reliability/production/test_stateless.py"
+            }
+          ]
+        },
+        {
+          "id": "day14-cp5",
+          "label": "CP5",
+          "title": "Final Project",
+          "requirement": "Hoàn thiện agent production trong thư mục Part 6 và qua 12 kiểm tra sẵn sàng.",
+          "expected_deliverable": "Bằng chứng production readiness 12/12 trong báo cáo.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 66,
+            "line_end": 72,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L66-L72"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Readiness",
+              "Service lifecycle",
+              "Persistence"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day14-cp5-e01",
+              "kind": "code",
+              "path": "06-lab-complete/app/main.py",
+              "state": "todo",
+              "verified_in_template": true,
+              "locator": {
+                "type": "text_anchor",
+                "text": "TODO",
+                "lines": [
+                  4,
+                  16,
+                  30,
+                  32,
+                  37,
+                  38,
+                  39,
+                  44
+                ]
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/app/main.py#L4"
+            },
+            {
+              "id": "day14-cp5-e02",
+              "kind": "code",
+              "path": "06-lab-complete/check_production_ready.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/check_production_ready.py"
+            }
+          ]
+        },
+        {
+          "id": "day14-cp6",
+          "label": "CP6",
+          "title": "Cloud deployment",
+          "requirement": "Triển khai agent Part 6 và backing storage, xác nhận endpoint readiness.",
+          "expected_deliverable": "DEPLOYMENT.md, URL và bằng chứng readiness.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 74,
+            "line_end": 86,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L74-L86"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Cloud deployment",
+              "Redis",
+              "Readiness"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day14-cp6-e01",
+              "kind": "code",
+              "path": "06-lab-complete/Dockerfile",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/Dockerfile"
+            },
+            {
+              "id": "day14-cp6-e02",
+              "kind": "report",
+              "path": "DEPLOYMENT.md",
+              "state": "expected_learner",
+              "verified_in_template": false,
+              "locator": {
+                "type": "path"
+              },
+              "url": null
+            }
+          ]
+        },
+        {
+          "id": "day14-cp7",
+          "label": "CP7",
+          "title": "Benchmark local",
+          "requirement": "Đo tải và chạy eval v1/v2, sửa lỗi rồi chạy lại gate.",
+          "expected_deliverable": "Báo cáo benchmark, run JSON và kết quả quality gate.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 88,
+            "line_end": 112,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L88-L112"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Load testing",
+              "Latency",
+              "Quality gate"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day14-cp7-e01",
+              "kind": "code",
+              "path": "06-lab-complete/benchmark-observability/develop/load_test.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/benchmark-observability/develop/load_test.py"
+            },
+            {
+              "id": "day14-cp7-e02",
+              "kind": "code",
+              "path": "06-lab-complete/benchmark-observability/develop/eval/run_eval.py",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/benchmark-observability/develop/eval/run_eval.py"
+            }
+          ]
+        },
+        {
+          "id": "day14-cp8",
+          "label": "CP8",
+          "title": "Observability và nộp",
+          "requirement": "Chạy stack quan sát, xem metric qua dashboard và tổng hợp gói nộp.",
+          "expected_deliverable": "Dashboard, minh chứng quan sát và các báo cáo nộp.",
+          "definition_source": {
+            "path": "CHECKPOINTS.md",
+            "line_start": 114,
+            "line_end": 131,
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md#L114-L131"
+          },
+          "lecture_topics": {
+            "status": "candidate_from_lab",
+            "terms": [
+              "Prometheus",
+              "Grafana",
+              "Operational telemetry"
+            ]
+          },
+          "evidence": [
+            {
+              "id": "day14-cp8-e01",
+              "kind": "configuration",
+              "path": "06-lab-complete/benchmark-observability/production/docker-compose.yml",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/benchmark-observability/production/docker-compose.yml"
+            },
+            {
+              "id": "day14-cp8-e02",
+              "kind": "configuration",
+              "path": "06-lab-complete/benchmark-observability/production/prometheus/prometheus.yml",
+              "state": "provided",
+              "verified_in_template": true,
+              "locator": {
+                "type": "file"
+              },
+              "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/06-lab-complete/benchmark-observability/production/prometheus/prometheus.yml"
+            }
+          ]
+        }
+      ],
+      "checkpoint_definition": {
+        "path": "CHECKPOINTS.md",
+        "url": "https://github.com/VinUni-AI20k/K5-L3-Day14-Deployment-Agent-Benchmark-Observability/blob/83e677fef599a58e21ba796b42ccc52ed43c1968/CHECKPOINTS.md"
+      }
+    }
+  ],
+  "sample_checks": [
+    {
+      "id": "lab-check-01",
+      "checkpoint_id": "day01-cp2",
+      "scenario": "Template có gọi encode.",
+      "expected_behavior": "Gắn Embedding với cell 6ee9d295 và ghi đây là code có sẵn trong template.",
+      "reference_evidence_ids": [
+        "day01-cp2-e01"
+      ]
+    },
+    {
+      "id": "lab-check-02",
+      "checkpoint_id": "day01-cp2",
+      "scenario": "Template có tên hàm cosine và kNN, thân hàm còn TODO.",
+      "expected_behavior": "Giải thích vai trò hai khái niệm và báo chưa đủ căn cứ áp dụng trực tiếp ở các hàm này.",
+      "reference_evidence_ids": [
+        "day01-cp2-e02",
+        "day01-cp2-e03"
+      ]
+    },
+    {
+      "id": "lab-check-03",
+      "checkpoint_id": "day01-cp2",
+      "scenario": "Bản nộp dùng đường dẫn notebook khác template.",
+      "expected_behavior": "Ưu tiên notebook trong report/individual và tìm lại cell ở đúng commit được đọc.",
+      "reference_evidence_ids": []
+    },
+    {
+      "id": "lab-check-04",
+      "checkpoint_id": "day02-cp4",
+      "scenario": "Repo chỉ có mẫu báo cáo nhóm.",
+      "expected_behavior": "Giải thích yêu cầu kiểm chứng và ghi thiếu nguồn chứng minh nhóm đã thực hiện.",
+      "reference_evidence_ids": [
+        "day02-cp4-e01"
+      ]
+    },
+    {
+      "id": "lab-check-05",
+      "checkpoint_id": "day07-m02",
+      "scenario": "Starter có vòng lặp agent và hợp đồng adapter.",
+      "expected_behavior": "Giải thích vòng lặp và citation, kiểm độc lập bằng chứng tích hợp retriever thật.",
+      "reference_evidence_ids": [
+        "day07-m02-e01"
+      ]
+    },
+    {
+      "id": "lab-check-06",
+      "checkpoint_id": "day10-cp3",
+      "scenario": "Cổng phòng ngừa chỉ có hàm khung.",
+      "expected_behavior": "Mô tả yêu cầu và hỏi bằng chứng kiểm thử trước khi kết luận cổng hoạt động.",
+      "reference_evidence_ids": [
+        "day10-cp3-e01"
+      ]
+    },
+    {
+      "id": "lab-check-07",
+      "checkpoint_id": "day12-phase2",
+      "scenario": "Chỉ có lịch công khai.",
+      "expected_behavior": "Nêu mốc tag đã xác nhận và báo thiếu tài liệu chi tiết phase.",
+      "reference_evidence_ids": []
+    },
+    {
+      "id": "lab-check-08",
+      "checkpoint_id": "day14-cp7",
+      "scenario": "Có script load test và eval, thiếu kết quả chạy.",
+      "expected_behavior": "Giải thích script và quality gate, ghi thiếu số đo.",
+      "reference_evidence_ids": [
+        "day14-cp7-e01",
+        "day14-cp7-e02"
+      ]
+    }
+  ]
+}
