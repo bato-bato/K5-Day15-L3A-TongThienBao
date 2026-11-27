@@ -50,7 +50,7 @@ def _match_gold_rules(query: str, day: int | None) -> list[dict[str, Any]]:
                 score += 3
         if rule["checkpoint"].lower() in q_lower:
             score += 5
-        if score >= 3 or (day is not None and day in rule["days"] and len(q_lower) < 12):
+        if score >= 3:
             scored.append((score, rule))
     scored.sort(key=lambda x: x[0], reverse=True)
     return [r for _, r in scored]

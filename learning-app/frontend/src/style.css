@@ -15,55 +15,6 @@
   background-color: #f8fafc;
 }
 
-.lecture-mindmap-dialog {
-  width: min(72rem, calc(100% - 2rem));
-  height: min(48rem, calc(100dvh - 2rem));
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  background: #fff;
-  color: #1e293b;
-  box-shadow: 0 24px 64px rgb(15 23 42 / 24%);
-}
-
-.lecture-mindmap-dialog::backdrop {
-  background: rgb(15 23 42 / 48%);
-}
-
-.lecture-mindmap-panel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.lecture-mindmap-panel > header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px 10px 16px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.lecture-mindmap-panel h2 {
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.lecture-mindmap-panel > header button {
-  flex: 0 0 36px;
-  height: 36px;
-  border-radius: 8px;
-  color: #475569;
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.lecture-mindmap-panel > header button:hover {
-  background: #f1f5f9;
-}
-
 .node-inspector {
   display: flex;
   flex-direction: column;
@@ -74,30 +25,13 @@
 
 .node-inspector-drawer {
   position: fixed;
-  inset: 4rem 1rem 5rem auto;
+  inset: 4.25rem 1rem 1.25rem auto;
   z-index: 30;
   width: min(450px, calc(100% - 2rem));
   height: auto;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
   box-shadow: 0 24px 64px rgb(15 23 42 / 24%);
-}
-
-.lecture-node-dialog {
-  inset: 0;
-  width: min(490px, calc(100% - 2rem));
-  height: min(48rem, calc(100dvh - 2rem));
-  margin: auto 1rem auto auto;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  color: #1e293b;
-  box-shadow: 0 24px 64px rgb(15 23 42 / 24%);
-}
-
-.lecture-node-dialog::backdrop {
-  background: rgb(15 23 42 / 24%);
 }
 
 .mindmap-viewport {

@@ -1,13 +1,13 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChatBot } from './ChatBot.jsx';
-import { CourseTree } from './CourseTree.jsx';
+import { CourseTree, getNodeTitle } from './CourseTree.jsx';
 import { LabGuide } from './LabGuide.jsx';
-import { Mindmap } from './Mindmap.jsx';
+import { buildEnrichedMindmaps, resolveCheckpointMindmapNodes } from './LectureReferences.jsx';
+import { labs } from '../../../data/lab-mapping/labs.json';
+import { checkpoint_views } from '../../../data/lab-mapping/knowledge-graph.json';
 import './style.css';
 
-const EMPTY = { nodes: [] };
-const TABS = { mindmaps: 'Mindmap (KG)', lab: 'Lab' };
 const DAYS = Array.from({ length: 14 }, (_, index) => index + 1);
 const QUICK_QUERIES = ['CP1', 'CP2', 'CP3', 'CP4', 'Lethal Trifecta', 'Cost-of-Pass', 'Rogan-Gladen', 'FTS5'];
 
@@ -17,11 +17,40 @@ async function request(path, options) {
   return response.json();
 }
 
-function getDayShortTitle(workspace, day) {
-  const root = workspace?.mindmaps?.[day]?.nodes?.find(n => n.node_type === 'day_root');
+function getDayShortTitle(mindmapsByDay, day) {
+  const lab = labs.find(item => item.day === day);
+  if (lab?.title) return lab.title;
+  const root = mindmapsByDay?.[day]?.nodes?.find(n => n.node_type === 'day_root');
   if (!root?.text) return `Ngày ${day}`;
   const firstLine = root.text.split('\n')[0].replace(/^Ngày\s+\d+:\s*/i, '').trim();
   return firstLine || `Ngày ${day}`;
+}
+
+function normalizeForSearch(text) {
+  return String(text || '')
+    .normalize('NFC')
+    .toLowerCase();
+}
+
+function stripVietnameseDiacritics(text) {
+  return normalizeForSearch(text)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd');
+}
+
+function matchesAllTokens(haystack, query) {
+  const tokens = normalizeForSearch(query)
+    .split(/\s+/)
+    .map(t => t.trim())
+    .filter(Boolean);
+  if (!tokens.length) return false;
+  const normHaystack = normalizeForSearch(haystack);
+  const plainHaystack = stripVietnameseDiacritics(haystack);
+  return tokens.every(tok => {
+    const plainTok = stripVietnameseDiacritics(tok);
+    return normHaystack.includes(tok) || plainHaystack.includes(plainTok);
+  });
 }
 
 const NODE_TYPE_LABELS = {
@@ -192,7 +221,6 @@ function parseStudySections(rawText) {
   const blocks = chunks.map(chunk => {
     const clean = chunk.replace(/->/g, '→');
 
-    // 1. Formula: "LHS = A + B + C"
     const eqIdx = clean.indexOf(' = ');
     if (eqIdx > 0 && eqIdx <= 42 && !clean.slice(0, eqIdx).includes(':')) {
       const lhs = clean.slice(0, eqIdx).trim();
@@ -205,13 +233,11 @@ function parseStudySections(rawText) {
       }
     }
 
-    // Extract "Label: rest" (allow longer descriptive lead-ins up to 120 chars)
     const colonIdx = clean.indexOf(': ');
     const hasLabel = colonIdx > 0 && colonIdx <= 120;
     const label = hasLabel ? clean.slice(0, colonIdx).trim() : '';
     const rest = hasLabel ? clean.slice(colonIdx + 2).trim() : clean;
 
-    // 2. Colon-separated List BEFORE Flow so commas separating items with "(A → B)" stay intact
     if (hasLabel) {
       const items = splitTopLevelCommas(rest);
       if (items.length >= 2 && items.every(i => i.length <= 80)) {
@@ -219,13 +245,11 @@ function parseStudySections(rawText) {
       }
     }
 
-    // 3. Step Flow: top-level arrows "→" outside parentheses
     const flowSteps = splitTopLevelArrows(rest);
     if (flowSteps.length >= 2) {
       return { kind: 'flow', label, steps: flowSteps };
     }
 
-    // 4. Implicit Vietnamese Pillar List: "... đòi hỏi A, B, C, D" or "... gồm A, B, C"
     const verbMatch = clean.match(/^(.{6,60}?\b(?:đòi hỏi|bao gồm|gồm|gồm có|qua \d+ [^:]+))\s+([^:]+)$/i);
     if (verbMatch) {
       const items = splitTopLevelCommas(verbMatch[2]);
@@ -281,12 +305,12 @@ function parseExplanationSummary(text) {
   return { headline, concepts, codeFiles, stats };
 }
 
-function NodeInspector({ selectedNode, className = '', titleId, onClose, onRelatedConcept, onExploreGraph }) {
+function NodeInspector({ selectedNode, day, className = '', titleId, onClose, onRelatedConcept, onOpenCheckpoint }) {
   const conceptId = selectedNode.source_ref?.concept_id;
   const [nodeGraph, setNodeGraph] = useState(null);
 
   useEffect(() => {
-    if (!conceptId) return;
+    if (!conceptId || conceptId.startsWith('DAY_')) return;
     let cancelled = false;
     request(`/api/graph/subgraph?node_id=${encodeURIComponent(conceptId)}&hops=2&direction=both`)
       .then(data => {
@@ -306,15 +330,16 @@ function NodeInspector({ selectedNode, className = '', titleId, onClose, onRelat
   const selfGraphNode = gData?.nodes?.find(n => n.id === conceptId);
   const keywords = selfGraphNode?.keywords || [];
   const relatedConcepts = (gData?.nodes || []).filter(
-    n => n.node_kind === 'concept' && n.id !== conceptId && n.type !== 'DayModule'
+    n => n.node_kind === 'concept' && n.id !== conceptId && n.type !== 'DayModule',
   ).slice(0, 4);
   const appliedTargets = (gData?.nodes || []).filter(
-    n => n.node_kind === 'checkpoint' || n.node_kind === 'code_symbol'
+    n => n.node_kind === 'checkpoint' || n.node_kind === 'code_symbol',
   ).slice(0, 4);
   const topCommunity = gData?.communities?.[0] || null;
+  const labCheckpoints = selectedNode.lab_topic?.checkpoints ?? [];
 
   return (
-    <aside className={`node-inspector ${className}`} aria-label="Kiểm chứng nguồn nút">
+    <aside className={`node-inspector ${className}`} aria-label="Thông tin tri thức nút">
       {/* Colored Hero Header */}
       <div className={`bg-gradient-to-r ${theme.hero} px-4 py-3.5 shrink-0`}>
         <div className="flex items-center justify-between gap-2 mb-2">
@@ -336,7 +361,6 @@ function NodeInspector({ selectedNode, className = '', titleId, onClose, onRelat
           <button
             type="button"
             aria-label="Đóng chi tiết nút"
-            autoFocus={Boolean(titleId)}
             onClick={onClose}
             className="text-white/80 hover:text-white hover:bg-white/15 px-1.5 py-0.5 rounded-md text-sm font-bold"
           >
@@ -346,10 +370,15 @@ function NodeInspector({ selectedNode, className = '', titleId, onClose, onRelat
         <h3 id={titleId} className="text-[15.5px] font-bold leading-snug text-white">
           {study.title}
         </h3>
+        {selectedNode.source_ref?.section_ref && (
+          <div className="mt-1 text-[11px] text-white/80 truncate" title={selectedNode.source_ref.section_ref}>
+            📖 {selectedNode.source_ref.section_ref}
+          </div>
+        )}
       </div>
 
       <div className="p-4 overflow-y-auto space-y-3.5 text-xs select-text">
-        {/* Key Quote Callout (prominent at top when available) */}
+        {/* Key Quote Callout */}
         {selectedNode.source_ref?.key_quote && (
           <div className="bg-amber-50/90 border border-amber-200 border-l-4 border-l-amber-500 rounded-xl p-3">
             <div className="text-[10px] font-bold uppercase tracking-wider text-amber-700 mb-1">
@@ -477,6 +506,28 @@ function NodeInspector({ selectedNode, className = '', titleId, onClose, onRelat
           </div>
         )}
 
+        {/* Linked Lab Checkpoints */}
+        {labCheckpoints.length > 0 && (
+          <div className="bg-blue-50/70 border border-blue-200 rounded-xl p-3 space-y-2">
+            <div className="text-[10.5px] font-bold uppercase tracking-wider text-blue-800">
+              Áp dụng trong bài Lab Ngày {day}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {labCheckpoints.map(cp => (
+                <button
+                  key={cp.id}
+                  type="button"
+                  onClick={() => onOpenCheckpoint?.(day, cp.id)}
+                  className="px-2.5 py-1 rounded-lg bg-white hover:bg-blue-100 border border-blue-200 text-blue-800 font-semibold text-[11px] flex items-center gap-1.5 transition"
+                >
+                  <span className="font-mono font-bold text-blue-700">{cp.label}</span>
+                  <span className="truncate max-w-[220px] text-slate-700">{cp.title}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Keywords from Graph DB */}
         {keywords.length > 0 && (
           <div className="space-y-1.5">
@@ -558,32 +609,6 @@ function NodeInspector({ selectedNode, className = '', titleId, onClose, onRelat
           </div>
         )}
 
-        {/* Lecture Provenance Metadata */}
-        {selectedNode.source_ref && (
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-slate-700 text-[11.5px]">Truy vết Nguồn (Provenance)</span>
-              <code className="bg-white px-2 py-0.5 rounded-md border border-slate-200 text-blue-700 text-[10.5px] font-semibold">
-                {selectedNode.source_ref.concept_id}
-              </code>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-[11px]">
-              <div className="bg-white rounded-lg px-2.5 py-1.5 border border-slate-200/80">
-                <div className="text-[9.5px] uppercase tracking-wider text-slate-400 font-semibold">Trang PDF</div>
-                <div className="font-semibold text-slate-800">
-                  Ngày {selectedNode.source_ref.day} · Tr. {selectedNode.source_ref.pdf_pages?.join(', ') || '—'}
-                </div>
-              </div>
-              <div className="bg-white rounded-lg px-2.5 py-1.5 border border-slate-200/80">
-                <div className="text-[9.5px] uppercase tracking-wider text-slate-400 font-semibold">Mục giáo trình</div>
-                <div className="font-semibold text-slate-800 truncate" title={selectedNode.source_ref.section_ref}>
-                  {selectedNode.source_ref.section_ref}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {selectedNode.code_link && (
           <div className="bg-teal-50/70 border border-teal-200 rounded-xl p-3.5 space-y-1.5">
             <div className="font-bold text-teal-900">Liên kết Code Lab (Repo Parser AST)</div>
@@ -594,106 +619,22 @@ function NodeInspector({ selectedNode, className = '', titleId, onClose, onRelat
             <div><strong>Dòng:</strong> L{selectedNode.code_link.line_start}–L{selectedNode.code_link.line_end}</div>
           </div>
         )}
-
-        {study.title && (
-          <button
-            type="button"
-            onClick={() => onExploreGraph(study.title)}
-            className="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-sm"
-          >
-            <span>⚡</span> Khám phá GraphRAG & Code Lab cho nút này →
-          </button>
-        )}
       </div>
     </aside>
   );
 }
 
-function LectureNodeDialog({ node, onClose, onRelatedConcept, onExploreGraph }) {
-  const dialogRef = useRef(null);
-
-  useLayoutEffect(() => {
-    dialogRef.current.showModal();
-  }, []);
-
-  return (
-    <dialog
-      ref={dialogRef}
-      className="lecture-node-dialog"
-      aria-labelledby="lecture-node-title"
-      onClose={event => {
-        event.stopPropagation();
-        onClose();
-      }}
-    >
-      <NodeInspector
-        key={node.id}
-        selectedNode={node}
-        titleId="lecture-node-title"
-        onClose={() => dialogRef.current.close()}
-        onRelatedConcept={onRelatedConcept}
-        onExploreGraph={onExploreGraph}
-      />
-    </dialog>
-  );
-}
-
-function LectureMindmapDialog({ day, title, nodes, nodeId, onClose, findRelatedConcept, onExploreGraph }) {
-  const dialogRef = useRef(null);
-  const [selectedId, setSelectedId] = useState(nodeId);
-  const [detail, setDetail] = useState(null);
-
-  useLayoutEffect(() => {
-    dialogRef.current.showModal();
-  }, []);
-
-  function selectNode(nextId) {
-    setSelectedId(nextId);
-    const node = nodes.find(item => item.id === nextId);
-    if (node) setDetail({ day, node });
-  }
-
-  return (
-    <dialog ref={dialogRef} className="lecture-mindmap-dialog" aria-labelledby="lecture-mindmap-title" onClose={onClose}>
-      <div className="lecture-mindmap-panel">
-        <header>
-          <h2 id="lecture-mindmap-title">Mindmap · Ngày {day} · {title}</h2>
-          <button type="button" aria-label="Đóng Mindmap" onClick={() => dialogRef.current.close()}>×</button>
-        </header>
-        <Mindmap nodes={nodes} day={day} selectedId={selectedId} initialFocusId={nodeId} onSelect={selectNode} />
-      </div>
-      {detail && (
-        <LectureNodeDialog
-          node={detail.node}
-          onClose={() => setDetail(null)}
-          onRelatedConcept={(conceptId, targetDay) => {
-            const node = findRelatedConcept(conceptId, targetDay);
-            if (node) setDetail({ day: targetDay, node });
-          }}
-          onExploreGraph={query => onExploreGraph(query, detail.day, detail.node.id)}
-        />
-      )}
-    </dialog>
-  );
-}
-
 function App() {
   const [view, setView] = useState('lab');
-  const [day, setDay] = useState(2);
-  const [tab, setTab] = useState('lab');
+  const [day, setDay] = useState(1);
   const [workspace, setWorkspace] = useState(null);
-  const [loadError, setLoadError] = useState(false);
-  const [edits, setEdits] = useState({});
-  const [saving, setSaving] = useState({});
-  const [messages, setMessages] = useState({});
   const [selectedId, setSelectedId] = useState(null);
   const [labCheckpoint, setLabCheckpoint] = useState(null);
-  const [lectureMindmap, setLectureMindmap] = useState(null);
+  const [focusedCheckpoint, setFocusedCheckpoint] = useState(null);
 
   const [dayMenuOpen, setDayMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showGrid, setShowGrid] = useState(true);
-  const [layoutTrigger, setLayoutTrigger] = useState(0);
+  const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
 
   const [mapperOpen, setMapperOpen] = useState(false);
   const [mapQuery, setMapQuery] = useState('CP3');
@@ -712,78 +653,160 @@ function App() {
   const [ingestStatus, setIngestStatus] = useState(null);
 
   const searchInputRef = useRef(null);
+  const searchBoxRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  const key = `${tab}/${day}`;
-  const edited = edits[key];
-  const draft = edited ?? workspace?.[tab]?.[day] ?? EMPTY;
-  const selectedNode = draft.nodes.find(n => n.id === selectedId) || null;
-  const activeTitle = getDayShortTitle(workspace, day);
+  const enrichedMindmaps = useMemo(() => buildEnrichedMindmaps(workspace), [workspace]);
+  const currentNodes = enrichedMindmaps?.[day]?.nodes ?? [];
+  const selectedNode = currentNodes.find(n => n.id === selectedId) || null;
+  const activeTitle = getDayShortTitle(enrichedMindmaps, day);
 
-  // Concept currently selected on canvas -> chatbot focus (KG concept_id from verified seed nodes)
+  const currentLab = useMemo(() => labs.find(item => item.day === day), [day]);
+  const activeCheckpoint = useMemo(
+    () => currentLab?.checkpoints.find(cp => cp.id === labCheckpoint) ?? null,
+    [currentLab, labCheckpoint],
+  );
+
+  // Concept or Lab section currently focused -> ChatBot context
   const chatFocus = selectedNode?.source_ref?.concept_id
     ? {
         id: selectedNode.source_ref.concept_id,
         day: selectedNode.source_ref.day ?? day,
-        label: (selectedNode.text || '').split('\n')[0].replace(/^\[[^\]]+\]\s*/, '').slice(0, 80),
+        label: getNodeTitle(selectedNode).slice(0, 80),
+      }
+    : null;
+  const currentLabFocusId = activeCheckpoint ? activeCheckpoint.id : currentLab?.id;
+  const currentLabFocus = currentLab
+    ? {
+        day,
+        label: activeCheckpoint ? `${activeCheckpoint.label} · ${activeCheckpoint.title}` : currentLab.title,
       }
     : null;
 
-  // Citation chip click -> open that concept's node on the Mindmap of its day
+  // Deterministic Search Results across Lab Checkpoints & Mindmap Concepts
+  const searchResults = useMemo(() => {
+    const q = searchQuery.trim();
+    if (!q) return { labHits: [], conceptHits: [] };
+
+    const labHits = [];
+    for (const lab of labs) {
+      for (const cp of lab.checkpoints) {
+        const viewData = checkpoint_views?.[cp.id];
+        const haystack = [
+          `Ngày ${lab.day}`,
+          `D${lab.day}`,
+          lab.title,
+          cp.label,
+          cp.title,
+          cp.requirement,
+          viewData?.explanation || '',
+        ].join(' ');
+        if (matchesAllTokens(haystack, q)) {
+          labHits.push({
+            day: lab.day,
+            labTitle: lab.title,
+            cpId: cp.id,
+            label: cp.label,
+            title: cp.title,
+          });
+        }
+      }
+    }
+
+    const conceptHits = [];
+    for (const d of DAYS) {
+      const nodes = enrichedMindmaps?.[d]?.nodes ?? [];
+      for (const node of nodes) {
+        if (node.node_type === 'day_root') continue;
+        const haystack = [
+          `Ngày ${d}`,
+          `D${d}`,
+          node.text || '',
+          node.source_ref?.concept_id || '',
+          node.source_ref?.section_ref || '',
+          node.lab_topic?.id || '',
+        ].join(' ');
+        if (matchesAllTokens(haystack, q)) {
+          conceptHits.push({
+            day: d,
+            nodeId: node.id,
+            title: getNodeTitle(node),
+            pages: node.source_ref?.pdf_pages || [],
+            isTrap: node.node_type === 'trap',
+          });
+        }
+      }
+    }
+
+    return {
+      labHits: labHits.slice(0, 6),
+      conceptHits: conceptHits.slice(0, 8),
+    };
+  }, [searchQuery, enrichedMindmaps]);
+
+  function openMindmapFromLab(targetDay, nodeId, checkpoint) {
+    const nextDay = targetDay || day;
+    setDay(nextDay);
+    setView('mindmap');
+    setSelectedId(nodeId || null);
+    if (checkpoint) {
+      const guide = checkpoint_views?.[checkpoint.id];
+      const linked = resolveCheckpointMindmapNodes(checkpoint, guide, enrichedMindmaps, nextDay);
+      setFocusedCheckpoint({
+        day: nextDay,
+        id: checkpoint.id,
+        label: checkpoint.label,
+        title: checkpoint.title,
+        nodeIds: linked.map(item => item.node.id),
+      });
+    } else {
+      setFocusedCheckpoint(null);
+    }
+  }
+
   function jumpToConcept(conceptId, targetDay) {
     if (!targetDay) return;
-    const mapKey = `mindmaps/${targetDay}`;
-    const nodes = (edits[mapKey] ?? workspace?.mindmaps?.[targetDay] ?? EMPTY).nodes;
-    const target = nodes.find(n => n.source_ref?.concept_id === conceptId);
-    setTab('mindmaps');
-    if (tab === 'lab') setView('mindmaps');
+    const nodes = enrichedMindmaps?.[targetDay]?.nodes ?? [];
+    const target = nodes.find(
+      n => n.source_ref?.concept_id === conceptId || n.lab_topic?.id === conceptId,
+    );
+    setView('mindmap');
     setDay(targetDay);
+    setFocusedCheckpoint(null);
     setSelectedId(target ? target.id : null);
   }
 
-  function openLectureMindmap(targetDay, nodeId) {
-    setLectureMindmap({ day: targetDay, nodes: workspace.mindmaps[targetDay].nodes, nodeId });
-  }
-
   function selectRelatedConcept(conceptId, targetDay) {
-    if (targetDay < 1 || targetDay > 14 || !targetDay) return;
-    selectDay(targetDay);
-    const targetNodes = (edits[`${tab}/${targetDay}`] ?? workspace?.[tab]?.[targetDay] ?? EMPTY).nodes;
-    const node = targetNodes.find(item => item.source_ref?.concept_id === conceptId);
-    if (node) setSelectedId(node.id);
-  }
-
-  function exploreGraph(query, targetDay = day) {
-    setMapperOpen(true);
-    runMapping(query, targetDay);
-  }
-
-  function exploreLectureGraph(query, targetDay, nodeId) {
-    setLectureMindmap(null);
-    switchView('mindmaps');
+    if (!targetDay || targetDay < 1 || targetDay > 14) return;
     setDay(targetDay);
-    setSelectedId(nodeId);
-    exploreGraph(query, targetDay);
+    setFocusedCheckpoint(null);
+    const targetNodes = enrichedMindmaps?.[targetDay]?.nodes ?? [];
+    const node = targetNodes.find(item => item.source_ref?.concept_id === conceptId);
+    setSelectedId(node ? node.id : null);
   }
 
   function selectDay(nextDay) {
     setDay(nextDay);
     setSelectedId(null);
+    setLabCheckpoint(null);
+    setFocusedCheckpoint(null);
   }
 
   function switchView(nextView) {
-    setView(nextView);
-    setTab(nextView === 'lab' ? 'lab' : 'mindmaps');
+    const normalized = nextView === 'lab' ? 'lab' : 'mindmap';
+    setView(normalized);
     setSelectedId(null);
     setMapperOpen(false);
+    if (normalized === 'lab') {
+      setFocusedCheckpoint(null);
+    }
   }
 
   async function load() {
-    setLoadError(false);
     try {
       setWorkspace(await request('/api/workspace'));
     } catch {
-      setLoadError(true);
+      /* Labs & Mindmap bridge remain usable offline from static curriculum catalogs */
     }
   }
 
@@ -794,11 +817,18 @@ function App() {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
         searchInputRef.current?.focus();
+        setSearchDropdownOpen(true);
+      } else if (event.key === 'Escape') {
+        setSearchDropdownOpen(false);
+        setDayMenuOpen(false);
       }
     }
     function onClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDayMenuOpen(false);
+      }
+      if (searchBoxRef.current && !searchBoxRef.current.contains(event.target)) {
+        setSearchDropdownOpen(false);
       }
     }
     window.addEventListener('keydown', onKeyDown);
@@ -808,70 +838,6 @@ function App() {
       window.removeEventListener('mousedown', onClickOutside);
     };
   }, []);
-
-  function edit(value) {
-    setEdits(current => ({ ...current, [key]: value }));
-    setMessages(current => ({ ...current, [key]: '' }));
-  }
-
-  async function save() {
-    setSaving(current => ({ ...current, [key]: true }));
-    setMessages(current => ({ ...current, [key]: '' }));
-    try {
-      const saved = await request(`/api/${key}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(draft),
-      });
-      setWorkspace(current => ({
-        ...current,
-        [tab]: { ...current[tab], [day]: saved },
-      }));
-      setEdits(current => {
-        if (current[key] !== edited) return current;
-        const next = { ...current };
-        delete next[key];
-        return next;
-      });
-      setMessages(current => ({ ...current, [key]: 'Đã lưu' }));
-    } catch {
-      setMessages(current => ({ ...current, [key]: 'Lưu thất bại' }));
-    } finally {
-      setSaving(current => ({ ...current, [key]: false }));
-    }
-  }
-
-  async function resetToSeed() {
-    setSaving(current => ({ ...current, [key]: true }));
-    try {
-      const seeded = await request(`/api/reset/${key}`, { method: 'POST' });
-      setWorkspace(current => ({
-        ...current,
-        [tab]: { ...current[tab], [day]: seeded },
-      }));
-      setEdits(current => {
-        const next = { ...current };
-        delete next[key];
-        return next;
-      });
-      setSelectedId(null);
-      setMessages(current => ({ ...current, [key]: 'Đã khôi phục KG' }));
-    } catch {
-      setMessages(current => ({ ...current, [key]: 'Khôi phục lỗi' }));
-    } finally {
-      setSaving(current => ({ ...current, [key]: false }));
-    }
-  }
-
-  function exportJson() {
-    const blob = new Blob([JSON.stringify(draft, null, 2)], { type: 'application/json;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ai-mindmap-d${day}-${tab}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
 
   async function runMapping(overrideQuery, targetDay = day) {
     const q = (overrideQuery ?? mapQuery).trim();
@@ -931,65 +897,53 @@ function App() {
     }
   }
 
-  function insertVerifiedNode(kRef) {
-    if (draft.nodes.length >= 100) return;
-    const id = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}`;
-    const newNode = {
-      id,
-      text: `[D${kRef.day}${kRef.pdf_pages?.length ? ` tr.${kRef.pdf_pages.join(',')}` : ''}] ${kRef.label}\n${kRef.summary}`,
-      x: 160 + (draft.nodes.length % 3) * 370,
-      y: 280 + Math.floor(draft.nodes.length / 3) * 210,
-      parent_id: draft.nodes[0]?.id ?? null,
-      node_type: kRef.type === 'FailureOrTrap' ? 'trap' : 'concept',
-      source_ref: {
-        concept_id: kRef.concept_id,
-        day: kRef.day,
-        pdf_pages: kRef.pdf_pages || [],
-        section_ref: kRef.section_ref || '',
-        key_quote: kRef.key_quote || '',
-      },
-      code_link: null,
-      verification_status: 'verified',
-    };
-    edit({ nodes: [...draft.nodes, newNode] });
-    setSelectedId(id);
-  }
+  const hasSearchQuery = searchQuery.trim().length > 0;
+  const totalSearchMatches = searchResults.labHits.length + searchResults.conceptHits.length;
 
   return (
     <div className="h-full flex flex-col overflow-hidden bg-slate-50 text-slate-800">
-      {/* TopNavigationBar */}
-      <header className="h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between z-30 shrink-0 shadow-sm">
-        {/* Left: Logo, Project Name, View & Day Dropdown */}
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2">
+      {/* Unified Header (identical in both Lab and Mindmap) */}
+      <header className="h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between gap-3 z-30 shrink-0 shadow-sm">
+        {/* Left: Logo, View Tabs & Unified Day Selector */}
+        <div className="flex items-center space-x-3 min-w-0">
+          <div className="flex items-center space-x-2 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-blue-500/30">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path d="M13 10V3L4 14h7v7l9-11h-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
               </svg>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-slate-800 tracking-tight text-sm hidden sm:inline">AI20K</span>
-            </div>
+            <span className="font-bold text-slate-800 tracking-tight text-sm hidden sm:inline">AI20K</span>
           </div>
-          <nav className="workspace-view-tabs" aria-label="Khu vực học">
-            <button type="button" aria-current={tab === 'lab' ? 'page' : undefined} onClick={() => switchView('lab')}>Lab</button>
-            <button type="button" aria-current={tab === 'mindmaps' ? 'page' : undefined} onClick={() => switchView('tree')}>Mindmap</button>
+
+          <nav className="workspace-view-tabs shrink-0" aria-label="Khu vực học">
+            <button
+              type="button"
+              aria-current={view === 'lab' ? 'page' : undefined}
+              onClick={() => switchView('lab')}
+            >
+              Lab
+            </button>
+            <button
+              type="button"
+              aria-current={view === 'mindmap' ? 'page' : undefined}
+              onClick={() => switchView('mindmap')}
+            >
+              Mindmap
+            </button>
           </nav>
 
-          <div className="h-4 w-px bg-slate-300 mx-1 hidden sm:block" />
+          <div className="h-4 w-px bg-slate-300 mx-1 hidden sm:block shrink-0" />
 
-          {/* Active Topic / Day Selector Dropdown */}
-          {view !== 'lab' && <div className="relative hidden md:block" ref={dropdownRef}>
+          {/* Unified Day Selector Dropdown */}
+          <div className="relative hidden md:block" ref={dropdownRef}>
             <button
               type="button"
               onClick={() => setDayMenuOpen(o => !o)}
               className="flex items-center gap-2 px-2.5 py-1.5 rounded-md hover:bg-slate-100 text-xs font-medium text-slate-700 border border-slate-200 transition"
             >
-              <span className={`w-2 h-2 rounded-full ${view === 'tree' ? 'bg-blue-600' : 'bg-purple-500'}`} />
+              <span className={`w-2 h-2 rounded-full ${view === 'lab' ? 'bg-teal-600' : 'bg-blue-600'}`} />
               <span className="truncate max-w-[230px] sm:max-w-[280px]">
-                {tab === 'mindmaps'
-                  ? `D${day} · Mindmap: ${activeTitle}`
-                  : `D${day} · Lab: ${activeTitle}`}
+                {`D${String(day).padStart(2, '0')} · ${activeTitle}`}
               </span>
               <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -998,23 +952,10 @@ function App() {
 
             {dayMenuOpen && (
               <div className="absolute left-0 mt-1.5 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2">
-                <div className="flex gap-1 p-1 bg-slate-100 rounded-lg mb-2">
-                  {[
-                    ['tree', 'Mindmap'],
-                    ['lab', 'Lab'],
-                  ].map(([id, label]) => (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => switchView(id)}
-                      className={`flex-1 py-1 text-xs font-semibold rounded-md transition ${view === id ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
+                <div className="px-2 py-1 text-[10.5px] font-bold uppercase tracking-wider text-slate-400">
+                  Chọn ngày học (1–14)
                 </div>
-                <div className="max-h-72 overflow-y-auto space-y-0.5">
+                <div className="max-h-80 overflow-y-auto space-y-0.5">
                   {DAYS.map(d => (
                     <button
                       key={d}
@@ -1023,40 +964,61 @@ function App() {
                         selectDay(d);
                         setDayMenuOpen(false);
                       }}
-                      className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 transition ${day === d ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-50'
-                        }`}
+                      className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 transition ${
+                        day === d ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-50'
+                      }`}
                     >
-                      <span className={`w-6 text-center font-mono text-[11px] px-1 py-0.5 rounded ${day === d ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
-                        }`}>
-                        D{d}
+                      <span
+                        className={`w-7 text-center font-mono text-[11px] px-1 py-0.5 rounded shrink-0 ${
+                          day === d ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
+                        }`}
+                      >
+                        D{String(d).padStart(2, '0')}
                       </span>
-                      <span className="truncate">{getDayShortTitle(workspace, d)}</span>
+                      <span className="truncate">{getDayShortTitle(enrichedMindmaps, d)}</span>
                     </button>
                   ))}
                 </div>
               </div>
             )}
-          </div>}
+          </div>
         </div>
 
-        {/* Center: Search Quick Action */}
-        {view !== 'lab' && <div className="hidden lg:flex items-center">
+        {/* Center: Unified Deterministic Search */}
+        <div className="hidden lg:flex items-center relative" ref={searchBoxRef}>
           <form
             className="relative"
             onSubmit={e => {
               e.preventDefault();
-              if (searchQuery.trim()) {
-                setMapperOpen(true);
-                runMapping(searchQuery.trim());
+              if (!hasSearchQuery) return;
+              if (searchResults.labHits.length > 0) {
+                const first = searchResults.labHits[0];
+                setDay(first.day);
+                setLabCheckpoint(first.cpId);
+                setView('lab');
+                setSearchDropdownOpen(false);
+              } else if (searchResults.conceptHits.length > 0) {
+                const first = searchResults.conceptHits[0];
+                setDay(first.day);
+                setSelectedId(first.nodeId);
+                setFocusedCheckpoint(null);
+                setView('mindmap');
+                setSearchDropdownOpen(false);
+              } else {
+                setSearchDropdownOpen(true);
               }
             }}
           >
             <input
               ref={searchInputRef}
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-72 pl-8 pr-12 py-1.5 text-xs bg-slate-100 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white text-slate-700 transition"
-              placeholder="Tìm kiếm khái niệm, tr. sách... (Ctrl+K)"
+              onFocus={() => setSearchDropdownOpen(true)}
+              onChange={e => {
+                setSearchQuery(e.target.value);
+                setSearchDropdownOpen(true);
+              }}
+              className="w-80 pl-8 pr-12 py-1.5 text-xs bg-slate-100 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white text-slate-700 transition"
+              placeholder="Tìm checkpoint, khái niệm... (Ctrl+K)"
               type="text"
             />
             <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1065,7 +1027,11 @@ function App() {
             {searchQuery ? (
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
+                onClick={() => {
+                  setSearchQuery('');
+                  setSearchDropdownOpen(false);
+                }}
+                aria-label="Xóa từ khóa tìm kiếm"
                 className="absolute right-2 top-1.5 text-[10px] bg-slate-200 hover:bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded font-mono"
               >
                 ×
@@ -1076,60 +1042,96 @@ function App() {
               </span>
             )}
           </form>
-        </div>}
 
-        {/* Right: Canvas Controls, Save, Export, AI GraphRAG, Avatar */}
-        {view !== 'lab' && <div className="flex items-center space-x-2">
-          <button
-            type="button"
-            onClick={() => setShowGrid(g => !g)}
-            className={`p-1.5 rounded-md transition text-xs flex items-center gap-1 ${showGrid ? 'text-blue-600 bg-blue-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            title="Bật/Tắt Lưới"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-            </svg>
-          </button>
+          {searchDropdownOpen && hasSearchQuery && (
+            <div className="absolute left-0 top-full mt-1.5 w-[420px] max-h-[70vh] overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-2 space-y-2 text-xs">
+              {totalSearchMatches === 0 ? (
+                <div className="px-3 py-4 text-center text-slate-500 space-y-2">
+                  <div>Không tìm thấy kết quả phù hợp cho “{searchQuery.trim()}”.</div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchDropdownOpen(false);
+                      setMapperOpen(true);
+                      runMapping(searchQuery.trim());
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold transition"
+                  >
+                    Tra cứu bằng AI GraphRAG →
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {searchResults.labHits.length > 0 && (
+                    <div className="space-y-1">
+                      <div className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Phần bài Lab ({searchResults.labHits.length})
+                      </div>
+                      {searchResults.labHits.map(hit => (
+                        <button
+                          key={hit.cpId}
+                          type="button"
+                          onClick={() => {
+                            setDay(hit.day);
+                            setLabCheckpoint(hit.cpId);
+                            setFocusedCheckpoint(null);
+                            setSelectedId(null);
+                            setView('lab');
+                            setSearchDropdownOpen(false);
+                          }}
+                          className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-blue-50 flex items-center justify-between gap-2 transition"
+                        >
+                          <div className="min-w-0">
+                            <div className="font-semibold text-slate-800 truncate">
+                              <span className="font-mono text-blue-700 mr-1.5">{hit.label}</span>
+                              {hit.title}
+                            </div>
+                            <div className="text-[11px] text-slate-500 truncate">{hit.labTitle}</div>
+                          </div>
+                          <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-[10px] shrink-0">
+                            D{String(hit.day).padStart(2, '0')}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
-          <button
-            type="button"
-            onClick={() => setLayoutTrigger(t => t + 1)}
-            className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-md transition text-xs flex items-center gap-1"
-            title="Tự động căn chỉnh sơ đồ"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-            </svg>
-          </button>
-
-          <div className="h-4 w-px bg-slate-300" />
-
-          {(messages[key] || edited) && (
-            <span role="status" className="text-[11px] font-medium text-slate-500 hidden md:inline">
-              {messages[key] || 'Chưa lưu'}
-            </span>
+                  {searchResults.conceptHits.length > 0 && (
+                    <div className="space-y-1">
+                      <div className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Tri thức Mindmap ({searchResults.conceptHits.length})
+                      </div>
+                      {searchResults.conceptHits.map(hit => (
+                        <button
+                          key={`${hit.day}:${hit.nodeId}`}
+                          type="button"
+                          onClick={() => {
+                            setDay(hit.day);
+                            setSelectedId(hit.nodeId);
+                            setFocusedCheckpoint(null);
+                            setView('mindmap');
+                            setSearchDropdownOpen(false);
+                          }}
+                          className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-purple-50 flex items-center justify-between gap-2 transition"
+                        >
+                          <span className="font-semibold text-slate-800 truncate">
+                            {hit.isTrap ? '▲ ' : '◆ '}{hit.title}
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 font-mono text-[10px] shrink-0">
+                            D{String(hit.day).padStart(2, '0')}{hit.pages.length ? ` · Tr.${hit.pages.join(',')}` : ''}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           )}
-          <button
-            type="button"
-            onClick={save}
-            disabled={!edited || saving[key]}
-            className="px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200 disabled:opacity-45 transition"
-          >
-            {saving[key] ? 'Đang lưu…' : 'Lưu'}
-          </button>
+        </div>
 
-          <button
-            type="button"
-            onClick={exportJson}
-            className="px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200 hidden sm:flex items-center gap-1.5 transition"
-          >
-            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-            </svg>
-            Xuất file
-          </button>
-
+        {/* Right: AI GraphRAG & Avatar (clean & identical across views) */}
+        <div className="flex items-center space-x-2 shrink-0">
           <button
             type="button"
             onClick={() => setMapperOpen(open => !open)}
@@ -1144,91 +1146,53 @@ function App() {
           <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-600 hidden sm:flex items-center justify-center text-white text-[11px] font-bold border border-white shadow-sm ring-1 ring-slate-200">
             AI
           </div>
-        </div>}
+        </div>
       </header>
 
       {/* MainWorkspace */}
-      <main className="flex-1 relative overflow-hidden flex" aria-label={`${TABS[tab]} · Ngày ${day}`}>
+      <main className="flex-1 relative overflow-hidden flex" aria-label={`${view === 'lab' ? 'Lab' : 'Mindmap'} · Ngày ${day}`}>
         {view === 'lab' ? (
           <LabGuide
             day={day}
-            onDayChange={selectDay}
             selection={labCheckpoint}
             onSelect={setLabCheckpoint}
-            workspace={workspace}
-            loadError={loadError}
-            onRetry={load}
-            onJumpToConcept={jumpToConcept}
-            onOpenMindmap={openLectureMindmap}
+            enrichedMindmaps={enrichedMindmaps}
+            onOpenMindmap={openMindmapFromLab}
           />
-        ) : !workspace ? (
-          <section className="flex-1 flex flex-col items-center justify-center gap-3 text-sm text-slate-500">
-            {loadError ? (
-              <>
-                <p>Chưa kết nối được với máy chủ.</p>
-                <button
-                  type="button"
-                  onClick={load}
-                  className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-                >
-                  Thử lại
-                </button>
-              </>
-            ) : (
-              <p role="status">Đang tải Knowledge Graph…</p>
-            )}
-          </section>
-        ) : view === 'tree' ? (
+        ) : (
           <CourseTree
-            workspace={workspace}
-            edits={edits}
-            contentTab={tab}
+            mindmapsByDay={enrichedMindmaps}
             activeDay={day}
             selectedNodeId={selectedId}
-            showGrid={showGrid}
+            focusedCheckpoint={focusedCheckpoint}
             searchQuery={searchQuery}
-            layoutTrigger={layoutTrigger}
             onSelectConcept={(targetDay, nodeId) => {
               setDay(targetDay);
               setSelectedId(nodeId);
             }}
             onSelectDay={selectDay}
-            onOpenDayCanvas={targetDay => {
-              setDay(targetDay);
-              setView(tab);
-              setSelectedId(null);
+            onBackToLab={() => {
+              if (focusedCheckpoint) {
+                setDay(focusedCheckpoint.day);
+                setLabCheckpoint(focusedCheckpoint.id);
+              }
+              switchView('lab');
             }}
-            onOpenMapper={() => setMapperOpen(open => !open)}
-            onSwitchView={switchView}
-            onSwitchContentTab={t => switchView(t === 'lab' ? 'lab' : 'tree')}
-          />
-        ) : (
-          <Mindmap
-            key={key}
-            nodes={draft.nodes}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            onChange={nodes => edit({ nodes })}
-            onOpenMapper={() => setMapperOpen(open => !open)}
-            onReset={resetToSeed}
-            showGrid={showGrid}
-            searchQuery={searchQuery}
-            layoutTrigger={layoutTrigger}
-            day={day}
-            tab={tab}
-            onSwitchDay={selectDay}
-            onSwitchTab={t => switchView(t === 'lab' ? 'lab' : 'mindmaps')}
-            onSwitchView={switchView}
           />
         )}
 
-        {selectedNode && (
+        {view !== 'lab' && selectedNode && (
           <NodeInspector
             selectedNode={selectedNode}
+            day={day}
             className="node-inspector-drawer"
             onClose={() => setSelectedId(null)}
             onRelatedConcept={selectRelatedConcept}
-            onExploreGraph={exploreGraph}
+            onOpenCheckpoint={(targetDay, cpId) => {
+              setDay(targetDay);
+              setLabCheckpoint(cpId);
+              switchView('lab');
+            }}
           />
         )}
 
@@ -1240,10 +1204,9 @@ function App() {
 
           return (
             <aside
-              className="fixed top-16 left-16 bottom-20 w-[min(470px,calc(100vw-5rem))] bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-2xl z-30 flex flex-col overflow-hidden"
+              className="fixed top-16 left-4 bottom-20 w-[min(470px,calc(100vw-2rem))] bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-2xl z-30 flex flex-col overflow-hidden"
               aria-label="AI Lecture-to-Lab Mapper"
             >
-              {/* Sleek Gradient Header */}
               <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-blue-900 px-4 py-3 text-white flex items-center justify-between shrink-0">
                 <div>
                   <div className="text-[13px] font-bold tracking-tight flex items-center gap-1.5">
@@ -1263,7 +1226,6 @@ function App() {
               </div>
 
               <div className="p-4 overflow-y-auto space-y-3.5 text-xs select-text">
-                {/* Search Form */}
                 <form className="flex gap-2" onSubmit={e => { e.preventDefault(); runMapping(); }}>
                   <input
                     type="text"
@@ -1281,7 +1243,6 @@ function App() {
                   </button>
                 </form>
 
-                {/* Quick Query Chips */}
                 <div className="space-y-1">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Gợi ý nhanh
@@ -1304,7 +1265,6 @@ function App() {
                   </div>
                 </div>
 
-                {/* Grouped Controls */}
                 <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-[10.5px] font-semibold text-slate-500 shrink-0">Chế độ:</span>
@@ -1367,7 +1327,6 @@ function App() {
 
                 {mapResult && (
                   <div className="space-y-3">
-                    {/* Status Banner + KPI Chips */}
                     <div className={`px-3 py-2.5 rounded-xl border space-y-2 ${mapResult.blocked
                       ? 'bg-red-50 text-red-800 border-red-200'
                       : mapResult.abstention
@@ -1399,7 +1358,6 @@ function App() {
                       )}
                     </div>
 
-                    {/* Structured Summary Card */}
                     {summaryData && (
                       <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
                         <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">
@@ -1453,7 +1411,6 @@ function App() {
                       </div>
                     )}
 
-                    {/* Trap Warnings (Guardrails) */}
                     {mapResult.trap_warnings?.length > 0 && (
                       <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 rounded-xl p-3 text-rose-900 space-y-1.5">
                         <div className="font-bold text-[11.5px] flex items-center gap-1.5">
@@ -1470,7 +1427,6 @@ function App() {
                       </div>
                     )}
 
-                    {/* Nút Tri thức Lecture (Prioritized) */}
                     {mapResult.knowledge_refs?.length > 0 && (
                       <div className="bg-blue-50/50 border border-blue-200/80 rounded-xl p-3 space-y-2">
                         <div className="font-bold text-slate-900 text-[12px]">
@@ -1490,10 +1446,13 @@ function App() {
                               <p className="text-slate-600 leading-relaxed text-[11.5px]">{k.summary}</p>
                               <button
                                 type="button"
-                                onClick={() => insertVerifiedNode(k)}
+                                onClick={() => {
+                                  jumpToConcept(k.concept_id, k.day);
+                                  setMapperOpen(false);
+                                }}
                                 className="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold text-[11px] transition"
                               >
-                                + Thêm vào Canvas
+                                Xem trên Mindmap →
                               </button>
                             </div>
                           ))}
@@ -1501,7 +1460,6 @@ function App() {
                       </div>
                     )}
 
-                    {/* Code Repo Đối chiếu */}
                     {mapResult.code_refs?.length > 0 && (
                       <div className="bg-teal-50/60 border border-teal-200 rounded-xl p-3 space-y-2">
                         <div className="font-bold text-teal-950 text-[12px]">
@@ -1529,7 +1487,6 @@ function App() {
                       </div>
                     )}
 
-                    {/* Graph Communities */}
                     {mapResult.communities?.length > 0 && (
                       <div className="bg-indigo-50/60 border border-indigo-200 rounded-xl p-3 space-y-2">
                         <div className="font-bold text-indigo-950 text-[12px]">
@@ -1554,7 +1511,6 @@ function App() {
                       </div>
                     )}
 
-                    {/* GraphRAG Multi-hop Paths */}
                     {paths.length > 0 && (
                       <div className="bg-purple-50/60 border border-purple-200 rounded-xl p-3 space-y-2">
                         <div className="flex items-center justify-between">
@@ -1597,7 +1553,6 @@ function App() {
                   </div>
                 )}
 
-                {/* Multi-Lecture Ingestion */}
                 <div className="pt-2 border-t border-slate-200 space-y-2">
                   <button
                     type="button"
@@ -1643,7 +1598,8 @@ function App() {
                       </button>
                       {ingestStatus && (
                         <div className={`px-2.5 py-1.5 rounded-lg font-medium ${ingestStatus.ok ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
-                          }`}>
+                          }`}
+                        >
                           {ingestStatus.ok
                             ? `✅ Đã nạp ${ingestStatus.data.lecture_id}: +${ingestStatus.data.nodes_added} nút, +${ingestStatus.data.edges_added} cạnh (${ingestStatus.data.cross_links_created} liên kết chéo).`
                             : ingestStatus.message}
@@ -1658,16 +1614,15 @@ function App() {
         })()}
       </main>
 
-      {lectureMindmap && (
-        <LectureMindmapDialog
-          {...lectureMindmap}
-          title={getDayShortTitle(workspace, lectureMindmap.day)}
-          onClose={() => setLectureMindmap(null)}
-          findRelatedConcept={(conceptId, targetDay) => workspace.mindmaps[targetDay]?.nodes.find(node => node.source_ref?.concept_id === conceptId)}
-          onExploreGraph={exploreLectureGraph}
-        />
-      )}
-      {workspace && view !== 'lab' && <ChatBot day={day} focus={chatFocus} onJumpToConcept={jumpToConcept} />}
+      <ChatBot
+        key={view === 'lab' ? `lab:${currentLabFocusId}` : `mindmap:${day}`}
+        day={day}
+        labId={view === 'lab' ? currentLabFocusId : undefined}
+        focus={view === 'lab' ? currentLabFocus : chatFocus}
+        inspectorOpen={view !== 'lab' && Boolean(selectedNode)}
+        hasMinimap={view === 'mindmap' && !selectedNode}
+        onJumpToConcept={jumpToConcept}
+      />
     </div>
   );
 }
