@@ -241,18 +241,18 @@ def test_chat_abstains_off_topic_and_blocks_injection(monkeypatch):
 def test_chat_low_similarity_answers_without_rag_when_llm_enabled(monkeypatch):
     import chat_engine
 
-    captured: dict[str, object] = {}
+    state = {"count": 0, "cite": True}
 
     def fake_call_llm(messages, intent):
-        captured["messages"] = messages
+        state["count"] += 1
         user_prompt = messages[-1]["content"]
-        if "[DAY_07]" in user_prompt and "Bỏ qua tham khảo" not in user_prompt:
-            return "RAG kết hợp truy xuất tài liệu và sinh câu trả lời [DAY_07].\n\n💡 Tự kiểm tra: RAG giải quyết vấn đề gì?", {
+        if state["cite"] and "[DAY_07]" in user_prompt:
+            return "RAG kết hợp truy xuất tài liệu và sinh câu trả lời [DAY_07].", {
                 "llm_used": True,
                 "model": "mock-llm",
                 "usage": {},
             }
-        return "Giải thích trực tiếp từ kiến thức của LLM.\n\n💡 Tự kiểm tra: Bạn nắm được ý chính chưa?", {
+        return "Giải thích mở rộng xoay quanh chủ đề RAG từ kiến thức chuyên môn.", {
             "llm_used": True,
             "model": "mock-llm",
             "usage": {},
@@ -261,21 +261,25 @@ def test_chat_low_similarity_answers_without_rag_when_llm_enabled(monkeypatch):
     monkeypatch.setenv("USE_REMOTE_LLM", "1")
     monkeypatch.setattr(chat_engine, "call_llm", fake_call_llm)
 
+    # Off-curriculum / low similarity (< 0.5) must abstain without calling LLM
     low_sim = chat_engine.chat_turn("Python decorator hoạt động như thế nào?", focus_id="CON_D1_TAXONOMY", lab_id="day01")
     assert low_sim["blocked"] is False
-    assert low_sim["abstained"] is False
+    assert low_sim["abstained"] is True
     assert low_sim["citations"] == []
-    assert low_sim["trace"]["llm_used"] is True
+    assert low_sim["trace"]["llm_used"] is False
+    assert low_sim["trace"]["reason"] == "no_grounding"
     assert low_sim["trace"]["max_similarity"] < 0.5
-    assert "Không có tài liệu RAG đạt ngưỡng tương đồng >= 0.5" in captured["messages"][-1]["content"]
+    assert state["count"] == 0
 
+    # In-curriculum (>= 0.5) uses LLM with RAG as reference
     high_sim = chat_engine.chat_turn("RAG là gì?")
     assert high_sim["abstained"] is False
     assert high_sim["trace"]["max_similarity"] >= 0.5
     assert [c["id"] for c in high_sim["citations"]] == ["DAY_07"]
 
-    # When LLM answers directly without citing KB even if KB reference was provided, citations stay empty
-    no_cite = chat_engine.chat_turn("RAG là gì? Bỏ qua tham khảo")
+    # When LLM answers in-scope without citing KB explicitly, citations stay empty
+    state["cite"] = False
+    no_cite = chat_engine.chat_turn("RAG là gì?")
     assert no_cite["abstained"] is False
     assert no_cite["citations"] == []
 
@@ -415,7 +419,7 @@ def test_async_chat_turn_handles_30_concurrent_requests(monkeypatch):
     import chat_engine
 
     async def fake_async_call_llm(messages, intent):
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(0.2)
         return "Phản hồi bất đồng bộ thành công.", {"llm_used": True, "model": "mock-async", "usage": {}}
 
     monkeypatch.setenv("USE_REMOTE_LLM", "1")
@@ -424,12 +428,12 @@ def test_async_chat_turn_handles_30_concurrent_requests(monkeypatch):
     async def run_batch():
         t0 = time.perf_counter()
         results = await asyncio.gather(
-            *(chat_engine.async_chat_turn(f"Câu hỏi thảo luận số {i}") for i in range(30))
+            *(chat_engine.async_chat_turn("RAG là gì?") for _ in range(30))
         )
         return results, time.perf_counter() - t0
 
     results, elapsed = asyncio.run(run_batch())
     assert len(results) == 30
     assert all(r["abstained"] is False and r["trace"]["llm_used"] is True for r in results)
-    # 30 * 0.05s sequentially would take >= 1.5s; concurrent execution should finish much faster
-    assert elapsed < 1.0
+    # 30 * 0.2s sequentially would take >= 6.0s; concurrent execution should finish much faster
+    assert elapsed < 3.0
