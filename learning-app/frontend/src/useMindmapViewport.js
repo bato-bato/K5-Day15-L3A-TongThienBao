@@ -19,9 +19,10 @@ function midpoint(a, b) {
   return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
 }
 
-export function useMindmapViewport(layout, { viewKey, layoutTrigger, bottomInset, onBackgroundPointerDown }) {
+export function useMindmapViewport(layout, { viewKey, layoutTrigger, bottomInset, initialFocus, onBackgroundPointerDown }) {
   const viewport = useRef(null);
   const pointers = useRef(new Map());
+  const hasFocused = useRef(false);
   const [camera, setCamera] = useState({ x: 0, y: 0, zoom: 0.88 });
   const [size, setSize] = useState({ width: 0, height: 0 });
 
@@ -63,6 +64,17 @@ export function useMindmapViewport(layout, { viewKey, layoutTrigger, bottomInset
     // Refitting on node edits would pull the canvas away from the current branch.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewKey, layoutTrigger]);
+
+  useLayoutEffect(() => {
+    if (!initialFocus || hasFocused.current || !size.width || !size.height) return;
+    const zoom = clampZoom(Math.min(1.05, (size.width - 48) / initialFocus.width));
+    setCamera({
+      x: size.width / 2 - (initialFocus.x + initialFocus.width / 2) * zoom,
+      y: (size.height - bottomInset) / 2 - (initialFocus.y + initialFocus.height / 2) * zoom,
+      zoom,
+    });
+    hasFocused.current = true;
+  }, [initialFocus, size, bottomInset]);
 
   useEffect(() => {
     const element = viewport.current;
