@@ -398,3 +398,29 @@ def test_chat_security_hardening_and_rate_limit(monkeypatch):
             assert u1_again.status_code == 200
     finally:
         reset_rate_limiter()
+
+
+def test_async_chat_turn_handles_30_concurrent_requests(monkeypatch):
+    import asyncio
+    import time
+    import chat_engine
+
+    async def fake_async_call_llm(messages, intent):
+        await asyncio.sleep(0.05)
+        return "Phản hồi bất đồng bộ thành công.", {"llm_used": True, "model": "mock-async", "usage": {}}
+
+    monkeypatch.setenv("USE_REMOTE_LLM", "1")
+    monkeypatch.setattr(chat_engine, "async_call_llm", fake_async_call_llm)
+
+    async def run_batch():
+        t0 = time.perf_counter()
+        results = await asyncio.gather(
+            *(chat_engine.async_chat_turn(f"Câu hỏi thảo luận số {i}") for i in range(30))
+        )
+        return results, time.perf_counter() - t0
+
+    results, elapsed = asyncio.run(run_batch())
+    assert len(results) == 30
+    assert all(r["abstained"] is False and r["trace"]["llm_used"] is True for r in results)
+    # 30 * 0.05s sequentially would take >= 1.5s; concurrent execution should finish much faster
+    assert elapsed < 1.0

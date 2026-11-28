@@ -16,7 +16,7 @@ from graph_db import (
     list_lectures,
     traverse_subgraph,
 )
-from chat_engine import chat_turn
+from chat_engine import async_chat_turn, close_async_clients
 from guardrails import chat_rate_limiter, check_input_guard
 from kg_store import ensure_kg_loaded, get_day_mindmap_seed, get_kg_summary, search_kg
 from lecture_extractor import extract_lecture_knowledge
@@ -131,7 +131,10 @@ async def lifespan(app: FastAPI):
     ensure_kg_loaded()
     ensure_repo_index()
     ensure_graph_db_loaded()
-    yield
+    try:
+        yield
+    finally:
+        await close_async_clients()
 
 
 app = FastAPI(title="AI in Action · Knowledge Graph & Mapper", lifespan=lifespan)
@@ -287,21 +290,31 @@ def ai_lecture_to_lab_map(req: MapRequest) -> dict[str, Any]:
 
 
 @app.post("/api/chat")
-def kg_rag_chat(req: ChatRequest, request: Request, response: Response) -> dict[str, Any]:
+async def kg_rag_chat(req: ChatRequest, request: Request, response: Response) -> dict[str, Any]:
     """KG-RAG tutor: explain concepts/lessons at eli5|standard|deep, grounded + cited on the GraphRAG DB."""
     response.headers["Cache-Control"] = "no-store"
     client_key = request.cookies.get(COOKIE_NAME) or (request.client.host if request.client else "unknown")
     max_req = int(os.environ.get("CHAT_RATE_LIMIT_MAX", "10"))
     window_s = int(os.environ.get("CHAT_RATE_LIMIT_WINDOW_S", "60"))
-    max_users = int(os.environ.get("CHAT_MAX_CONCURRENT_USERS", "30"))
-    allowed, retry_after = chat_rate_limiter.check(client_key, max_req, window_s, max_keys=max_users)
+    max_users = int(os.environ.get("CHAT_MAX_CONCURRENT_USERS", "0"))
+    allowed, retry_after = chat_rate_limiter.check(
+        client_key,
+        max_req,
+        window_s,
+        max_keys=max_users if max_users > 0 else None,
+    )
     if not allowed:
+        detail = (
+            "Hệ thống đang đạt giới hạn người dùng hoặc bạn gửi quá nhanh. Vui lòng đợi vài giây rồi thử lại."
+            if max_users > 0
+            else "Bạn đang gửi quá nhanh (tối đa 10 lượt/phút). Vui lòng đợi vài giây rồi thử lại."
+        )
         raise HTTPException(
             status_code=429,
-            detail="Hệ thống đang đạt giới hạn người dùng hoặc bạn gửi quá nhanh. Vui lòng đợi vài giây rồi thử lại.",
+            detail=detail,
             headers={"Retry-After": str(retry_after)},
         )
-    return chat_turn(
+    return await async_chat_turn(
         req.message,
         history=[t.model_dump() for t in req.history],
         level=req.level,

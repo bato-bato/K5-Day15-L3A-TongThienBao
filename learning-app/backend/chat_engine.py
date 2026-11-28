@@ -13,11 +13,13 @@ Pipeline (one LLM call per turn, deterministic everywhere else):
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
 import re
 import time
+import weakref
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -359,29 +361,102 @@ def build_messages(
     return msgs
 
 
+def _llm_payload(messages: list[dict[str, str]], intent: str, model: str) -> dict[str, Any]:
+    return {
+        "model": model,
+        "temperature": 0.8,
+        "max_tokens": 10000 if intent in ("quiz", "compare", "lesson") else 5000,
+        "messages": messages,
+    }
+
+
+_SYNC_CLIENT: httpx.Client | None = None
+_ASYNC_CLIENTS: weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, httpx.AsyncClient] = weakref.WeakKeyDictionary()
+_ASYNC_SEMAPHORES: weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, asyncio.Semaphore] = weakref.WeakKeyDictionary()
+
+
+def _http_limits() -> httpx.Limits:
+    max_conn = max(10, int(os.environ.get("CHAT_HTTP_MAX_CONNECTIONS", "200")))
+    keepalive = max(5, int(os.environ.get("CHAT_HTTP_KEEPALIVE", "50")))
+    return httpx.Limits(max_connections=max_conn, max_keepalive_connections=keepalive)
+
+
+def _get_sync_client() -> httpx.Client:
+    global _SYNC_CLIENT
+    if _SYNC_CLIENT is None or _SYNC_CLIENT.is_closed:
+        _SYNC_CLIENT = httpx.Client(limits=_http_limits(), timeout=LLM_TIMEOUT_S)
+    return _SYNC_CLIENT
+
+
+def _get_async_client() -> tuple[httpx.AsyncClient, asyncio.Semaphore]:
+    loop = asyncio.get_running_loop()
+    client = _ASYNC_CLIENTS.get(loop)
+    if client is None or client.is_closed:
+        client = httpx.AsyncClient(limits=_http_limits(), timeout=LLM_TIMEOUT_S)
+        _ASYNC_CLIENTS[loop] = client
+    sem = _ASYNC_SEMAPHORES.get(loop)
+    if sem is None:
+        max_inflight = max(1, int(os.environ.get("CHAT_MAX_INFLIGHT_LLM", "100")))
+        sem = asyncio.Semaphore(max_inflight)
+        _ASYNC_SEMAPHORES[loop] = sem
+    return client, sem
+
+
+async def close_async_clients() -> None:
+    """Close the pooled AsyncClient bound to the current event loop (if any)."""
+    loop = asyncio.get_running_loop()
+    client = _ASYNC_CLIENTS.pop(loop, None)
+    _ASYNC_SEMAPHORES.pop(loop, None)
+    if client is not None and not client.is_closed:
+        await client.aclose()
+
+
+def _parse_llm_response(data: dict[str, Any], model: str) -> tuple[str | None, dict[str, Any]]:
+    text = (data["choices"][0]["message"]["content"] or "").strip()
+    return (nfc(text) or None), {"llm_used": True, "model": model, "usage": data.get("usage", {})}
+
+
 def call_llm(messages: list[dict[str, str]], intent: str) -> tuple[str | None, dict[str, Any]]:
     cfg = _llm_config()
     if not cfg:
         return None, {"llm_used": False, "reason": "no_api_key"}
     api_key, base_url, model = cfg
     try:
-        resp = httpx.post(
+        resp = _get_sync_client().post(
             f"{base_url}/chat/completions",
             headers={"Authorization": f"Bearer {api_key}"},
-            json={
-                "model": model,
-                "temperature": 0.8,
-                "max_tokens": 10000 if intent in ("quiz", "compare", "lesson") else 5000,
-                "messages": messages,
-            },
+            json=_llm_payload(messages, intent, model),
             timeout=LLM_TIMEOUT_S,
         )
         resp.raise_for_status()
-        data = resp.json()
-        text = (data["choices"][0]["message"]["content"] or "").strip()
-        return (nfc(text) or None), {"llm_used": True, "model": model, "usage": data.get("usage", {})}
+        return _parse_llm_response(resp.json(), model)
     except Exception as exc:  # degrade gracefully to extractive answer
         logger.warning("chat LLM call failed: %s", type(exc).__name__)
+        return None, {"llm_used": False, "model": model, "reason": f"llm_error:{type(exc).__name__}"}
+
+
+_ORIGINAL_CALL_LLM = call_llm
+
+
+async def async_call_llm(messages: list[dict[str, str]], intent: str) -> tuple[str | None, dict[str, Any]]:
+    """Non-blocking LLM call using pooled httpx.AsyncClient and concurrency semaphore."""
+    cfg = _llm_config()
+    if not cfg:
+        return None, {"llm_used": False, "reason": "no_api_key"}
+    api_key, base_url, model = cfg
+    client, sem = _get_async_client()
+    try:
+        async with sem:
+            resp = await client.post(
+                f"{base_url}/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}"},
+                json=_llm_payload(messages, intent, model),
+                timeout=LLM_TIMEOUT_S,
+            )
+            resp.raise_for_status()
+            return _parse_llm_response(resp.json(), model)
+    except Exception as exc:  # degrade gracefully to extractive answer
+        logger.warning("async chat LLM call failed: %s", type(exc).__name__)
         return None, {"llm_used": False, "model": model, "reason": f"llm_error:{type(exc).__name__}"}
 
 
@@ -510,22 +585,22 @@ def _material_similarity(material: list[str], cleaned_query: str) -> float:
     return hits / len(tokens)
 
 
-def chat_turn(
+def _prepare_chat_turn(
     message: str,
-    history: list[dict[str, str]] | None = None,
-    level: str = "standard",
-    scope_day: int | None = None,
-    focus_id: str | None = None,
-    prev_citation_ids: list[str] | None = None,
-    lab_id: str | None = None,
-) -> dict[str, Any]:
-    t0 = time.perf_counter()
+    history: list[dict[str, str]] | None,
+    level: str,
+    scope_day: int | None,
+    focus_id: str | None,
+    prev_citation_ids: list[str] | None,
+    lab_id: str | None,
+    t0: float,
+) -> tuple[bool, dict[str, Any]]:
     msg = sanitize_text(message or "")
     level = level if level in LEVELS else "standard"
     guard = check_input_guard(msg)
     if guard["blocked"]:
         logger.warning(json.dumps({"event": "chat_blocked", "rules": len(guard["matched_rules"])}, ensure_ascii=False))
-        return {
+        return False, {
             "answer": f"⚠️ Mình không thể xử lý yêu cầu này: {guard['reason']}",
             "blocked": True, "abstained": True, "intent": None, "level": level,
             "citations": [], "prerequisites": [], "suggestions": [],
@@ -559,7 +634,35 @@ def chat_turn(
         context = ""
 
     messages = build_messages(msg, clean_history, intent, level, context, relations)
-    answer, meta = call_llm(messages, intent)
+    return True, {
+        "msg": msg,
+        "level": level,
+        "intent": intent,
+        "r": r,
+        "context": context,
+        "citable": citable,
+        "relations": relations,
+        "material": material,
+        "messages": messages,
+        "input_redacted": input_redacted,
+        "history_dropped": history_dropped,
+        "t0": t0,
+    }
+
+
+def _finalize_chat_turn(prep: dict[str, Any], answer: str | None, meta: dict[str, Any]) -> dict[str, Any]:
+    msg = prep["msg"]
+    level = prep["level"]
+    intent = prep["intent"]
+    r = prep["r"]
+    context = prep["context"]
+    citable = prep["citable"]
+    relations = prep["relations"]
+    material = prep["material"]
+    input_redacted = prep["input_redacted"]
+    history_dropped = prep["history_dropped"]
+    t0 = prep["t0"]
+
     if answer:
         out_guard = check_output_guard(answer)
         answer = out_guard["text"]
@@ -646,3 +749,43 @@ def chat_turn(
         "sanitized_message": msg if input_redacted else None,
         "trace": trace,
     }
+
+
+def chat_turn(
+    message: str,
+    history: list[dict[str, str]] | None = None,
+    level: str = "standard",
+    scope_day: int | None = None,
+    focus_id: str | None = None,
+    prev_citation_ids: list[str] | None = None,
+    lab_id: str | None = None,
+) -> dict[str, Any]:
+    t0 = time.perf_counter()
+    ok, payload = _prepare_chat_turn(message, history, level, scope_day, focus_id, prev_citation_ids, lab_id, t0)
+    if not ok:
+        return payload
+    answer, meta = call_llm(payload["messages"], payload["intent"])
+    return _finalize_chat_turn(payload, answer, meta)
+
+
+async def async_chat_turn(
+    message: str,
+    history: list[dict[str, str]] | None = None,
+    level: str = "standard",
+    scope_day: int | None = None,
+    focus_id: str | None = None,
+    prev_citation_ids: list[str] | None = None,
+    lab_id: str | None = None,
+) -> dict[str, Any]:
+    """Non-blocking chat turn: offloads retrieval to worker thread and awaits pooled async LLM I/O."""
+    t0 = time.perf_counter()
+    ok, payload = await asyncio.to_thread(
+        _prepare_chat_turn, message, history, level, scope_day, focus_id, prev_citation_ids, lab_id, t0
+    )
+    if not ok:
+        return payload
+    if call_llm is not _ORIGINAL_CALL_LLM:
+        answer, meta = await asyncio.to_thread(call_llm, payload["messages"], payload["intent"])
+    else:
+        answer, meta = await async_call_llm(payload["messages"], payload["intent"])
+    return _finalize_chat_turn(payload, answer, meta)
