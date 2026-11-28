@@ -238,6 +238,48 @@ def test_chat_abstains_off_topic_and_blocks_injection(monkeypatch):
     assert blocked["blocked"] is True and blocked["citations"] == []
 
 
+def test_chat_low_similarity_answers_without_rag_when_llm_enabled(monkeypatch):
+    import chat_engine
+
+    captured: dict[str, object] = {}
+
+    def fake_call_llm(messages, intent):
+        captured["messages"] = messages
+        user_prompt = messages[-1]["content"]
+        if "[DAY_07]" in user_prompt and "Bỏ qua tham khảo" not in user_prompt:
+            return "RAG kết hợp truy xuất tài liệu và sinh câu trả lời [DAY_07].\n\n💡 Tự kiểm tra: RAG giải quyết vấn đề gì?", {
+                "llm_used": True,
+                "model": "mock-llm",
+                "usage": {},
+            }
+        return "Giải thích trực tiếp từ kiến thức của LLM.\n\n💡 Tự kiểm tra: Bạn nắm được ý chính chưa?", {
+            "llm_used": True,
+            "model": "mock-llm",
+            "usage": {},
+        }
+
+    monkeypatch.setenv("USE_REMOTE_LLM", "1")
+    monkeypatch.setattr(chat_engine, "call_llm", fake_call_llm)
+
+    low_sim = chat_engine.chat_turn("Python decorator hoạt động như thế nào?", focus_id="CON_D1_TAXONOMY", lab_id="day01")
+    assert low_sim["blocked"] is False
+    assert low_sim["abstained"] is False
+    assert low_sim["citations"] == []
+    assert low_sim["trace"]["llm_used"] is True
+    assert low_sim["trace"]["max_similarity"] < 0.5
+    assert "Không có tài liệu RAG đạt ngưỡng tương đồng >= 0.5" in captured["messages"][-1]["content"]
+
+    high_sim = chat_engine.chat_turn("RAG là gì?")
+    assert high_sim["abstained"] is False
+    assert high_sim["trace"]["max_similarity"] >= 0.5
+    assert [c["id"] for c in high_sim["citations"]] == ["DAY_07"]
+
+    # When LLM answers directly without citing KB even if KB reference was provided, citations stay empty
+    no_cite = chat_engine.chat_turn("RAG là gì? Bỏ qua tham khảo")
+    assert no_cite["abstained"] is False
+    assert no_cite["citations"] == []
+
+
 def test_chat_followup_simplify_uses_previous_citations(monkeypatch):
     from chat_engine import chat_turn
     monkeypatch.setenv("USE_REMOTE_LLM", "0")

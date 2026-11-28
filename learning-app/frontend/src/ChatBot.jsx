@@ -216,11 +216,16 @@ export function ChatBot({ day, focus, labId, draftRef, isLab, graphContent, labC
 
   const starters = focus
     ? [
-        `Giải thích "${focus.label}"`,
-        `Cho ví dụ thực tế về ${focus.label}`,
-        `Quiz 3 câu về ${focus.label}`,
+        `Cùng bàn về "${focus.label}"`,
+        `Áp dụng ${focus.label} vào thực tế thế nào?`,
+        `Đặt 1 tình huống về ${focus.label} để mình thử phân tích`,
       ]
-    : [`Tóm tắt ngày ${day}`, 'RAG là gì?', 'So sánh Generative và Agentic AI', 'Lethal Trifecta là gì?'];
+    : [
+        `Hôm nay (Ngày ${day}) có điểm nào đáng chú ý nhất?`,
+        'Cùng thảo luận về kiến trúc RAG',
+        'Khi nào nên dùng Agentic AI thay vì Workflow cố định?',
+        'Mình đang phân vân cách thiết kế prompt & guardrails',
+      ];
 
   const pillPositionClass = 'right-4 bottom-4';
 
@@ -249,7 +254,7 @@ export function ChatBot({ day, focus, labId, draftRef, isLab, graphContent, labC
         <div className="flex items-center justify-between">
           <div>
             <div className="text-[13px] font-bold flex items-center gap-1.5">Gia sư AI</div>
-            <div className="text-[10.5px] text-teal-100">Xem nguồn và hỏi thêm về bài đang học</div>
+            <div className="text-[10.5px] text-teal-100">Trợ lý trao đổi, thảo luận & gợi mở bài học</div>
           </div>
           <div className="flex items-center gap-1">
             <button type="button" onClick={() => setMessages([])} title="Xóa hội thoại" className="px-2 py-0.5 rounded-lg hover:bg-white/15 text-[11px]">↺</button>
@@ -291,7 +296,7 @@ export function ChatBot({ day, focus, labId, draftRef, isLab, graphContent, labC
         {graphContent || labContent}
         {messages.length === 0 && (
           <div className="text-slate-500 space-y-2">
-            <p>{(graphContent || labContent) ? 'Bạn có thể hỏi thêm về tài liệu đang xem.' : 'Hỏi về bài đang học để được giải thích kèm nguồn.'}</p>
+            <p>{(graphContent || labContent) ? 'Bạn muốn trao đổi hoặc hỏi thêm điểm nào về phần đang xem?' : 'Cùng trao đổi bài học, phản biện ý tưởng hoặc hỏi bất cứ điều gì bạn đang thắc mắc.'}</p>
             <div className="flex flex-wrap gap-1.5">
               {starters.map(s => (
                 <button key={s} type="button" onClick={() => send(s)} className="px-2 py-1 rounded-full border border-slate-300 bg-white hover:border-teal-400 hover:text-teal-700 text-[11px]">
@@ -345,10 +350,10 @@ export function ChatBot({ day, focus, labId, draftRef, isLab, graphContent, labC
                   </div>
                 )}
 
-                {!m.error && (
+                {!m.error && !m.blocked && (
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    {m.level !== 'eli5' && !m.abstained && (
-                      <button type="button" onClick={() => send('Giải thích đơn giản hơn', 'eli5')} className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 text-[10.5px] font-medium transition">🧒 Dễ hơn nữa</button>
+                    {m.level !== 'eli5' && !m.abstained && ((m.citations?.length > 0) || (m.content?.length || 0) > 180) && (
+                      <button type="button" onClick={() => send('Giải thích đơn giản hơn', 'eli5')} className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 text-[10.5px] font-medium transition">🧒 Góc nhìn dễ hiểu hơn</button>
                     )}
                     {(m.suggestions || []).filter(s => s !== 'Giải thích đơn giản hơn').map(s => (
                       <button key={s} type="button" onClick={() => send(s)} className="px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 hover:border-teal-300 hover:text-teal-700 text-[10.5px] max-w-full truncate transition">
@@ -370,7 +375,7 @@ export function ChatBot({ day, focus, labId, draftRef, isLab, graphContent, labC
             <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce" />
             <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce [animation-delay:120ms]" />
             <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce [animation-delay:240ms]" />
-            Đang tra Knowledge Graph…
+            Gia sư AI đang suy nghĩ…
           </div>
         )}
       </div>
@@ -383,7 +388,7 @@ export function ChatBot({ day, focus, labId, draftRef, isLab, graphContent, labC
           maxLength={2000}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-          placeholder={focus ? `Hỏi về "${focus.label}"…` : 'Ví dụ: Token Economy là gì?'}
+          placeholder={focus ? `Trao đổi về "${focus.label}"…` : 'Nhắn để trao đổi bài học hoặc hỏi điều bạn đang thắc mắc…'}
           className="flex-1 resize-none rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-teal-500 focus:ring-teal-500"
         />
         <button type="submit" disabled={loading || !input.trim()} className="px-3 rounded-xl bg-teal-600 text-white font-semibold disabled:opacity-40 hover:bg-teal-700">
