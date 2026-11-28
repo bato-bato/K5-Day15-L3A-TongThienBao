@@ -52,18 +52,6 @@ function matchesAllTokens(haystack, query) {
   });
 }
 
-const NODE_TYPE_LABELS = {
-  day_root: 'Chủ đề ngày học',
-  concept: 'Khái niệm cốt lõi',
-  pattern: 'Mẫu kiến trúc',
-  metric: 'Chỉ số & Công thức',
-  trap: 'Bẫy & Sai lầm cần tránh',
-  case_study: 'Case Study thực tế',
-  checkpoint: 'Hackathon Checkpoint',
-  code_ref: 'Mã nguồn Code Lab',
-  note: 'Ghi chú cá nhân',
-};
-
 const INSPECTOR_THEMES = {
   day_root: {
     hero: 'from-blue-600 to-indigo-600 text-white',
@@ -263,7 +251,7 @@ function parseStudySections(rawText) {
   return { title, tag, blocks };
 }
 
-function NodeInspector({ selectedNode, detail, onClearDetail, day, className = '', titleId, onClose, onRelatedConcept, onOpenCheckpoint }) {
+function NodeSources({ selectedNode, detail, readings, onClearDetail, day, onRelatedConcept, onOpenCheckpoint }) {
   const conceptId = selectedNode.source_ref?.concept_id;
   const [nodeGraph, setNodeGraph] = useState(null);
 
@@ -282,7 +270,6 @@ function NodeInspector({ selectedNode, detail, onClearDetail, day, className = '
 
   const study = parseStudySections(selectedNode.text);
   const typeKey = selectedNode.node_type || 'note';
-  const typeLabel = NODE_TYPE_LABELS[typeKey] || typeKey;
   const theme = INSPECTOR_THEMES[typeKey] || INSPECTOR_THEMES.note;
   const gData = nodeGraph?.conceptId === conceptId ? nodeGraph?.data : null;
   const selfGraphNode = gData?.nodes?.find(n => n.id === conceptId);
@@ -296,45 +283,15 @@ function NodeInspector({ selectedNode, detail, onClearDetail, day, className = '
   const labCheckpoints = selectedNode.lab_topic?.checkpoints ?? [];
 
   return (
-    <aside className={`node-inspector ${className}`} aria-label="Thông tin tri thức nút">
-      {/* Colored Hero Header */}
-      <div className={`bg-gradient-to-r ${theme.hero} px-4 py-3.5 shrink-0`}>
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className={`px-2 py-0.5 rounded-full text-[10.5px] font-bold border ${theme.badge}`}>
-              {theme.icon} {typeLabel}
-            </span>
-            {selectedNode.verification_status === 'verified' && (
-              <span className="px-2 py-0.5 rounded-full bg-emerald-400/25 border border-emerald-200/40 text-white text-[10.5px] font-semibold">
-                ✓ Verified
-              </span>
-            )}
-            {selectedNode.source_ref?.pdf_pages?.length > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-black/20 text-white text-[10.5px] font-mono">
-                D{selectedNode.source_ref.day} · Tr.{selectedNode.source_ref.pdf_pages.join(',')}
-              </span>
-            )}
-          </div>
-          <button
-            type="button"
-            aria-label="Đóng chi tiết nút"
-            onClick={onClose}
-            className="text-white/80 hover:text-white hover:bg-white/15 px-1.5 py-0.5 rounded-md text-sm font-bold"
-          >
-            ×
-          </button>
-        </div>
-        <h3 id={titleId} className="text-[15.5px] font-bold leading-snug text-white">
-          {detail?.title || study.title}
-        </h3>
-        {selectedNode.source_ref?.section_ref && (
-          <div className="mt-1 text-[11px] text-white/80 truncate" title={selectedNode.source_ref.section_ref}>
-            📖 {selectedNode.source_ref.section_ref}
-          </div>
-        )}
-      </div>
-
-      <div className="p-4 overflow-y-auto space-y-3.5 text-xs select-text">
+    <section className="tutor-node-sources space-y-3" aria-label="Tài liệu từ Graph">
+      <h3 className="font-semibold text-base">{detail?.title || study.title}</h3>
+      {selectedNode.verification_status === 'verified' && <span className="text-teal-800">Đã xác minh</span>}
+      {selectedNode.source_ref?.section_ref && (
+        <p className="text-slate-600">
+          {selectedNode.source_ref.section_ref}
+          {selectedNode.source_ref.pdf_pages?.length > 0 && ` · Trang ${selectedNode.source_ref.pdf_pages.join(', ')}`}
+        </p>
+      )}
         {detail && (
           <section aria-label="Chi tiết nhánh" className="space-y-3 rounded-xl border border-indigo-100 bg-indigo-50 p-3 text-sm">
             <button type="button" onClick={onClearDetail} className="font-semibold text-indigo-700">← Xem nhánh cha</button>
@@ -352,6 +309,18 @@ function NodeInspector({ selectedNode, detail, onClearDetail, day, className = '
                 ))}
               </dl>
             )}
+          </section>
+        )}
+        {readings.length > 0 && (
+          <section className="space-y-2" aria-label="Tài liệu bổ sung Day 07">
+            <h4 className="font-semibold text-teal-900">Đọc sâu Day 07 · M03</h4>
+            {readings.map(item => (
+              <details key={item.id} open={readings.length <= 2} className="rounded-lg border border-teal-100 bg-white p-3">
+                <summary className="cursor-pointer font-semibold">{item.label}</summary>
+                <p className="mt-2 leading-relaxed">{item.summary}</p>
+                <a href={item.url} target="_blank" rel="noreferrer" className="mt-2 inline-block font-medium text-teal-800 underline">Mở nguồn</a>
+              </details>
+            ))}
           </section>
         )}
         {/* Key Quote Callout */}
@@ -528,7 +497,7 @@ function NodeInspector({ selectedNode, detail, onClearDetail, day, className = '
           <div className="bg-purple-50/60 border border-purple-200 rounded-xl p-3 space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="font-bold text-purple-950 text-[12px]">
-                Liên kết Tri thức (Lý thuyết ↔ Thực hành)
+                Liên kết tri thức Lec ↔ Lab
               </span>
             </div>
 
@@ -590,8 +559,8 @@ function NodeInspector({ selectedNode, detail, onClearDetail, day, className = '
             <div><strong>Dòng:</strong> L{selectedNode.code_link.line_start}–L{selectedNode.code_link.line_end}</div>
           </div>
         )}
-      </div>
-    </aside>
+
+    </section>
   );
 }
 
@@ -630,13 +599,27 @@ function App() {
   );
 
   // Concept or Lab section currently focused -> ChatBot context
-  const chatFocus = selectedNode?.source_ref?.concept_id
-    ? {
-        id: selectedNode.source_ref.concept_id,
-        day: selectedNode.source_ref.day ?? day,
-        label: getNodeTitle(selectedNode).slice(0, 80),
-      }
-    : null;
+  const graphConcept = selectedNode?.source_ref?.concept_id;
+  const m03 = checkpoint_views['day07-m03'];
+  const graphTopic = selectedDetail?.title ?? '';
+  const graphGroup = selectedDetail?.groupLabel ?? graphTopic;
+  const topicKey = /cross.encoder|rerank/i.test(graphTopic) && selectedDetail?.kind === 'l3' ? 'rerank'
+    : /\brrf\b/i.test(graphTopic) && selectedDetail?.kind === 'l3' ? 'rrf'
+    : /bm25/i.test(graphTopic) && selectedDetail?.kind === 'l3' ? 'bm25'
+    : /dense/i.test(graphTopic) && selectedDetail?.kind === 'l3' ? 'dense' : null;
+  const graphReadingKeys = topicKey ? [topicKey]
+    : /tìm kiếm lai/i.test(graphGroup) ? ['bm25', 'dense', 'rrf']
+    : /gộp hạng/i.test(graphGroup) ? ['rrf', 'rerank']
+    : !selectedDetail && graphConcept === 'PAT_D7_RETRIEVAL' ? ['bm25', 'dense', 'rrf']
+    : !selectedDetail && graphConcept === 'PAT_D7_POST_RETRIEVAL_AUGMENT' ? ['rrf', 'rerank'] : [];
+  const graphReadings = day === 7
+    ? (m03.deep_reading_guides ?? []).filter(item => graphReadingKeys.some(key => item.id === `day07-m03-${key}`))
+    : [];
+  const chatFocus = selectedNode ? {
+    id: topicKey && graphReadings.length ? `LAB:day07-m03-${topicKey}` : graphConcept,
+    day,
+    label: selectedDetail?.title || getNodeTitle(selectedNode),
+  } : null;
   const currentLabFocusId = activeCheckpoint ? activeCheckpoint.id : currentLab?.id;
   const currentLabFocus = currentLab
     ? {
@@ -827,8 +810,6 @@ function App() {
     <div className="h-full flex flex-col overflow-hidden bg-slate-50 text-slate-800">
       {/* Unified Header (identical in both Lab and Mindmap) */}
       <header className="workspace-header">
-        {/* Left: Logo, View Tabs & Unified Day Selector */}
-        <div className="workspace-header-nav">
           <div className="workspace-brand flex items-center space-x-2 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-blue-500/30">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -838,20 +819,22 @@ function App() {
             <span className="font-bold text-slate-800 tracking-tight text-sm hidden sm:inline">AI20K</span>
           </div>
 
+        <div className="workspace-header-controls">
+        <div className="workspace-header-nav">
           <nav className="workspace-view-tabs shrink-0" aria-label="Khu vực học">
             <button
               type="button"
               aria-current={view === 'lab' ? 'page' : undefined}
               onClick={() => switchView('lab')}
             >
-              Thực hành
+              Lab
             </button>
             <button
               type="button"
               aria-current={view === 'mindmap' ? 'page' : undefined}
               onClick={() => switchView('mindmap')}
             >
-              Lý thuyết
+              Lec
             </button>
           </nav>
 
@@ -951,7 +934,7 @@ function App() {
             <svg className="workspace-search-icon" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
             </svg>
-            {searchQuery ? (
+            {searchQuery && (
               <button
                 type="button"
                 onClick={() => {
@@ -963,10 +946,6 @@ function App() {
               >
                 ×
               </button>
-            ) : (
-              <kbd className="workspace-search-accessory">
-                ⌘K
-              </kbd>
             )}
           </form>
 
@@ -1033,6 +1012,8 @@ function App() {
           )}
         </div>
 
+        </div>
+
         {/* Right: Avatar (clean & identical across views) */}
         <div className="workspace-avatar">
           <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center text-white text-[11px] font-bold border border-white shadow-sm ring-1 ring-slate-200">
@@ -1042,7 +1023,7 @@ function App() {
       </header>
 
       {/* MainWorkspace */}
-      <main className="flex-1 relative overflow-hidden flex" aria-label={view === 'lab' ? `Thực hành · Ngày ${day}` : showAllDays ? 'Lý thuyết · Tất cả các ngày' : `Lý thuyết · Ngày ${day}`}>
+      <main className="flex-1 relative overflow-hidden flex" aria-label={view === 'lab' ? `Lab · Ngày ${day}` : showAllDays ? 'Lec · Tất cả các ngày' : `Lec · Ngày ${day}`}>
         {view === 'lab' ? (
           <LabGuide
             day={day}
@@ -1074,14 +1055,29 @@ function App() {
           />
         )}
 
-        {view !== 'lab' && selectedNode && (
-          <NodeInspector
+      </main>
+
+      <ChatBot
+        key={view === 'lab' ? `lab:${currentLabFocusId}` : `mindmap:${day}`}
+        day={day}
+        draftRef={tutorDraft}
+        isLab={view === 'lab'}
+        labId={view === 'lab' ? currentLabFocusId : graphReadings.length ? 'day07-m03' : undefined}
+        focus={view === 'lab' ? currentLabFocus : chatFocus}
+        labContent={view === 'lab' && activeCheckpoint ? (
+          <section className="tutor-node-sources space-y-2" aria-label="Tài liệu checkpoint">
+            <h3 className="text-base font-semibold">{activeCheckpoint.label} · {activeCheckpoint.title}</h3>
+            <p className="leading-relaxed">{checkpoint_views[activeCheckpoint.id]?.explanation || activeCheckpoint.requirement}</p>
+            <a href={activeCheckpoint.definition_source.url} target="_blank" rel="noreferrer" className="inline-block font-medium text-teal-800 underline">Mở đề checkpoint</a>
+          </section>
+        ) : null}
+        graphContent={view !== 'lab' && selectedNode ? (
+          <NodeSources
             selectedNode={selectedNode}
             detail={selectedDetail}
             onClearDetail={() => setSelectedDetail(null)}
             day={day}
-            className="node-inspector-drawer"
-            onClose={() => setSelectedId(null)}
+            readings={graphReadings}
             onRelatedConcept={selectRelatedConcept}
             onOpenCheckpoint={(targetDay, cpId) => {
               setDay(targetDay);
@@ -1089,16 +1085,8 @@ function App() {
               switchView('lab');
             }}
           />
-        )}
-      </main>
-
-      <ChatBot
-        key={view === 'lab' ? `lab:${currentLabFocusId}` : `mindmap:${day}`}
-        day={day}
-        draftRef={tutorDraft}
-        labId={view === 'lab' ? currentLabFocusId : undefined}
-        focus={view === 'lab' ? currentLabFocus : chatFocus}
-        inspectorOpen={view !== 'lab' && Boolean(selectedNode)}
+        ) : null}
+        onCloseGraph={() => setSelectedId(null)}
         onJumpToConcept={jumpToConcept}
       />
     </div>

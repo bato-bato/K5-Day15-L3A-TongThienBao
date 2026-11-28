@@ -502,9 +502,14 @@ def resolve_lab_scope(message, lab_id, scope_day, previous_ids):
 _m03_vectors = None
 
 
-def checkpoint_context(scope, message, previous_ids):
+def checkpoint_context(scope, message, previous_ids, focus_id=None):
     main, evidence, lecture_ids = lab_materials()[scope]
-    words = set(tokenize_text(message))
+    focused = next((node for node in evidence if node["id"] == focus_id), None)
+    if focused and is_followup(message, clean_query(message)):
+        query_text = f"{focused['label']} {message}"
+    else:
+        query_text = message
+    words = set(tokenize_text(query_text))
     def rank(node):
         return (int(node["label"].lower() in message.lower()),
                 len(words.intersection(tokenize_text(node["label"] + " " + node["summary"]))),
@@ -519,7 +524,7 @@ def checkpoint_context(scope, message, previous_ids):
             vectors = embed_remote([n["label"] + "\n" + n["summary"] for n in evidence], enabled=True)
             if vectors is not None and len(vectors) == len(evidence):
                 _m03_vectors = vectors
-        query = embed_remote([message], enabled=True) if vectors is not None else None
+        query = embed_remote([query_text], enabled=True) if vectors is not None else None
         if query is not None and len(vectors) == len(evidence) and vectors.shape[1] == query.shape[1]:
             scores = dict(zip((n["id"] for n in evidence), vectors @ query[0]))
             dense = sorted(evidence, key=lambda n: scores[n["id"]], reverse=True)
@@ -529,12 +534,16 @@ def checkpoint_context(scope, message, previous_ids):
                     fused[node["id"]] += 1 / (60 + index)
             ranked = sorted(lexical, key=lambda n: fused[n["id"]], reverse=True)
             retrieval = "hybrid_rrf"
+    if focused:
+        ranked = [focused, *(node for node in ranked if node["id"] != focus_id)]
     sources = [main, *ranked[:5]]
     if lecture_ids:
         lecture = {n["id"]: n for n in get_all_graph_nodes(node_kinds=["concept"])}
         sources.extend(lecture[k] for k in dict.fromkeys(lecture_ids) if k in lecture)
     lines = [f"[{n['id']}] {n['label']} — {n['summary']}" for n in sources]
     context = "Nguồn của " + scope + ". Ưu tiên file và hàm được nêu. Nếu thiếu file hoặc không rõ dòng nào, hỏi lại.\n"
+    if focused:
+        context += f"Mục đang mở: [{focused['id']}] {focused['label']}. Dùng mục này để hiểu câu hỏi nối tiếp.\n"
     return context + "\n".join(lines), sources, retrieval
 
 
@@ -576,7 +585,7 @@ def chat_turn(
     previous_ids = prev_citation_ids or []
     scope = resolve_lab_scope(msg, lab_id, scope_day, previous_ids)
     if scope:
-        context, citable, retrieval = checkpoint_context(scope, msg, previous_ids)
+        context, citable, retrieval = checkpoint_context(scope, msg, previous_ids, focus_id)
         relations = {"prerequisites": [], "extends": []}
         seeds = [{"id": scope, "reason": "lab_scope", "retrieval": retrieval}]
     else:

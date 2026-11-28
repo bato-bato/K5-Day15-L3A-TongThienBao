@@ -15,7 +15,7 @@ body {
   position: relative;
   z-index: 30;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(18rem, 30vw, 26rem) minmax(0, 1fr);
+  grid-template-columns: minmax(6rem, 1fr) minmax(0, 52rem) minmax(6rem, 1fr);
   align-items: center;
   gap: 8px 12px;
   flex: none;
@@ -24,6 +24,14 @@ body {
   border-bottom: 1px solid #e2e8f0;
   background: white;
   box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
+}
+
+.workspace-header-controls {
+  display: grid;
+  grid-template-columns: auto minmax(12rem, 1fr);
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
 }
 
 .workspace-header-nav {
@@ -36,7 +44,7 @@ body {
 .workspace-day-picker {
   position: relative;
   min-width: 0;
-  max-width: 18rem;
+  max-width: clamp(8rem, 18vw, 16rem);
 }
 
 .workspace-day-button,
@@ -141,31 +149,32 @@ input.workspace-search-input:focus {
   justify-self: end;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 760px) {
   .workspace-header {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: 2rem minmax(0, 1fr) 2rem;
+    gap: 8px;
     padding-inline: 12px;
+  }
+
+  .workspace-header .workspace-brand > span {
+    display: none;
+  }
+
+  .workspace-header-controls {
+    display: contents;
+  }
+
+  .workspace-header-nav {
+    justify-content: center;
   }
 
   .workspace-search {
     grid-column: 1 / -1;
     grid-row: 2;
   }
-
-  .workspace-day-picker {
-    position: static;
-  }
-
-  .workspace-day-menu {
-    left: 12px;
-  }
 }
 
 @media (max-width: 480px) {
-  .workspace-header {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .workspace-header-nav {
     gap: 5px;
   }
@@ -174,18 +183,12 @@ input.workspace-search-input:focus {
     padding-inline: 6px;
   }
 
-  .workspace-avatar {
-    display: none;
+  .workspace-day-picker {
+    max-width: 6rem;
   }
 
   input.workspace-search-input {
     font-size: 16px;
-  }
-}
-
-@media (max-width: 360px) {
-  .workspace-header .workspace-brand {
-    display: none;
   }
 }
 
@@ -199,30 +202,14 @@ input.workspace-search-input:focus {
   background-color: #f8fafc;
 }
 
-.node-inspector {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  background: #fff;
+.tutor-node-sources {
+  border: 1px solid #b9d8d1;
+  border-radius: 14px;
+  background: #f4faf8;
+  color: #183c35;
+  padding: 1rem;
 }
 
-.node-inspector-drawer {
-  position: fixed;
-  inset: 4.25rem 1rem 4.5rem auto;
-  z-index: 30;
-  width: min(450px, calc(100% - 2rem));
-  height: auto;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  box-shadow: 0 24px 64px rgb(15 23 42 / 24%);
-}
-
-@media (max-width: 1199px) {
-  .node-inspector-drawer {
-    top: 6.5rem;
-  }
-}
 
 .mindmap-viewport {
   overflow: clip;

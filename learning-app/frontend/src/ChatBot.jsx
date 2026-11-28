@@ -43,9 +43,9 @@ function renderInline(text, citeMap, onCite, keyBase) {
           type="button"
           title={c ? `${c.label} · Ngày ${c.day} · tr.${(c.pdf_pages || []).join(',')}` : cite[1]}
           onClick={() => c && onCite(c)}
-          className="mx-0.5 align-middle inline-flex items-center px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200/80 text-[10px] font-semibold hover:bg-indigo-100 transition"
+          className="mx-0.5 align-middle inline-flex items-center px-1.5 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200/80 text-[10px] font-semibold hover:bg-teal-100 transition"
         >
-          {c ? `N${c.day}` : '↗'}
+          {c ? 'Nguồn' : '↗'}
         </button>
       );
     }
@@ -88,7 +88,7 @@ function Markdown({ text, citations, onCite }) {
         i += 1;
       }
       blocks.push(
-        <ul key={`u${i}`} className="my-2 space-y-1.5 pl-4 list-disc marker:text-indigo-400 text-[12px] leading-[1.55] text-slate-700">
+        <ul key={`u${i}`} className="my-2 space-y-1.5 pl-4 list-disc marker:text-teal-400 text-[12px] leading-[1.55] text-slate-700">
           {items.map((it, ii) => <li key={ii}>{renderInline(it, citeMap, onCite, `u${i}-${ii}`)}</li>)}
         </ul>,
       );
@@ -119,9 +119,10 @@ function Markdown({ text, citations, onCite }) {
 }
 
 /* ---------------------------------- component ---------------------------------- */
-export function ChatBot({ day, focus, labId, draftRef, inspectorOpen = false, onJumpToConcept }) {
+export function ChatBot({ day, focus, labId, draftRef, isLab, graphContent, labContent, onCloseGraph, onJumpToConcept }) {
   const [open, setOpen] = useState(false);
-  const storageKey = labId ? STORAGE_KEY + "/" + labId : STORAGE_KEY;
+  const visible = open || Boolean(graphContent);
+  const storageKey = !isLab ? `${STORAGE_KEY}/graph/${day}` : labId ? `${STORAGE_KEY}/${labId}` : STORAGE_KEY;
   const [messages, setMessages] = useState(() => loadStored(storageKey));
   const [input, setInput] = useState('');
   const [level, setLevel] = useState('standard');
@@ -145,11 +146,15 @@ export function ChatBot({ day, focus, labId, draftRef, inspectorOpen = false, on
 
   useEffect(() => saveStored(storageKey, messages), [storageKey, messages]);
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
+    if (messages.length || loading) listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, loading]);
   useEffect(() => {
-    if (open) inputRef.current?.focus();
+    if (open && !graphContent) inputRef.current?.focus();
   }, [open]);
+
+  useEffect(() => {
+    if (graphContent) listRef.current?.scrollTo({ top: 0 });
+  }, [focus?.id, focus?.label, Boolean(graphContent)]);
 
   async function send(text, overrideLevel) {
     const message = (text ?? input).trim();
@@ -219,16 +224,14 @@ export function ChatBot({ day, focus, labId, draftRef, inspectorOpen = false, on
 
   const pillPositionClass = 'right-4 bottom-4';
 
-  const panelPositionClass = inspectorOpen
-    ? 'right-4 md:right-[476px] bottom-24 h-[min(580px,calc(100vh-11rem))]'
-    : 'right-4 bottom-5 h-[min(640px,calc(100vh-9rem))] md:h-[min(640px,calc(100vh-11rem))]';
+  const panelPositionClass = 'right-4 bottom-4 h-[min(720px,calc(100dvh-6rem))]';
 
-  if (!open) {
+  if (!visible) {
     return (
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`fixed ${pillPositionClass} z-40 flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-xs font-semibold shadow-xl shadow-blue-500/30 hover:scale-[1.03] transition-all`}
+        className={`fixed ${pillPositionClass} z-40 flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full bg-gradient-to-r from-teal-800 to-emerald-700 text-white text-xs font-semibold shadow-xl shadow-teal-900/25 hover:scale-[1.03] transition-all`}
         aria-label="Mở Gia sư AI"
       >
         <span className="text-base">🎓</span> Gia sư AI
@@ -239,18 +242,18 @@ export function ChatBot({ day, focus, labId, draftRef, inspectorOpen = false, on
 
   return (
     <aside
-      className={`fixed ${panelPositionClass} z-40 w-[min(420px,calc(100vw-2rem))] bg-white border border-slate-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-xs transition-all`}
-      aria-label="Gia sư AI KG-RAG"
+      className={`fixed ${panelPositionClass} z-40 w-[min(500px,calc(100vw-2rem))] bg-white border border-slate-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-xs transition-all`}
+      aria-label="Gia sư AI"
     >
-      <div className="bg-gradient-to-r from-indigo-700 to-blue-700 px-4 py-2.5 text-white shrink-0">
+      <div className="bg-gradient-to-r from-teal-950 to-teal-800 px-4 py-2.5 text-white shrink-0">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-[13px] font-bold flex items-center gap-1.5">🎓 Gia sư AI <span className="text-[9px] font-semibold bg-white/20 px-1.5 py-0.5 rounded">KG-RAG</span></div>
-            <div className="text-[10.5px] text-blue-100">Trả lời dựa trên Knowledge Graph · có trích nguồn</div>
+            <div className="text-[13px] font-bold flex items-center gap-1.5">Gia sư AI</div>
+            <div className="text-[10.5px] text-teal-100">Xem nguồn và hỏi thêm về bài đang học</div>
           </div>
           <div className="flex items-center gap-1">
             <button type="button" onClick={() => setMessages([])} title="Xóa hội thoại" className="px-2 py-0.5 rounded-lg hover:bg-white/15 text-[11px]">↺</button>
-            <button type="button" onClick={() => setOpen(false)} className="px-2 py-0.5 rounded-lg hover:bg-white/15 text-base font-bold">×</button>
+            <button type="button" aria-label="Đóng Gia sư AI" onClick={() => { setOpen(false); onCloseGraph?.(); }} className="px-2 py-0.5 rounded-lg hover:bg-white/15 text-base font-bold">×</button>
           </div>
         </div>
         <div className="mt-2 flex items-center gap-2">
@@ -263,34 +266,35 @@ export function ChatBot({ day, focus, labId, draftRef, inspectorOpen = false, on
                 aria-checked={level === l.id}
                 title={l.hint}
                 onClick={() => setLevel(l.id)}
-                className={`px-2 py-1 rounded-md text-[10.5px] font-medium transition ${level === l.id ? 'bg-white text-indigo-700 shadow' : 'text-white/90 hover:bg-white/10'}`}
+                className={`px-2 py-1 rounded-md text-[10.5px] font-medium transition ${level === l.id ? 'bg-white text-teal-700 shadow' : 'text-white/90 hover:bg-white/10'}`}
               >
                 {l.icon} {l.label}
               </button>
             ))}
           </div>
-          <label className="flex items-center gap-1 text-[10.5px] text-blue-100 cursor-pointer select-none">
-            <input type="checkbox" checked={scopeDay} onChange={e => setScopeDay(e.target.checked)} className="rounded border-white/40 text-indigo-600 w-3 h-3" />
+          <label className="flex items-center gap-1 text-[10.5px] text-teal-100 cursor-pointer select-none">
+            <input type="checkbox" checked={scopeDay} onChange={e => setScopeDay(e.target.checked)} className="rounded border-white/40 text-teal-600 w-3 h-3" />
             Chỉ Ngày {day}
           </label>
         </div>
       </div>
 
       {focus && (
-        <div className="px-3 py-1.5 bg-indigo-50 border-b border-indigo-100 text-[10.5px] text-indigo-800 flex items-center gap-1.5 shrink-0">
+        <div className="px-3 py-1.5 bg-teal-50 border-b border-teal-100 text-[10.5px] text-teal-800 flex items-center gap-1.5 shrink-0">
           <span>📍 Đang xem:</span>
           <span className="font-semibold truncate">{focus.label}</span>
-          <span className="text-indigo-400">· Ngày {focus.day}</span>
+          <span className="text-teal-400">· Ngày {focus.day}</span>
         </div>
       )}
 
       <div ref={listRef} className="flex-1 overflow-y-auto p-3 space-y-3 bg-slate-50/60 select-text">
+        {graphContent || labContent}
         {messages.length === 0 && (
           <div className="text-slate-500 space-y-2">
-            <p>Hỏi mình bất kỳ khái niệm hay bài học nào trong 14 ngày. Mình sẽ giải thích theo độ khó bạn chọn và chỉ ra trang giáo trình tương ứng.</p>
+            <p>{(graphContent || labContent) ? 'Bạn có thể hỏi thêm về tài liệu đang xem.' : 'Hỏi về bài đang học để được giải thích kèm nguồn.'}</p>
             <div className="flex flex-wrap gap-1.5">
               {starters.map(s => (
-                <button key={s} type="button" onClick={() => send(s)} className="px-2 py-1 rounded-full border border-slate-300 bg-white hover:border-indigo-400 hover:text-indigo-700 text-[11px]">
+                <button key={s} type="button" onClick={() => send(s)} className="px-2 py-1 rounded-full border border-slate-300 bg-white hover:border-teal-400 hover:text-teal-700 text-[11px]">
                   {s}
                 </button>
               ))}
@@ -301,7 +305,7 @@ export function ChatBot({ day, focus, labId, draftRef, inspectorOpen = false, on
         {messages.map((m, idx) => (
           m.role === 'user' ? (
             <div key={idx} className="flex justify-end">
-              <div className="max-w-[85%] px-3 py-2 rounded-2xl rounded-br-sm bg-indigo-600 text-white whitespace-pre-wrap">{m.content}</div>
+              <div className="max-w-[85%] px-3 py-2 rounded-2xl rounded-br-sm bg-teal-600 text-white whitespace-pre-wrap">{m.content}</div>
             </div>
           ) : (
             <div key={idx} className="flex justify-start">
@@ -332,8 +336,8 @@ export function ChatBot({ day, focus, labId, draftRef, inspectorOpen = false, on
                 {m.citations?.length > 0 && (
                   <div className="mt-2.5 pt-2 border-t border-slate-100 space-y-1.5">
                     {m.citations.map(c => (
-                      <button key={c.id} type="button" onClick={() => openCitation(c)} className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-indigo-50/70 border border-slate-200/70 text-[11px] text-slate-600 hover:text-indigo-700 transition">
-                        <span className="shrink-0 px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-[10px] font-semibold">N{c.day}</span>
+                      <button key={c.id} type="button" onClick={() => openCitation(c)} className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-teal-50/70 border border-slate-200/70 text-[11px] text-slate-600 hover:text-teal-700 transition">
+                        <span className="shrink-0 px-1.5 py-0.5 rounded bg-teal-50 border border-teal-200/80 text-teal-700 text-[10px] font-semibold">N{c.day}</span>
                         <span className="truncate font-medium">{c.label}</span>
                         {c.pdf_pages?.length > 0 && <span className="ml-auto shrink-0 text-[10px] text-slate-400">tr.{c.pdf_pages.join(',')}</span>}
                       </button>
@@ -347,7 +351,7 @@ export function ChatBot({ day, focus, labId, draftRef, inspectorOpen = false, on
                       <button type="button" onClick={() => send('Giải thích đơn giản hơn', 'eli5')} className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 text-[10.5px] font-medium transition">🧒 Dễ hơn nữa</button>
                     )}
                     {(m.suggestions || []).filter(s => s !== 'Giải thích đơn giản hơn').map(s => (
-                      <button key={s} type="button" onClick={() => send(s)} className="px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 hover:border-indigo-300 hover:text-indigo-700 text-[10.5px] max-w-full truncate transition">
+                      <button key={s} type="button" onClick={() => send(s)} className="px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 hover:border-teal-300 hover:text-teal-700 text-[10.5px] max-w-full truncate transition">
                         {s}
                       </button>
                     ))}
@@ -363,9 +367,9 @@ export function ChatBot({ day, focus, labId, draftRef, inspectorOpen = false, on
 
         {loading && (
           <div className="flex items-center gap-1.5 text-slate-400 text-[11px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" />
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:120ms]" />
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:240ms]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce" />
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce [animation-delay:120ms]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce [animation-delay:240ms]" />
             Đang tra Knowledge Graph…
           </div>
         )}
@@ -380,9 +384,9 @@ export function ChatBot({ day, focus, labId, draftRef, inspectorOpen = false, on
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
           placeholder={focus ? `Hỏi về "${focus.label}"…` : 'Ví dụ: Token Economy là gì?'}
-          className="flex-1 resize-none rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-indigo-500 focus:ring-indigo-500"
+          className="flex-1 resize-none rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-teal-500 focus:ring-teal-500"
         />
-        <button type="submit" disabled={loading || !input.trim()} className="px-3 rounded-xl bg-indigo-600 text-white font-semibold disabled:opacity-40 hover:bg-indigo-700">
+        <button type="submit" disabled={loading || !input.trim()} className="px-3 rounded-xl bg-teal-600 text-white font-semibold disabled:opacity-40 hover:bg-teal-700">
           Gửi
         </button>
       </form>
