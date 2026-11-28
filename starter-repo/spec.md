@@ -7,15 +7,19 @@ Track A · EdTech. Hỗ trợ học viên L3 đang vướng ở một checkpoint
 Nguồn bằng chứng ban đầu: log Preclass đã ẩn danh, ở mức số tổng hợp. Xem Canvas.
 
 ## §0. Hiện tại việc này diễn ra thế nào *(guide 1.1)*
-- Luồng hiện tại của việc này, trong khoá hoặc trên app thật (3–5 bước; ảnh chụp từ tài khoản của mình, đã che thông tin):
-- Công cụ / AI đang được dùng cho việc này (nếu có) + nguồn. Không kiểm được thì ghi "chưa kiểm":
+- **Luồng hiện tại (4 bước trong khóa AI20K L3):**
+  1. Học viên xem bài Pre-class (video, câu hỏi, mini-lab trên `preclass-online.com`) và nghe Lecture trên lớp trong quỹ thời gian hạn chế.
+  2. Sang phần Lab, học viên mở `CHECKPOINTS.md` của ngày học (Day 01–Day 14) và đọc yêu cầu từng checkpoint.
+  3. Khi vướng ở một bước hoặc gặp lỗi, học viên phải tự mở lại slide/tài liệu bài giảng để tìm khái niệm liên quan, hoặc dán thẳng đề lab sang công cụ AI bên ngoài.
+  4. Học viên chạy thử code nhận được rồi chuyển sang checkpoint tiếp theo, thường bỏ qua bước đối chiếu ngược lại lý thuyết hoặc tự kiểm tra hiểu bài.
+- **Công cụ / AI đang được dùng:** Trợ giảng AI tích hợp trên trang Pre-class (`preclass-online.com`, ghi nhận 1.260 lượt chat trong [log Preclass](../data/preclass/README.md)) và các chatbot đa năng bên ngoài (ChatGPT, Claude, Cursor) trong lúc làm Lab *(tỷ lệ dùng từng công cụ cụ thể đang kiểm chứng qua [khảo sát](evidence/survey/questions.md))*.
 
 ## §1. Người dùng & bằng chứng *(guide 1.1, 1.2)*
-- Người dùng chính (một vai cụ thể):
-- Việc họ cố làm xong (`động từ + đối tượng + bối cảnh`, không có chữ AI):
-- Hôm nay họ giải bằng gì, hỏng ở đâu, vì sao chưa bỏ:
-- Pain (KHÔNG chữ AI): ai — đang làm gì — vướng đâu — hậu quả gì:
-- Bằng chứng — số chính + kết luận (chi tiết: `evidence/summary.md`): __
+- **Người dùng chính:** Học viên AI20K L3 khóa 5 đang chuẩn bị bài và cần hoàn thành từng checkpoint Lab trên lớp với quỹ thời gian chuẩn bị khác nhau.
+- **Việc họ cố làm xong:** Xác định đúng khái niệm cần dùng và tự hoàn thành bước tiếp theo của một checkpoint Lab đang vướng để kiểm tra kết quả trước khi sang mốc kế tiếp.
+- **Hôm nay họ giải bằng gì, hỏng ở đâu, vì sao chưa bỏ:** Họ tự tra lại slide/PDF rời rạc (tốn thời gian trong giờ lab ngắn) hoặc dán cả đề sang chatbot ngoài (nhanh ra code nhưng dễ giải hộ trọn bài, thiếu gắn với checkpoint cụ thể của khóa và không buộc học viên tự kiểm). Họ chưa bỏ vì chưa có công cụ nối trực tiếp từng checkpoint với đúng nút kiến thức của khóa.
+- **Pain (không chữ AI):** Học viên AI20K L3 — khi đang làm từng checkpoint Lab trong thời lượng lớp hạn chế — không kịp hệ thống hóa và lần ngược về đúng khái niệm bài giảng liên quan — dẫn tới dễ bấm bỏ qua bước thực hành hoặc phụ thuộc vào lời giải có sẵn mà chưa hiểu và chưa tự kiểm kết quả.
+- **Bằng chứng:** **102/453 sự kiện `lab_completed` (22,5%)** trong log Pre-class BTC (05–25/11/2026) được đánh dấu `data.skipped=true`, kèm 5 bản ghi nguyên văn đã ẩn danh (chi tiết: [evidence/summary.md](evidence/summary.md) và [evidence/data-mining.md](evidence/data-mining.md)). Khảo sát L3A/L3B đã mở để kiểm chứng sâu hơn lý do bỏ qua và thói quen tự kiểm ([questions.md](evidence/survey/questions.md)).
 
 ## §2. Impact & quyết định chọn *(guide 1.3)*
 
@@ -30,7 +34,9 @@ Nguồn bằng chứng ban đầu: log Preclass đã ẩn danh, ở mức số t
 - **Bằng chứng hành vi:** [102/453 sự kiện hoàn thành Lab có cờ bỏ qua](evidence/summary.md) là tỷ lệ theo sự kiện. Mức tiết kiệm và lý do bỏ qua cần đo riêng.
 
 ## §3. Giải pháp tương tự *(guide 2.1)*
-- [sản phẩm / tính năng gần giống]: một điều đáng học · một điều đáng né · mình khác gì
+- **ChatGPT / Claude / Copilot đa năng:** Đáng học: phản hồi nhanh, giải thích linh hoạt theo ngữ cảnh học viên dán vào · Đáng né: dễ viết trọn bộ lời giải thay học viên và bịa trích dẫn không khớp giáo trình khóa · Mình khác gì: khóa chặt ngữ cảnh theo đúng `checkpoint_id` + Knowledge Graph của AI20K, kiểm chứng ID nguồn trước khi trả và luôn kèm câu tự kiểm thay vì làm hộ.
+- **NotebookLM (Mind Map + Hỏi đáp theo nguồn):** Đáng học: hiển thị sơ đồ tư duy phân nhánh và luôn trỏ trích dẫn về đúng tài liệu nạp vào · Đáng né: không hiểu cấu trúc checkpoint, vị trí hàm/file TODO trong repo bài lab của từng ngày học · Mình khác gì: ánh xạ hai chiều giữa nút kiến thức bài giảng với đúng `checkpoint` và vị trí code mẫu trong 14 repo Lab AI20K.
+- **Khanmigo / Socratic AI Tutor:** Đáng học: nguyên tắc sư phạm gợi mở từng bước thay vì đưa thẳng đáp án · Đáng né: hội thoại nhiều vòng dễ dài dòng, tốn token khi học viên chỉ cần định vị nhanh khái niệm trong giờ lab gấp · Mình khác gì: trả về đúng **1 gợi ý ngắn + 1 nguồn đối chiếu + 1 bước tự kiểm** trong một lượt gọn nhẹ.
 
 ## §4. Thiết kế
 
@@ -113,16 +119,22 @@ flowchart LR
 
 ## §10. Phân công & changelog
 
-- CP4: Bổ sung thao tác tự kiểm cho ba checkpoint, chạy Lượt 2, mô phỏng chi phí và xuất slide.
-- Phân công có tên (theo chặng, chia cặp — guide "Cách chia việc"): __
-- Dùng AI vào việc gì (2–3 dòng; chi tiết `docs/ai-usage.md`):
-- Nhật ký thay đổi — **mọi thay đổi sau CP2 19:30 Thứ Sáu 27/11 phải có dòng ở đây**:
+- **Phân công có tên** (khớp [TEAMS.md](TEAMS.md) và [canvas.md](canvas.md)):
+  - **Tống Thiên Bảo** (Đội trưởng): System Design, Mindmap Lab, GraphRAG/checkpoint pipeline & tổng hợp `spec.md`, chi phí CP4.
+  - **Lê Thái Dương**: QA&QC, Chatbot & Eval (`eval/benchmark.csv`, `eval/metric_spec.yaml`, `data/DATA_CARD.md`, kiểm thử UI & pipeline).
+  - **Vũ Trọng Quang**: BackEnd, Mindmap Lec (`learning-app/backend`, Knowledge Graph & API).
+  - **Nguyễn Thị Thanh Bình**: FrontEnd, BA & điều phối nhóm (`canvas.md`, `README.md`, khảo sát `evidence/survey/`, UX Mindmap–Lab).
+- **Dùng AI vào việc gì:** Nhóm dùng ChatGPT/Codex và Antigravity để hỗ trợ soạn cấu trúc form khảo sát, tổng hợp tài liệu từ repo, viết code giao diện/pipeline, hỗ trợ chạy chấm theo rubric và rà định dạng. Nhóm tự chốt bài toán, tự kiểm chứng nguồn dữ liệu thật và không dùng AI để bịa phỏng vấn/trích dẫn hay sửa kết quả lượt chạy (`eval/run-*.csv`, `cost/simulate-*.csv`). Chi tiết: [docs/ai-usage.md](docs/ai-usage.md).
+- **Nhật ký thay đổi** — mọi thay đổi sau CP2 (19:30 Thứ Sáu 27/11):
 
-**CP2 → CP4** (vd thu hẹp lát cắt, hỏi thêm người dùng, lần cải tiến trước lượt 2)
+**CP2 → CP4**
 
 | Thời điểm | Đổi gì | Vì sao (trỏ về câu thử / lỗi / bằng chứng nào) |
 |---|---|---|
-|  |  |  |
+| 27/11 23:29 | Nối model OpenAI thật (`gpt-4o-mini`) vào `codebase/ai.py`, hoàn thiện bằng chứng `evidence/summary.md` và chạy Lượt 1 (`run-1@20261127-232931`) | Đáp ứng yêu cầu CP3 gọi AI thật; Lượt 1 đạt 16/20 (80%), lộ nhóm lỗi thiếu thao tác tự kiểm cụ thể ở `B03`, `B06`, `B09` và từ chối chung chung ở `B18`. |
+| 28/11 01:48 | Bổ sung thao tác tự kiểm tác nghiệp cho 3 checkpoint (`B03`, `B06`, `B09`), hợp nhất luồng Lab–Mindmap và chạy Lượt 2 (`run-2@20261128-014840`) | Khắc phục nhóm lỗi lớn nhất của Lượt 1; kết quả tăng từ 16/20 (80%) lên 19/20 (95%, `thuong` 8/11 → 11/11), giữ nguyên bộ câu thử và chuẩn đạt. |
+| 28/11 02:30 | Chạy mô phỏng chi phí 50 phiên/model (`simulate-1..3.csv`) trên `gpt-4o-mini`, `gpt-5.4-mini`, `gpt-6.2-sol` và xuất `demo-slides.pdf` | Đáp ứng yêu cầu CP4 đo chi phí/task thành công trên nhiều mức model theo bảng giá BTC. |
+| 28/11 07:18 | Điền hoàn chỉnh các mục còn trống `§0`, `§1`, `§3`, `§10` trong `spec.md` | Hoàn thiện đủ cấu trúc `§0–§10` trước mốc CP3/CP4; giữ nguyên chuẩn đạt `§7`, bộ câu thử và kết quả đã chạy. |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)** (sửa theo góp ý — không sửa chuẩn "đạt", câu thử, số bằng chứng, kết quả các lượt đã chạy)
 
