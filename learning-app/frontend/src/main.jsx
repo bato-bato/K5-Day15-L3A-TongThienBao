@@ -291,6 +291,7 @@ function App() {
   const [saving, setSaving] = useState({});
   const [messages, setMessages] = useState({});
   const [selectedId, setSelectedId] = useState(null);
+  const [selectedDetail, setSelectedDetail] = useState(null);
   const [labCheckpoint, setLabCheckpoint] = useState(null);
 
   const [dayMenuOpen, setDayMenuOpen] = useState(false);
@@ -784,9 +785,10 @@ function App() {
             showGrid={showGrid}
             searchQuery={searchQuery}
             layoutTrigger={layoutTrigger}
-            onSelectConcept={(targetDay, nodeId) => {
+            onSelectConcept={(targetDay, nodeId, detail = null) => {
               setDay(targetDay);
               setSelectedId(nodeId);
+              setSelectedDetail(detail);
             }}
             onSelectDay={selectDay}
             onOpenDayCanvas={targetDay => {
@@ -861,18 +863,89 @@ function App() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setSelectedId(null)}
+                    onClick={() => {
+                      setSelectedId(null);
+                      setSelectedDetail(null);
+                    }}
                     className="text-white/80 hover:text-white hover:bg-white/15 px-1.5 py-0.5 rounded-md text-sm font-bold"
                   >
                     ×
                   </button>
                 </div>
+                {selectedDetail && (
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-[10.5px] font-semibold text-white/85 truncate">
+                      {selectedDetail.kind === 'l3'
+                        ? `↳ ${selectedDetail.groupLabel || selectedDetail.parentTitle}`
+                        : `↳ ${selectedDetail.parentTitle || study.title}`}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDetail(null)}
+                      className="shrink-0 px-2 py-0.5 rounded-md bg-white/15 hover:bg-white/25 text-white text-[10px] font-semibold transition"
+                    >
+                      ← Xem nhánh cha
+                    </button>
+                  </div>
+                )}
                 <h3 className="text-[15.5px] font-bold leading-snug text-white">
-                  {study.title}
+                  {selectedDetail ? selectedDetail.title : study.title}
                 </h3>
               </div>
 
               <div className="p-4 overflow-y-auto space-y-3.5 text-xs select-text">
+                {selectedDetail?.kind === 'l3' ? (
+                  <>
+                    {selectedDetail.problem && (
+                      <div className="bg-rose-50/80 border border-rose-200 border-l-4 border-l-rose-500 rounded-xl p-3">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-rose-700 mb-1">
+                          🎯 Vấn đề cần giải quyết
+                        </div>
+                        <p className="text-[12px] text-slate-800 leading-relaxed">{selectedDetail.problem}</p>
+                      </div>
+                    )}
+                    {selectedDetail.mechanism && (
+                      <div className="bg-indigo-50/80 border border-indigo-200 rounded-xl p-3">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 mb-1">
+                          ⚙️ Cơ chế hoạt động
+                        </div>
+                        <p className="text-[12px] text-slate-800 leading-relaxed font-medium">{selectedDetail.mechanism}</p>
+                      </div>
+                    )}
+                    {selectedDetail.example && (
+                      <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 mb-1">
+                          🧪 Ví dụ thực tế / Áp dụng Lab
+                        </div>
+                        <p className="text-[12px] text-slate-800 leading-relaxed">{selectedDetail.example}</p>
+                      </div>
+                    )}
+                    {selectedDetail.source && (
+                      <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">📚 Nguồn đối chiếu</span>
+                        <span className="text-[11px] font-semibold text-slate-800 text-right">{selectedDetail.source}</span>
+                      </div>
+                    )}
+                  </>
+                ) : selectedDetail?.kind === 'l2' ? (
+                  <div className="space-y-2">
+                    <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">
+                      Các kỹ thuật trong nhánh này ({selectedDetail.items?.length || 0} mục)
+                    </div>
+                    {(selectedDetail.items || []).map((item, idx) => {
+                      const cIdx = item.indexOf(': ');
+                      const itemTitle = cIdx > 0 ? item.slice(0, cIdx) : item;
+                      const itemDesc = cIdx > 0 ? item.slice(cIdx + 2) : '';
+                      return (
+                        <div key={idx} className="bg-white border border-slate-200 rounded-xl p-3 shadow-2xs space-y-1">
+                          <div className="font-bold text-slate-900 text-[12px]">{itemTitle}</div>
+                          {itemDesc && <p className="text-slate-600 text-[11.5px] leading-relaxed">{itemDesc}</p>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <>
                 {/* Key Quote Callout (prominent at top when available) */}
                 {selectedNode.source_ref?.key_quote && (
                   <div className="bg-amber-50/90 border border-amber-200 border-l-4 border-l-amber-500 rounded-xl p-3">
@@ -1088,6 +1161,8 @@ function App() {
                     )}
                   </div>
                 )}
+                  </>
+                )}
 
                 {/* Lecture Provenance Metadata */}
                 {selectedNode.source_ref && (
@@ -1126,12 +1201,12 @@ function App() {
                   </div>
                 )}
 
-                {study.title && (
+                {(selectedDetail?.title || study.title) && (
                   <button
                     type="button"
                     onClick={() => {
                       setMapperOpen(true);
-                      runMapping(study.title);
+                      runMapping(selectedDetail?.title || study.title);
                     }}
                     className="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-sm"
                   >

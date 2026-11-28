@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { DAY7_DEEP_BRANCHES, getLeafFocusedDetail } from './day07DeepBranches.js';
 import { sizeMindmap } from './mindmapSizing.js';
 import { useMindmapViewport } from './useMindmapViewport.js';
 
@@ -121,6 +122,11 @@ export function getNodeTitle(node) {
   }
 
   export function extractSubBranches(node) {
+    const conceptId = node?.source_ref?.concept_id;
+    if (conceptId && DAY7_DEEP_BRANCHES[conceptId]) {
+      return DAY7_DEEP_BRANCHES[conceptId];
+    }
+
     const raw = (node?.text || '').trim();
     const lines = raw.split('\n').map(l => l.trim()).filter(l => l && l !== '—');
     const body = lines.slice(1).join(' ').trim();
@@ -320,6 +326,8 @@ export function getNodeTitle(node) {
                 id: l2Id,
                 kind: 'l2',
                 side,
+                parentL1Id: l1Id,
+                leafItems: sg.leaves,
                 conceptId: branch.conceptId,
                 day: sg.dayOverride ?? branch.day,
                 text: sg.label,
@@ -354,6 +362,8 @@ export function getNodeTitle(node) {
                 id: l3Id,
                 kind: 'l3',
                 side,
+                parentL1Id: l1Id,
+                parentL2Id: l2Id,
                 conceptId: branch.conceptId,
                 day: sg.dayOverride ?? branch.day,
                 text: leafText,
@@ -377,6 +387,8 @@ export function getNodeTitle(node) {
               id: l2Id,
               kind: 'l2',
               side,
+              parentL1Id: l1Id,
+              leafItems: sg.leaves,
               conceptId: branch.conceptId,
               day: sg.dayOverride ?? branch.day,
               text: sg.label,
@@ -602,6 +614,24 @@ export function getNodeTitle(node) {
           });
         }
 
+        function buildSubDetail(node) {
+          if (node.kind === 'l3') {
+            const parentL2 = byId.get(node.parentL2Id);
+            const parentL1 = byId.get(node.parentL1Id);
+            return getLeafFocusedDetail(node.text, parentL2?.text || '', parentL1?.text || '');
+          }
+          if (node.kind === 'l2') {
+            const parentL1 = byId.get(node.parentL1Id);
+            return {
+              kind: 'l2',
+              title: node.text,
+              parentTitle: parentL1?.text || '',
+              items: node.leafItems || [],
+            };
+          }
+          return null;
+        }
+
         function handleNodeClick(node) {
           if (node.hasChildren) {
             if (clickTimer.current) clearTimeout(clickTimer.current);
@@ -611,7 +641,7 @@ export function getNodeTitle(node) {
             }, 180);
           }
           if (node.conceptId) {
-            onSelectConcept?.(node.day, node.conceptId);
+            onSelectConcept?.(node.day, node.conceptId, buildSubDetail(node));
           }
         }
 
@@ -621,7 +651,7 @@ export function getNodeTitle(node) {
             clickTimer.current = null;
           }
           if (node.conceptId) {
-            onSelectConcept?.(node.day, node.conceptId);
+            onSelectConcept?.(node.day, node.conceptId, buildSubDetail(node));
           } else if (page === 'all' && node.day) {
             goToPage(node.day);
           }
@@ -857,11 +887,12 @@ export function getNodeTitle(node) {
                     <button
                       key={node.id}
                       type="button"
+                      onClick={() => handleNodeClick(node)}
                       onDoubleClick={() => handleNodeDoubleClick(node)}
                       style={{ position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height }}
-                      className={`mindmap-node rounded-md bg-white px-2.5 flex items-center justify-center text-center text-[11px] font-medium text-slate-700 border shadow-2xs hover:border-slate-400 z-10 cursor-pointer ${isSelected ? 'border-blue-600 ring-1 ring-blue-300' : 'border-slate-300/85'
+                      className={`mindmap-node rounded-md bg-white px-2.5 flex items-center justify-center text-center text-[11px] font-medium text-slate-700 border shadow-2xs hover:border-blue-400 hover:bg-blue-50/40 z-10 cursor-pointer ${isSelected ? 'border-blue-600 ring-1 ring-blue-300' : 'border-slate-300/85'
                         } ${node.dimmed ? 'opacity-25' : ''}`}
-                      title={`${node.text} — Bấm đúp để xem chi tiết`}
+                      title={`${node.text} — Bấm để xem chi tiết mục này`}
                     >
                       <span className="mindmap-label">{node.label}</span>
                     </button>
