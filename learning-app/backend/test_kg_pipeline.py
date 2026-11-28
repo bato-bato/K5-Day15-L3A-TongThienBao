@@ -382,5 +382,19 @@ def test_chat_security_hardening_and_rate_limit(monkeypatch):
             assert r2.status_code == 200
             assert r3.status_code == 429
             assert "Retry-After" in r3.headers
+
+            # 8. Concurrent users limit (max_keys) rejects new user beyond limit while existing active users work
+            reset_rate_limiter()
+            monkeypatch.setenv("CHAT_RATE_LIMIT_MAX", "10")
+            monkeypatch.setenv("CHAT_MAX_CONCURRENT_USERS", "2")
+            u1 = client.post("/api/chat", json={"message": "RAG là gì?"}, cookies={"learning_workspace": "user-1"})
+            u2 = client.post("/api/chat", json={"message": "RAG là gì?"}, cookies={"learning_workspace": "user-2"})
+            u3 = client.post("/api/chat", json={"message": "RAG là gì?"}, cookies={"learning_workspace": "user-3"})
+            u1_again = client.post("/api/chat", json={"message": "RAG là gì?"}, cookies={"learning_workspace": "user-1"})
+            assert u1.status_code == 200
+            assert u2.status_code == 200
+            assert u3.status_code == 429
+            assert "Retry-After" in u3.headers
+            assert u1_again.status_code == 200
     finally:
         reset_rate_limiter()

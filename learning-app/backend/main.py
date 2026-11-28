@@ -291,13 +291,14 @@ def kg_rag_chat(req: ChatRequest, request: Request, response: Response) -> dict[
     """KG-RAG tutor: explain concepts/lessons at eli5|standard|deep, grounded + cited on the GraphRAG DB."""
     response.headers["Cache-Control"] = "no-store"
     client_key = request.cookies.get(COOKIE_NAME) or (request.client.host if request.client else "unknown")
-    max_req = int(os.environ.get("CHAT_RATE_LIMIT_MAX", "20"))
+    max_req = int(os.environ.get("CHAT_RATE_LIMIT_MAX", "10"))
     window_s = int(os.environ.get("CHAT_RATE_LIMIT_WINDOW_S", "60"))
-    allowed, retry_after = chat_rate_limiter.check(client_key, max_req, window_s)
+    max_users = int(os.environ.get("CHAT_MAX_CONCURRENT_USERS", "30"))
+    allowed, retry_after = chat_rate_limiter.check(client_key, max_req, window_s, max_keys=max_users)
     if not allowed:
         raise HTTPException(
             status_code=429,
-            detail="Bạn đang gửi quá nhanh. Vui lòng đợi vài giây rồi thử lại.",
+            detail="Hệ thống đang đạt giới hạn người dùng hoặc bạn gửi quá nhanh. Vui lòng đợi vài giây rồi thử lại.",
             headers={"Retry-After": str(retry_after)},
         )
     return chat_turn(

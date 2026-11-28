@@ -181,22 +181,34 @@ class SlidingWindowRateLimiter:
         self._hits: dict[str, deque[float]] = defaultdict(deque)
         self._ops = 0
 
-    def check(self, key: str, max_requests: int, window_seconds: int) -> tuple[bool, int]:
+    def check(
+        self,
+        key: str,
+        max_requests: int,
+        window_seconds: int,
+        max_keys: int | None = None,
+    ) -> tuple[bool, int]:
         now = time.monotonic()
-        cutoff = now - max(1, window_seconds)
+        window = max(1, window_seconds)
+        cutoff = now - window
         with self._lock:
             self._ops += 1
-            if self._ops % 100 == 0:
+            if max_keys is not None or self._ops % 100 == 0:
                 stale = [k for k, dq in self._hits.items() if not dq or dq[-1] <= cutoff]
                 for k in stale:
                     del self._hits[k]
+
+            if max_keys is not None and key not in self._hits and len(self._hits) >= max(1, max_keys):
+                earliest_expiry = min(dq[-1] for dq in self._hits.values() if dq)
+                retry_after = max(1, math.ceil(earliest_expiry + window - now))
+                return False, retry_after
 
             dq = self._hits[key]
             while dq and dq[0] <= cutoff:
                 dq.popleft()
 
             if len(dq) >= max(1, max_requests):
-                retry_after = max(1, math.ceil(dq[0] + window_seconds - now))
+                retry_after = max(1, math.ceil(dq[0] + window - now))
                 return False, retry_after
 
             dq.append(now)
