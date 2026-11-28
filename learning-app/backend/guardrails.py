@@ -62,7 +62,7 @@ POLITICS_ECON_CULTURE_PATTERNS = [
 
 CODE_FOR_USER_PATTERNS = [
     re.compile(
-        r"\b(viet|lam|giai|code|lap trinh|sua|fix|hoan thanh)\s+(?:ho|giup|thay|dum|gium)(?:\s+(?:minh|toi|em|ban))?\b"
+        r"\b(viet|lam|giai|code|lap trinh|hoan thanh)\s+(?:ho|giup|thay|dum|gium)(?:\s+(?:minh|toi|em|ban))?\b"
         r".{0,50}\b(code|ma nguon|chuong trinh|bai tap|bai lab|checkpoint|file|script|ham|function|class|du an|project|ung dung|app|api|bot)\b",
         re.IGNORECASE,
     ),

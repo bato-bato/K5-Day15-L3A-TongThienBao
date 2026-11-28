@@ -283,6 +283,18 @@ def test_chat_low_similarity_answers_without_rag_when_llm_enabled(monkeypatch):
     assert no_cite["abstained"] is False
     assert no_cite["citations"] == []
 
+    # Natural long conversational starters & greetings in Vietnamese should NOT be falsely abstained
+    for prompt in (
+        "Cùng thảo luận về kiến trúc RAG",
+        "Khi nào nên dùng Agentic AI thay vì Workflow cố định?",
+        "Mình đang phân vân cách thiết kế prompt & guardrails",
+        "Trade-off lớn nhất của Token Economy là gì?",
+        "Chào bạn, mình muốn trao đổi về bài học hôm nay",
+    ):
+        conv = chat_engine.chat_turn(prompt)
+        assert conv["blocked"] is False, prompt
+        assert conv["abstained"] is False, prompt
+
 
 def test_chat_followup_simplify_uses_previous_citations(monkeypatch):
     from chat_engine import chat_turn

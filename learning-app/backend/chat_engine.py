@@ -75,14 +75,21 @@ INTENT_TASK: dict[str, str] = {
 # Chat filler that pollutes retrieval ("giải thích ... đơn giản" matched unrelated nodes in probing).
 FILLER_RE = re.compile(
     r"(?<!\w)(giải thích lại|giải thích|là gì|là sao|nghĩa là gì|cho (tôi|mình|em)|giúp (tôi|mình|em)|"
+    r"cùng|thảo luận|bàn luận|trao đổi|chia sẻ|phân vân|tìm hiểu|áp dụng|thực tế|lớn nhất|"
     r"đơn giản hơn|đơn giản|dễ hiểu hơn|dễ hiểu|chưa hiểu|không hiểu|rõ hơn|ở đâu|chỗ nào|cài đặt|implement|ví dụ|minh họa|so sánh|khác nhau|khác gì|"
     r"tóm tắt|tổng quan|bài học|nội dung|hoạt động như thế nào|như thế nào|thế nào|tại sao|vì sao|"
-    r"được không|so với|với|về|nhé|nha|ạ|vậy|hả|lắm|hơn|nó|cái (này|đó|trên))(?!\w)|[?!.,]",
+    r"được không|so với|với|về|nhé|nha|ạ|vậy|hả|lắm|hơn|nó|mình|tôi|em|bạn|cách|cái (này|đó|trên))(?!\w)|[?!.,]",
     re.I,
 )
 FOLLOWUP_RE = re.compile(r"\b(nó|cái (này|đó|trên)|khái niệm (này|đó|trên)|phần (này|đó|trên)|ở trên|vừa rồi)\b", re.I)
 DAY_RE = re.compile(r"(?:ngày|bài|day)\s*(\d{1,2})\b", re.I)
 CITE_RE = re.compile(r"\[([A-Z][A-Z0-9_]*(?::[^\]\s]+)?)\]")
+GREETING_RE = re.compile(
+    r"^\s*(?:xin\s+)?(?:chào|hello|hi|hey|alo|good\s*(?:morning|afternoon|evening))(?:\s+(?:bạn|gia\s*sư|ai|mọi\s*người|ơi|nhé|nha))?"
+    r"(?:[\s,!.]*(?:mình|tôi|em|bạn|hôm nay|trao đổi|học|bài học|giúp).{0,55})?[?!.\s]*$",
+    re.I,
+)
+_GENERIC_KW = {"ai", "go", "uv", "api", "cost", "gate", "rule", "stop", "40%", "tool", "file", "code", "app", "and", "for", "the", "with"}
 
 MIN_COVERAGE = 0.5
 
@@ -155,9 +162,20 @@ def token_coverage(node: dict[str, Any], query: str) -> float:
 
 
 def similarity_score(node: dict[str, Any], query: str) -> float:
-    """Combined similarity score in [0, 1] from query token coverage and vector cosine score."""
+    """Combined similarity score in [0, 1] from query token coverage, KG keywords/label terms, and cosine score."""
     cov = token_coverage(node, query)
     cos = float(node.get("cosine_score", 0.0))
+    q_lower = (query or "").lower()
+    label_terms = re.findall(r"[a-zA-Z0-9_-]{3,}", node.get("label", ""))
+    candidates = [*node.get("keywords", []), *label_terms]
+    kw_hit = any(
+        (" " in kw_l or "-" in kw_l or (len(kw_l) >= 3 and kw_l not in _GENERIC_KW))
+        and re.search(rf"(?<!\w){re.escape(kw_l)}(?!\w)", q_lower)
+        for kw in candidates
+        if (kw_l := kw.strip().lower())
+    )
+    if kw_hit:
+        return round(max(cov, cos, MIN_COVERAGE + 0.05), 4)
     if cov <= 0.5 and cos < 0.25:
         return round(0.7 * cov + 0.3 * cos, 4)
     return round(max(cov, cos), 4)
@@ -205,6 +223,17 @@ def retrieve(
         hits = [h for h in hits if cov[h["id"]] >= MIN_COVERAGE]
         for h in hits:
             add(h["id"], "hybrid_search")
+    if not seeds and (cleaned or message.strip()):
+        q_check = cleaned or message.strip()
+        fallback_scored = sorted(
+            ((similarity_score(n, q_check), n) for n in concepts.values()),
+            key=lambda pair: pair[0],
+            reverse=True,
+        )
+        for score, node in fallback_scored[:3]:
+            if score >= MIN_COVERAGE:
+                cov[node["id"]] = score
+                add(node["id"], "keyword_match")
     if not seeds and focus_id in concepts:
         if not cleaned or similarity_score(concepts[focus_id], cleaned) >= MIN_COVERAGE:
             add(focus_id, "focused_node")
@@ -585,7 +614,8 @@ def _material_similarity(material: list[str], cleaned_query: str) -> float:
     hay = " ".join(material).lower()
     words = set(re.findall(r"[0-9a-zA-ZÀ-ỹ_]+", hay))
     hits = sum(1 for t in tokens if t in words or (len(t) >= 4 and t in hay))
-    return hits / len(tokens)
+    ratio = hits / len(tokens)
+    return max(MIN_COVERAGE, ratio) if hits >= 2 else ratio
 
 
 def _prepare_chat_turn(
@@ -631,9 +661,10 @@ def _prepare_chat_turn(
         mentions_lab = bool(re.search(r"\b(lab|checkpoint|cp\d*|m\d+|phase|bài thực hành|bài này)\b", msg, re.I))
         if not r["followup"] and not mentions_lab and _material_similarity(material, r["cleaned_query"]) < MIN_COVERAGE:
             material = None
+    is_greeting = bool(GREETING_RE.match(msg))
     if material:
         context = "Tài liệu Lab đang mở (tham khảo thêm nếu liên quan):\n" + "\n".join(material) + "\n\n" + context
-    elif not citable:
+    elif not citable and not is_greeting:
         answer = (
             "Nội dung này nằm ngoài phạm vi tài liệu khóa học AI in Action 14 ngày nên mình không trả lời. "
             "Bạn thử hỏi về các khái niệm trong giáo trình hoặc bài Lab (ví dụ: *RAG*, *Token Economy*, *Lethal Trifecta*) "
@@ -670,6 +701,8 @@ def _prepare_chat_turn(
             "sanitized_message": msg if input_redacted else None,
             "trace": trace,
         }
+    elif not citable and is_greeting:
+        context = ""
 
     messages = build_messages(msg, clean_history, intent, level, context, relations)
     return True, {
@@ -681,6 +714,7 @@ def _prepare_chat_turn(
         "citable": citable,
         "relations": relations,
         "material": material,
+        "is_greeting": is_greeting,
         "messages": messages,
         "input_redacted": input_redacted,
         "history_dropped": history_dropped,
@@ -725,6 +759,11 @@ def _finalize_chat_turn(prep: dict[str, Any], answer: str | None, meta: dict[str
         else:
             answer, valid, rejected = verify_citations(answer, {n["id"] for n in citable})
             abstained = False
+    elif prep.get("is_greeting"):
+        answer = "Chào bạn! Mình là Gia sư AI của khóa AI in Action 14 ngày. Bạn đang muốn trao đổi về khái niệm hay bài Lab nào hôm nay?"
+        valid, rejected = [], []
+        abstained = False
+        out_guard = {"blocked": False, "text": answer, "redacted_types": [], "flags": []}
     else:
         answer = (
             "Mình chưa tìm thấy nội dung này trong giáo trình 14 ngày nên không muốn đoán. "
