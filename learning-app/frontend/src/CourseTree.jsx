@@ -572,7 +572,7 @@ function computeSymmetricLayout({ mindmapsByDay, page, searchQuery, expandedIds 
 
 export function CourseTree({
   mindmapsByDay,
-  activeDay,
+  page,
   selectedNodeId,
   focusedCheckpoint,
   searchQuery = '',
@@ -580,7 +580,6 @@ export function CourseTree({
   onSelectDay,
   onBackToLab,
 }) {
-  const [page, setPage] = useState(activeDay || 1);
   const [expandedIds, setExpandedIds] = useState(() => {
     const initial = new Set();
     if (selectedNodeId) initial.add(`l1:${selectedNodeId}`);
@@ -590,10 +589,6 @@ export function CourseTree({
     return initial;
   });
   const lastPageRef = useRef(page);
-
-  useEffect(() => {
-    if (activeDay) setPage(activeDay);
-  }, [activeDay]);
 
   useEffect(() => {
     const pageChanged = lastPageRef.current !== page;
@@ -621,7 +616,7 @@ export function CourseTree({
     useMindmapViewport(tree, {
       viewKey: `mindmap:${page}`,
       layoutTrigger: 0,
-      bottomInset: 76,
+      bottomInset: 56,
       initialFocus: initialFocusNode,
     });
 
@@ -639,7 +634,7 @@ export function CourseTree({
 
   function handleNodeClick(node) {
     if (page === 'all' && node.kind === 'l2' && node.day) {
-      goToPage(node.day);
+      onSelectDay(node.day);
       return;
     }
     if (node.conceptId) {
@@ -664,13 +659,6 @@ export function CourseTree({
 
   function expandAllBranches() {
     setExpandedIds(new Set(tree.allExpandableIds));
-  }
-
-  function goToPage(nextPage) {
-    setPage(nextPage);
-    if (nextPage !== 'all') {
-      onSelectDay?.(nextPage);
-    }
   }
 
   function buildSymmetricEdge(edge) {
@@ -705,7 +693,7 @@ export function CourseTree({
             onClick={onBackToLab}
             className="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-xs transition shrink-0"
           >
-            ← Quay lại Lab
+            ← Quay lại thực hành
           </button>
           <div className="min-w-0 text-xs flex items-center gap-1.5">
             <span className="px-1.5 py-0.5 rounded bg-blue-600 text-white font-mono text-[10.5px] font-bold shrink-0">
@@ -878,59 +866,7 @@ export function CourseTree({
         </div>
       </div>
 
-      {/* Floating Bottom Controls + 1-to-14 Lesson Pagination */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1.5 max-w-[calc(100vw-2rem)]">
-        <div
-          className="bg-white/95 backdrop-blur-sm border border-slate-200 shadow-lg rounded-xl px-2 py-1 flex items-center gap-1 overflow-x-auto max-w-full"
-          aria-label="Phân trang bài học"
-        >
-          <button
-            type="button"
-            disabled={page === 'all' || page <= 1}
-            onClick={() => goToPage(Math.max(1, (page === 'all' ? activeDay : page) - 1))}
-            className="w-6 h-6 rounded-md text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-35"
-            title="Bài trước"
-          >
-            ‹
-          </button>
-          {Array.from({ length: 14 }, (_, idx) => idx + 1).map(num => (
-            <button
-              key={num}
-              type="button"
-              onClick={() => goToPage(num)}
-              title={`Ngày ${num}`}
-              className={`w-6 h-6 rounded-md text-[11px] font-mono font-semibold transition shrink-0 ${
-                page === num
-                  ? 'bg-blue-600 text-white shadow-sm ring-2 ring-blue-300/80'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              {num}
-            </button>
-          ))}
-          <button
-            type="button"
-            disabled={page === 'all' || page >= 14}
-            onClick={() => goToPage(Math.min(14, (page === 'all' ? activeDay : page) + 1))}
-            className="w-6 h-6 rounded-md text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-35"
-            title="Bài tiếp theo"
-          >
-            ›
-          </button>
-          <div className="h-3.5 w-px bg-slate-200 mx-0.5 shrink-0" />
-          <button
-            type="button"
-            onClick={() => goToPage(page === 'all' ? activeDay : 'all')}
-            className={`px-2 py-0.5 rounded-md text-[11px] font-semibold whitespace-nowrap transition ${
-              page === 'all'
-                ? 'bg-slate-900 text-white'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            Tất cả
-          </button>
-        </div>
-
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 max-w-[calc(100vw-2rem)]">
         <div className="bg-white/95 backdrop-blur-sm border border-slate-200 shadow-xl rounded-xl px-3 py-1.5 flex items-center space-x-2 overflow-x-auto max-w-full">
           <button
             type="button"
