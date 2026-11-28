@@ -39,6 +39,50 @@ INJECTION_PATTERNS = [
     re.compile(r"(print|show|dump|read|reveal|cat|echo)\s+.{0,40}(\.env|api[_\s-]?key|secret[_\s-]?key|openai_api_key|llm_api_key)", re.IGNORECASE),
 ]
 
+POLITICS_ECON_CULTURE_PATTERNS = [
+    re.compile(
+        r"\b(chinh tri|dia chinh tri|chinh phu|quoc hoi|dang phai|bau cu|tong thong|thu tuong|"
+        r"chu nghia (?:tu ban|xa hoi|cong san|dan toc)|xung dot vu trang|chien tranh|bieu tinh|cam van|"
+        r"politics|political|geopolitics|geopolitical|election|president|prime minister|parliament|congress|sanctions|warfare|armed conflict)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(kinh te (?:the gioi|vi mo|toan cau|chinh tri|thi truong)|suy thoai kinh te|lam phat|lai suat|"
+        r"ngan hang trung uong|ty gia|chung khoan|co phieu|bat dong san|tien ao|forex|gdp|cpi|"
+        r"world economy|global economy|macroeconomics|inflation|interest rate|central bank|exchange rate|stock market|real estate|cryptocurrency|trade war|tariff)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(van hoa (?:the gioi|cac nuoc|phuong dong|phuong tay|dan toc)|ton giao|tin nguong|sac toc|"
+        r"phan biet chung toc|phong tuc tap quan|"
+        r"world culture|cultural heritage|religion|religious|ethnicity|ethnic|racism)\b",
+        re.IGNORECASE,
+    ),
+]
+
+CODE_FOR_USER_PATTERNS = [
+    re.compile(
+        r"\b(viet|lam|giai|code|lap trinh|sua|fix|hoan thanh)\s+(?:ho|giup|thay|dum|gium)(?:\s+(?:minh|toi|em|ban))?\b"
+        r".{0,50}\b(code|ma nguon|chuong trinh|bai tap|bai lab|checkpoint|file|script|ham|function|class|du an|project|ung dung|app|api|bot)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(viet|tao|xay dung|sinh|generate|write)\s+(?:toan bo|tron bo|full|complete|entire|ready[- ]to[- ]run)\s+"
+        r"(?:code|ma nguon|solution|loi giai|bai nop|project|app|script)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(viet\s+code\s+(?:thay|ho|giup|dum)|code\s+(?:thay|ho|dum|gium)\s+(?:minh|toi|em)|"
+        r"lam\s+thay\s+(?:bai|lab|checkpoint)|giai\s+ho\s+(?:bai|lab|checkpoint))\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(write\s+(?:the\s+)?(?:whole|full|complete|entire)\s+code|"
+        r"do\s+my\s+(?:homework|assignment|lab|coding)|code\s+(?:this|it)\s+for\s+me|write\s+the\s+solution\s+for\s+me)\b",
+        re.IGNORECASE,
+    ),
+]
+
 ZERO_WIDTH_BIDI_RE = re.compile(r"[\u200b-\u200f\u202a-\u202e\u2060\ufeff]")
 CTRL_CHARS_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 DELIMITER_TAG_RE = re.compile(
@@ -86,8 +130,14 @@ def spotlight(text: str, tag: str) -> str:
     return f"<{tag}>\n{clean}\n</{tag}>"
 
 
+def _fold_ascii(text: str) -> str:
+    """Strip Vietnamese diacritics for accent-tolerant guardrail matching."""
+    decomposed = unicodedata.normalize("NFD", (text or "").casefold())
+    return "".join(ch for ch in decomposed if not unicodedata.combining(ch)).replace("đ", "d")
+
+
 def check_input_guard(text: str) -> dict[str, Any]:
-    """Screen input query for length limits and direct/indirect prompt injection patterns."""
+    """Screen input query for length limits, prompt injection, off-limit topics, and code-for-user requests."""
     normalized = sanitize_text(text).strip()
     if not normalized:
         return {"blocked": True, "reason": "Empty query", "matched_rules": ["empty_input"]}
@@ -108,6 +158,23 @@ def check_input_guard(text: str) -> dict[str, Any]:
             "blocked": True,
             "reason": "Phát hiện dấu hiệu Prompt Injection / chỉ dẫn vượt quyền trong dữ liệu đầu vào.",
             "matched_rules": matched,
+        }
+
+    folded = _fold_ascii(normalized)
+    topic_matched = [p.pattern for p in POLITICS_ECON_CULTURE_PATTERNS if p.search(folded)]
+    if topic_matched:
+        return {
+            "blocked": True,
+            "reason": "Gia sư AI chỉ hỗ trợ trao đổi kiến thức và bài học AI/kỹ thuật, không thảo luận các chủ đề chính trị, kinh tế hoặc văn hóa thế giới.",
+            "matched_rules": topic_matched,
+        }
+
+    code_matched = [p.pattern for p in CODE_FOR_USER_PATTERNS if p.search(folded)]
+    if code_matched:
+        return {
+            "blocked": True,
+            "reason": "Mình không viết code thay hay làm hộ bài cho bạn. Hãy chia sẻ hướng tiếp cận hoặc đoạn bạn đang vướng để mình gợi ý cách tự triển khai và debug nhé.",
+            "matched_rules": code_matched,
         }
 
     return {"blocked": False, "reason": "OK", "matched_rules": []}
