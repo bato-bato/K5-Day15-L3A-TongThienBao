@@ -12,3 +12,5 @@
 !data/lab-mapping/
 !data/lab-mapping/labs.json
 !data/lab-mapping/knowledge-graph.json
+
+!data/lab-mapping/lecture-topics.json

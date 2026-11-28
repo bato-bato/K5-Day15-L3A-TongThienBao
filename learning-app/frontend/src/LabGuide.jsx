@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useRef } from 'react';
 import { labs } from '../../../data/lab-mapping/labs.json';
 import { checkpoint_views } from '../../../data/lab-mapping/knowledge-graph.json';
 import { LectureReferences, resolveCheckpointMindmapNodes } from './LectureReferences.jsx';
+import { Counterexample } from './Counterexample.jsx';
 import './LabGuide.css';
 
 const groupLabels = { individual: 'Cá nhân', group: 'Làm nhóm', mixed: 'Cá nhân và nhóm' };
@@ -36,7 +37,7 @@ function References({ checkpoint, guide }) {
   );
 }
 
-export function LabGuide({ day, selection, onSelect, enrichedMindmaps, onOpenMindmap }) {
+export function LabGuide({ day, selection, onSelect, enrichedMindmaps, onOpenMindmap, onAskTutor }) {
   const guideRef = useRef(null);
   const lab = labs.find(item => item.day === day);
   const overviewId = lab ? `${lab.id}-overview` : 'overview';
@@ -177,6 +178,29 @@ export function LabGuide({ day, selection, onSelect, enrichedMindmaps, onOpenMin
                   <strong>Tự kiểm</strong>
                   <p>{guide.self_check}</p>
                 </div>
+              )}
+              {activeCheckpoint.id === 'day01-cp2' && (
+                <Counterexample onAskTutor={onAskTutor} onOpenConcept={() => {
+                  const nodes = resolveCheckpointMindmapNodes(activeCheckpoint, guide, enrichedMindmaps, day);
+                  const knn = nodes.find(item => item.topicId === 'knn');
+                  onOpenMindmap(knn?.day ?? day, knn?.node.id, activeCheckpoint);
+                }} />
+              )}
+              {guide?.reading_guides?.length > 0 && (
+                <section className="lab-mindmap-card">
+                  <h3>Thực hành so sánh trên dev</h3>
+                  <p>Ví dụ minh họa: 4 câu có đáp án, 3 câu tìm thấy evidence ở top-3 nhưng chỉ 2 câu còn đủ evidence trong context cuối.</p>
+                  <button type="button" className="lab-mindmap-cta" onClick={() => onAskTutor(
+                    'Trong ví dụ M03 có 4 câu có đáp án, 3 câu hit top-3 và 2 câu đủ evidence trong context cuối. Giúp mình tính hai tỷ lệ và chỉ ra cách dùng trace để điều tra phần chênh lệch.'
+                  )}>Hỏi gia sư về ví dụ này</button>
+                  {guide.reading_guides.map(item => (
+                    <details className="lab-extra" key={item.id}>
+                      <summary>{item.label}</summary>
+                      <p>{item.summary}</p>
+                      <SourceLink href={item.url}>Đối chiếu với đề gốc</SourceLink>
+                    </details>
+                  ))}
+                </section>
               )}
               <LectureReferences
                 day={day}

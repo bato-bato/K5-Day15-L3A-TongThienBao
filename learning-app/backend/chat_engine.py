@@ -34,7 +34,7 @@ from guardrails import (
     spotlight,
 )
 from kg_builder import nfc
-from semantic_engine import hybrid_search, tokenize_text
+from semantic_engine import embed_remote, hybrid_search, tokenize_text
 
 logger = logging.getLogger("kg_chat")
 
@@ -54,7 +54,7 @@ LEVELS: dict[str, str] = {
 }
 
 INTENT_RULES: list[tuple[str, re.Pattern[str]]] = [
-    ("quiz", re.compile(r"\b(quiz|kiểm tra|câu hỏi ôn|ôn tập|trắc nghiệm|test (tôi|mình))", re.I)),
+    ("quiz", re.compile(r"\b(quiz|kiểm tra (?:mình|tôi|kiến thức)|câu hỏi ôn|ôn tập|trắc nghiệm|test (tôi|mình))", re.I)),
     ("simplify", re.compile(r"(đơn giản hơn|dễ hiểu hơn|chưa hiểu|không hiểu|khó hiểu|nói dễ|eli5|giải thích lại)", re.I)),
     ("example", re.compile(r"(ví dụ|example|minh họa|áp dụng thực tế)", re.I)),
     ("compare", re.compile(r"(so sánh|khác nhau|khác gì|giống nhau|\bvs\.?\b|versus)", re.I)),
@@ -322,14 +322,17 @@ def call_llm(messages: list[dict[str, str]], intent: str) -> tuple[str | None, d
     if not cfg:
         return None, {"llm_used": False, "reason": "no_api_key"}
     api_key, base_url, model = cfg
+    limit = 900 if intent in ("quiz", "compare", "lesson") else 650
+    options = {"temperature": 0.3, "max_tokens": limit}
+    if model == "gpt-5.4-mini" or model.startswith("gpt-5.4-mini-"):
+        options = {"max_completion_tokens": limit}
     try:
         resp = httpx.post(
             f"{base_url}/chat/completions",
             headers={"Authorization": f"Bearer {api_key}"},
             json={
                 "model": model,
-                "temperature": 0.3,
-                "max_tokens": 900 if intent in ("quiz", "compare", "lesson") else 650,
+                **options,
                 "messages": messages,
             },
             timeout=LLM_TIMEOUT_S,
@@ -436,20 +439,103 @@ def suggest_followups(intent: str, level: str, citable: list[dict[str, Any]], re
 @lru_cache(maxsize=1)
 def lab_materials():
     directory = Path(__file__).resolve().parents[2] / "data" / "lab-mapping"
-    labs = json.loads((directory / "labs.json").read_text(encoding="utf-8"))["labs"]
-    graph = json.loads((directory / "knowledge-graph.json").read_text(encoding="utf-8"))
-    concepts = {node["id"]: node["definition"] for node in graph["graph"]["nodes"]}
-    materials = {}
-    for lab in labs:
-        materials[lab["id"]] = [lab["title"], lab["overview"], lab["overview_example"],
-                                *[cp["label"] + " · " + cp["title"] for cp in lab["checkpoints"]]]
+    def read(name):
+        return json.loads((directory / name).read_text(encoding="utf-8"))
+
+    graph = read("knowledge-graph.json")
+    lecture_ids = read("lecture-topics.json")
+    concepts = {n["id"]: n for n in graph["graph"]["nodes"]}
+    catalog = {}
+    for lab in read("labs.json")["labs"]:
+        day = lab["day"]
         for cp in lab["checkpoints"]:
             guide = graph["checkpoint_views"][cp["id"]]
-            materials[cp["id"]] = [cp["label"] + " · " + cp["title"], guide["explanation"],
-                                   cp["requirement"], cp["expected_deliverable"], guide["self_check"],
-                                   *[concepts[key] for key in guide["concept_ids"]],
-                                   *[item["explanation"] for item in guide["code_guides"]]]
-    return materials
+            definition = cp["definition_source"]["url"]
+            def source(key, label, summary, url):
+                return {"id": "LAB:" + key, "day": day, "label": label, "summary": summary,
+                        "node_kind": "checkpoint", "url": url}
+            title = cp["label"] + " · " + cp["title"]
+            overview = source(cp["id"], title, "\n".join([cp["requirement"], guide["explanation"],
+                              cp["expected_deliverable"], guide["self_check"]]), definition)
+            evidence = []
+            for code in guide["code_guides"]:
+                ref = code["source"]
+                symbols = ", ".join((ref.get("locator") or {}).get("symbols", []))
+                evidence.append(source(code["evidence_id"], symbols or ref["path"],
+                    f"{ref['path']} {symbols} ({code['template_state']}). {code['explanation']}", ref["url"]))
+            for reading in guide.get("reading_guides", []) + guide.get("deep_reading_guides", []):
+                evidence.append(source(reading["id"], reading["label"], reading["summary"], reading["url"]))
+            topics = guide["concept_ids"]
+            for key in topics:
+                node = concepts[key]
+                evidence.append(source(cp["id"] + "-" + key, node["label"], node["definition"], definition))
+            catalog[cp["id"]] = (overview, evidence, [lecture_ids[k] for k in topics if k in lecture_ids])
+        checkpoints = [catalog[c["id"]][0] for c in lab["checkpoints"]]
+        catalog[lab["id"]] = (dict(checkpoints[0], id="LAB:" + lab["id"], label=lab["title"],
+                                   summary=lab["overview"] + "\n" + lab["overview_example"],
+                                   url=checkpoints[0]["url"].split("#")[0]), checkpoints, [])
+    return catalog
+
+
+def resolve_lab_scope(message, lab_id, scope_day, previous_ids):
+    catalog = lab_materials()
+    current = lab_id if lab_id in catalog else None
+    asked_day = detect_day(message)
+    marker = re.search(r"\b(cp|checkpoint|m|phase)\s*[-_]?\s*(\d+)\b", message, re.I)
+    previous = next((cid[4:].split("-")[:2] for cid in previous_ids if cid.startswith("LAB:")), None)
+    if previous and is_followup(message, clean_query(message)) and not asked_day and not marker:
+        prior = "-".join(previous)
+        if prior in catalog:
+            return prior
+    day = asked_day or (catalog[current][0]["day"] if current else scope_day)
+    if day and marker:
+        prefix = marker[1].lower().replace("checkpoint", "cp")
+        for key in catalog:
+            if re.fullmatch(fr"day{day:02d}-{prefix}0*{int(marker[2])}", key):
+                return key
+        return f"day{day:02d}"  # overview lists the actual checkpoint labels
+    if asked_day and (not current or catalog[current][0]["day"] != asked_day):
+        return f"day{asked_day:02d}" if current else None
+    return current
+
+
+_m03_vectors = None
+
+
+def checkpoint_context(scope, message, previous_ids):
+    main, evidence, lecture_ids = lab_materials()[scope]
+    words = set(tokenize_text(message))
+    def rank(node):
+        return (int(node["label"].lower() in message.lower()),
+                len(words.intersection(tokenize_text(node["label"] + " " + node["summary"]))),
+                node["id"] in previous_ids)
+    lexical = sorted(evidence, key=rank, reverse=True)
+    ranked = lexical
+    retrieval = "lexical"
+    if scope == "day07-m03":
+        global _m03_vectors
+        vectors = _m03_vectors
+        if vectors is None:
+            vectors = embed_remote([n["label"] + "\n" + n["summary"] for n in evidence], enabled=True)
+            if vectors is not None and len(vectors) == len(evidence):
+                _m03_vectors = vectors
+        query = embed_remote([message], enabled=True) if vectors is not None else None
+        if query is not None and len(vectors) == len(evidence) and vectors.shape[1] == query.shape[1]:
+            scores = dict(zip((n["id"] for n in evidence), vectors @ query[0]))
+            dense = sorted(evidence, key=lambda n: scores[n["id"]], reverse=True)
+            fused = {n["id"]: 0.0 for n in evidence}
+            for ranking in (lexical, dense):
+                for index, node in enumerate(ranking, start=1):
+                    fused[node["id"]] += 1 / (60 + index)
+            ranked = sorted(lexical, key=lambda n: fused[n["id"]], reverse=True)
+            retrieval = "hybrid_rrf"
+    sources = [main, *ranked[:5]]
+    if lecture_ids:
+        lecture = {n["id"]: n for n in get_all_graph_nodes(node_kinds=["concept"])}
+        sources.extend(lecture[k] for k in dict.fromkeys(lecture_ids) if k in lecture)
+    lines = [f"[{n['id']}] {n['label']} — {n['summary']}" for n in sources]
+    context = "Nguồn của " + scope + ". Ưu tiên file và hàm được nêu. Nếu thiếu file hoặc không rõ dòng nào, hỏi lại.\n"
+    return context + "\n".join(lines), sources, retrieval
 
 
 def chat_turn(
@@ -487,13 +573,27 @@ def chat_turn(
     intent = detect_intent(msg)
     if intent == "simplify":
         level = "eli5"
-    r = retrieve(msg, intent, level, scope_day, focus_id, prev_citation_ids or [])
-    context, citable, relations = pack_context(r)
-
-    material = lab_materials().get(lab_id) if lab_id else None
-    if material:
-        context = "Bài Lab đang mở (ưu tiên khi trả lời):\n" + "\n".join(material) + "\n\n" + context
-    if not citable and not material:
+    previous_ids = prev_citation_ids or []
+    scope = resolve_lab_scope(msg, lab_id, scope_day, previous_ids)
+    if scope:
+        context, citable, retrieval = checkpoint_context(scope, msg, previous_ids)
+        relations = {"prerequisites": [], "extends": []}
+        seeds = [{"id": scope, "reason": "lab_scope", "retrieval": retrieval}]
+    else:
+        r = retrieve(msg, intent, level, scope_day, focus_id, previous_ids)
+        context, citable, relations = pack_context(r)
+        seeds = [{"id": s, "reason": r["seed_reason"].get(s)} for s in r["seeds"]]
+    vague_line = re.search(r"\b(dòng|đoạn (?:code|mã)|hàm) (này|đó)\b", msg, re.I)
+    if scope and vague_line and not re.search(r"[\x60=();_\n]|\w+\.\w+", msg) and not any(
+        n["label"].casefold() in msg.casefold() for n in citable
+    ):
+        answer = "Bạn dán dòng code hoặc cho mình tên hàm đang xem nhé. Mình sẽ đối chiếu đúng vị trí trong checkpoint này."
+        citable = []
+        meta = {"llm_used": False, "reason": "needs_code_selection"}
+        valid, rejected = [], []
+        abstained = True
+        out_guard = {"blocked": False, "text": answer, "redacted_types": [], "flags": []}
+    elif not citable:
         answer = (
             "Mình chưa tìm thấy nội dung này trong giáo trình 14 ngày nên không muốn đoán. "
             "Bạn thử hỏi bằng tên khái niệm cụ thể (ví dụ: *RAG*, *Token Economy*, *Lethal Trifecta*) "
@@ -507,12 +607,7 @@ def chat_turn(
         messages = build_messages(msg, clean_history, intent, level, context, relations)
         answer, meta = call_llm(messages, intent)
         if not answer:
-            if material:
-                words = set(tokenize_text(msg))
-                passages = sorted(material[1:], key=lambda text: len(words.intersection(tokenize_text(text))), reverse=True)
-                answer = material[0] + "\n\n" + "\n\n".join(passages[:2])
-            else:
-                answer = extractive_answer(intent, citable, relations)
+            answer = extractive_answer(intent, citable, relations)
         out_guard = check_output_guard(answer)
         answer = out_guard["text"]
         if out_guard["blocked"]:
@@ -532,6 +627,7 @@ def chat_turn(
             "pdf_pages": by_id[cid].get("provenance", {}).get("pdf_pages", []),
             "section_ref": by_id[cid].get("provenance", {}).get("section_ref", ""),
             "cited_in_text": cid in valid,
+            "url": by_id[cid].get("url"),
         }
         for cid in cite_ids if cid in by_id
     ]
@@ -544,8 +640,8 @@ def chat_turn(
     }
     trace = {
         **meta,
-        "cleaned_query": r["cleaned_query"],
-        "seeds": [{"id": s, "reason": r["seed_reason"].get(s)} for s in r["seeds"]],
+        "cleaned_query": clean_query(msg),
+        "seeds": seeds,
         "context_chars": len(context),
         "rejected_citations": rejected,
         "input_redacted": input_redacted,

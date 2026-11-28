@@ -78,8 +78,8 @@ def _featurize(text: str, idf: dict[str, float] | None = None) -> np.ndarray:
     return vec
 
 
-def _maybe_remote_embed(texts: list[str]) -> np.ndarray | None:
-    if os.environ.get("USE_REMOTE_EMBEDDINGS") != "1":
+def embed_remote(texts: list[str], *, enabled: bool = False) -> np.ndarray | None:
+    if not enabled and os.environ.get("USE_REMOTE_EMBEDDINGS") != "1":
         return None
     api_key = os.environ.get("EMBEDDING_API_KEY") or os.environ.get("OPENAI_API_KEY")
     if not api_key:
@@ -95,7 +95,7 @@ def _maybe_remote_embed(texts: list[str]) -> np.ndarray | None:
         )
         resp.raise_for_status()
         data = resp.json()["data"]
-        mat = np.array([item["embedding"] for item in data], dtype=np.float32)
+        mat = np.array([item["embedding"] for item in sorted(data, key=lambda entry: entry["index"])], dtype=np.float32)
         norms = np.linalg.norm(mat, axis=1, keepdims=True)
         norms[norms < 1e-8] = 1.0
         return mat / norms
@@ -125,7 +125,7 @@ def _ensure_index() -> tuple[list[dict[str, Any]], np.ndarray, dict[str, float]]
     total_docs = max(1, len(doc_texts))
     idf = {tok: math.log((total_docs + 1) / (freq + 1)) + 1.0 for tok, freq in df.items()}
 
-    remote_mat = _maybe_remote_embed(doc_texts)
+    remote_mat = embed_remote(doc_texts)
     if remote_mat is not None and remote_mat.shape[0] == len(nodes):
         matrix = remote_mat
     else:
@@ -168,7 +168,7 @@ def hybrid_search(
     # Query vector (remote if configured and matrix dimensions match, else local)
     q_vec: np.ndarray | None = None
     if matrix.shape[1] != VECTOR_DIM:
-        remote_q = _maybe_remote_embed([clean_q])
+        remote_q = embed_remote([clean_q])
         if remote_q is not None:
             q_vec = remote_q[0]
     if q_vec is None:

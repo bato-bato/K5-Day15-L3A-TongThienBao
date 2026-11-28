@@ -582,6 +582,7 @@ function App() {
   const [showAllDays, setShowAllDays] = useState(false);
   const [workspace, setWorkspace] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
+  const tutorDraft = useRef(null);
   const [labCheckpoint, setLabCheckpoint] = useState(null);
   const [focusedCheckpoint, setFocusedCheckpoint] = useState(null);
 
@@ -1023,6 +1024,7 @@ function App() {
             day={day}
             selection={labCheckpoint}
             onSelect={setLabCheckpoint}
+            onAskTutor={question => tutorDraft.current?.openDraft(question)}
             enrichedMindmaps={enrichedMindmaps}
             onOpenMindmap={openMindmapFromLab}
           />
@@ -1067,6 +1069,7 @@ function App() {
       <ChatBot
         key={view === 'lab' ? `lab:${currentLabFocusId}` : `mindmap:${day}`}
         day={day}
+        draftRef={tutorDraft}
         labId={view === 'lab' ? currentLabFocusId : undefined}
         focus={view === 'lab' ? currentLabFocus : chatFocus}
         inspectorOpen={view !== 'lab' && Boolean(selectedNode)}

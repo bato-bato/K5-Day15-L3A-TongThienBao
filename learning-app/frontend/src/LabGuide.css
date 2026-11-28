@@ -315,3 +315,16 @@
   .lab-checkpoint-list { display: none; }
   .lab-guide .lab-checkpoint-picker { display: grid; margin-bottom: 14px; }
 }
+
+.knn-demo { display: grid; gap: .85rem; margin: 1rem 0; padding: clamp(1rem, 3vw, 1.5rem); border: 1px solid #b9d8d1; border-radius: 16px; background: #f4faf8; color: #183c35; }
+.knn-demo h3 { font-size: 1.15rem; font-weight: 700; }
+.knn-demo p { line-height: 1.55; }
+.knn-demo fieldset { display: grid; gap: .5rem; border: 1px solid #c6d9d3; padding: .7rem 1rem; border-radius: 10px; min-width: 0; }
+.knn-demo legend { padding: 0 .3rem; font-weight: 600; }
+.knn-demo code { font-size: .84em; overflow-wrap: anywhere; }
+.knn-demo button, .knn-demo select { border: 1px solid #aac6bc; border-radius: 8px; padding: .4rem .65rem; background: white; }
+.knn-demo button:hover { border-color: #206758; }
+.knn-demo .knn-primary { justify-self: start; background: #195f50; color: white; font-weight: 600; }
+.knn-neighbors, .knn-actions, .knn-outputs { display: flex; flex-wrap: wrap; gap: .65rem; }
+.knn-neighbors label, .knn-outputs div { display: grid; gap: .3rem; }
+.knn-outputs div { flex: 1; background: white; padding: .6rem .8rem; border-left: 3px solid #629e8d; }

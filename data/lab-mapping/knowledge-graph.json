@@ -2726,8 +2726,79 @@
       ],
       "self_check": "Bạn đã dùng tiêu chí gì để chọn cấu hình?",
       "lab_source_url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/CHECKPOINTS.md#L9",
-      "code_guides": [],
-      "original_time_label": "2:00–3:30"
+      "code_guides": [
+        {
+          "evidence_id": "day07-m03-baseline",
+          "template_state": "provided",
+          "explanation": "TfidfIndex.search xếp hạng theo TF-IDF. hit kiểm source_id, page và chuỗi evidence. pack_context bỏ chunk trùng và chỉ thêm block còn vừa budget (mặc định 800 ký tự). evaluate lưu results, context_ids, hit1 và hit3. Khi top-3 có evidence nhưng context thiếu, đối chiếu ID chunk với context_ids rồi kiểm budget.",
+          "source": {
+            "path": "starter/baseline.py",
+            "locator": {
+              "type": "function",
+              "symbols": [
+                "TfidfIndex.search",
+                "hit",
+                "pack_context",
+                "evaluate"
+              ]
+            },
+            "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/starter/baseline.py#L50-L104"
+          }
+        }
+      ],
+      "reading_guides": [
+        {
+          "id": "day07-m03-methods",
+          "label": "Ba phương pháp và các giá trị top-k",
+          "summary": "M03 cần ít nhất ba phương pháp, trong đó có dense trên vector store Day 06. Có thể so sánh lexical TF-IDF, dense và hybrid RRF. Đổi riêng top-k từ 1 sang 3 hay 5 chỉ tạo cấu hình mới của cùng một phương pháp.",
+          "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/GUIDE.md#L9-L22"
+        },
+        {
+          "id": "day07-m03-metrics",
+          "label": "Hit@1, Evidence Hit@3 và Context Evidence Rate",
+          "summary": "Cả ba chỉ số dùng mẫu số là số câu có đáp án. Hit@1 và Evidence Hit@3 đếm câu có evidence hợp lệ trong top-1 và top-3 của ranking. Context Evidence Rate đếm câu có đủ evidence trong context cuối gửi model. Với câu cần nhiều evidence phải định nghĩa điều kiện đủ. Câu thiếu bằng chứng được đánh giá riêng. Ghi n/N, budget và đơn vị. Nhiều lượt tìm có thể làm context cuối đủ bằng chứng dù lượt đầu không hit.",
+          "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/BENCHMARK.md#L15-L27"
+        },
+        {
+          "id": "day07-m03-comparison",
+          "label": "So sánh công bằng trên dev",
+          "summary": "Giữ cùng corpus, index, bộ câu hỏi và nhãn dev. Nếu phương pháp cần index riêng, ghi thay đổi và chi phí. Báo ranking của query gốc cùng cutoff, tách kết quả pipeline viết lại query hoặc nhiều lượt. Không đưa gold vào truy vấn hay agent.",
+          "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/BENCHMARK.md#L15-L25"
+        },
+        {
+          "id": "day07-m03-decision",
+          "label": "Chọn cấu hình và phân tích lỗi dev",
+          "summary": "Thử ít nhất hai cấu hình cải thiện baseline, ghi giả thuyết và kết quả từng lần. Đọc ít nhất hai lỗi dev. Chọn theo tiêu chí chất lượng, chi phí và thời gian đã công bố, khóa cấu hình trước khi dùng test. Mẫu báo cáo là bảng trống; muốn nói hybrid thắng bao nhiêu cần kết quả đo của nhóm.",
+          "url": "https://github.com/VinUni-AI20k/K5-L3-Day07-Retrieval-Context-Engineering/blob/c67ec6292cd6d15e6e6cbaa2c7e7260398bb5a19/GUIDE.md#L34-L38"
+        }
+      ],
+      "original_time_label": "2:00–3:30",
+      "deep_reading_guides": [
+        {
+          "id": "day07-m03-bm25",
+          "label": "Lexical BM25",
+          "summary": "BM25 xếp hạng theo độ khớp từ khóa, độ hiếm của từ và độ dài tài liệu. Có ích khi câu hỏi chứa tên hàm như pack_context hoặc mã lỗi chính xác. Baseline TF-IDF của Lab và BM25 đều là lexical nhưng dùng công thức khác nhau.",
+          "url": "https://github.com/bato-bato/K5-Day15-L3A-TongThienBao/blob/2e0ef70d915a16b61eb2919ac8f6e726c1eddb30/learning-app/frontend/src/day07DeepBranches.js#L178-L183"
+        },
+        {
+          "id": "day07-m03-dense",
+          "label": "Dense Vector Search",
+          "summary": "Mã hóa câu hỏi và chunk vào cùng không gian vector rồi tìm đoạn gần nhau, ví dụ theo cosine. Hữu ích khi học viên diễn đạt lại bằng từ khác. Có thể kết hợp với lexical để giữ các khớp chính xác.",
+          "url": "https://github.com/bato-bato/K5-Day15-L3A-TongThienBao/blob/2e0ef70d915a16b61eb2919ac8f6e726c1eddb30/learning-app/frontend/src/day07DeepBranches.js#L184-L189"
+        },
+        {
+          "id": "day07-m03-rrf",
+          "label": "Hybrid và Reciprocal Rank Fusion (RRF)",
+          "summary": "Hybrid kết hợp các danh sách ứng viên từ lexical và dense. RRF tính tổng 1/(k + rank) dựa trên vị trí, với hằng số làm mượt thường là 60. Ví dụ một chunk hạng 1 ở lexical và hạng 2 ở dense có điểm 1/61 + 1/62. Không cần cộng điểm cosine với điểm BM25.",
+          "url": "https://github.com/bato-bato/K5-Day15-L3A-TongThienBao/blob/2e0ef70d915a16b61eb2919ac8f6e726c1eddb30/learning-app/frontend/src/day07DeepBranches.js#L232-L237"
+        },
+        {
+          "id": "day07-m03-rerank",
+          "label": "Cross-Encoder Reranking",
+          "summary": "Sau khi tìm ứng viên, cross-encoder đọc câu hỏi và từng chunk cùng nhau rồi chấm độ liên quan để xếp lại và chọn nhóm nhỏ. RRF gộp danh sách dựa trên hạng. Cross-encoder đọc nội dung từng cặp để chấm, có thêm độ trễ cần đo trên dev.",
+          "url": "https://github.com/bato-bato/K5-Day15-L3A-TongThienBao/blob/2e0ef70d915a16b61eb2919ac8f6e726c1eddb30/learning-app/frontend/src/day07DeepBranches.js#L238-L243"
+        }
+      ]
     },
     "day07-m04": {
       "checkpoint_id": "day07-m04",

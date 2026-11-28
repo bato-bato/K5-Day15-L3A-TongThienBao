@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 const LEVELS = [
   { id: 'eli5', label: 'Siêu dễ', icon: '🧒', hint: 'So sánh đời thường, không thuật ngữ' },
@@ -119,7 +119,7 @@ function Markdown({ text, citations, onCite }) {
 }
 
 /* ---------------------------------- component ---------------------------------- */
-export function ChatBot({ day, focus, labId, inspectorOpen = false, onJumpToConcept }) {
+export function ChatBot({ day, focus, labId, draftRef, inspectorOpen = false, onJumpToConcept }) {
   const [open, setOpen] = useState(false);
   const storageKey = labId ? STORAGE_KEY + "/" + labId : STORAGE_KEY;
   const [messages, setMessages] = useState(() => loadStored(storageKey));
@@ -129,6 +129,19 @@ export function ChatBot({ day, focus, labId, inspectorOpen = false, onJumpToConc
   const [loading, setLoading] = useState(false);
   const listRef = useRef(null);
   const inputRef = useRef(null);
+
+  useImperativeHandle(draftRef, () => ({
+    openDraft(question) {
+      setInput(question);
+      setOpen(true);
+      inputRef.current?.focus();
+    },
+  }), []);
+
+  function openCitation(citation) {
+    if (citation.url) window.open(citation.url, '_blank', 'noopener,noreferrer');
+    else onJumpToConcept?.(citation.id, citation.day);
+  }
 
   useEffect(() => saveStored(storageKey, messages), [storageKey, messages]);
   useEffect(() => {
@@ -303,7 +316,7 @@ export function ChatBot({ day, focus, labId, inspectorOpen = false, onJumpToConc
                     🔒 Đã tự động ẩn thông tin nhạy cảm trước khi xử lý
                   </div>
                 )}
-                <Markdown text={m.content} citations={m.citations} onCite={c => onJumpToConcept?.(c.id, c.day)} />
+                <Markdown text={m.content} citations={m.citations} onCite={openCitation} />
 
                 {m.prerequisites?.length > 0 && (
                   <div className="mt-2.5 pt-2 border-t border-slate-100 flex flex-wrap items-center gap-1.5 text-[11px]">
@@ -319,7 +332,7 @@ export function ChatBot({ day, focus, labId, inspectorOpen = false, onJumpToConc
                 {m.citations?.length > 0 && (
                   <div className="mt-2.5 pt-2 border-t border-slate-100 space-y-1.5">
                     {m.citations.map(c => (
-                      <button key={c.id} type="button" onClick={() => onJumpToConcept?.(c.id, c.day)} className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-indigo-50/70 border border-slate-200/70 text-[11px] text-slate-600 hover:text-indigo-700 transition">
+                      <button key={c.id} type="button" onClick={() => openCitation(c)} className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-indigo-50/70 border border-slate-200/70 text-[11px] text-slate-600 hover:text-indigo-700 transition">
                         <span className="shrink-0 px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-[10px] font-semibold">N{c.day}</span>
                         <span className="truncate font-medium">{c.label}</span>
                         {c.pdf_pages?.length > 0 && <span className="ml-auto shrink-0 text-[10px] text-slate-400">tr.{c.pdf_pages.join(',')}</span>}
