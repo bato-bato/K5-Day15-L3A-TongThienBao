@@ -263,7 +263,7 @@ function parseStudySections(rawText) {
   return { title, tag, blocks };
 }
 
-function NodeInspector({ selectedNode, day, className = '', titleId, onClose, onRelatedConcept, onOpenCheckpoint }) {
+function NodeInspector({ selectedNode, detail, onClearDetail, day, className = '', titleId, onClose, onRelatedConcept, onOpenCheckpoint }) {
   const conceptId = selectedNode.source_ref?.concept_id;
   const [nodeGraph, setNodeGraph] = useState(null);
 
@@ -325,7 +325,7 @@ function NodeInspector({ selectedNode, day, className = '', titleId, onClose, on
           </button>
         </div>
         <h3 id={titleId} className="text-[15.5px] font-bold leading-snug text-white">
-          {study.title}
+          {detail?.title || study.title}
         </h3>
         {selectedNode.source_ref?.section_ref && (
           <div className="mt-1 text-[11px] text-white/80 truncate" title={selectedNode.source_ref.section_ref}>
@@ -335,6 +335,25 @@ function NodeInspector({ selectedNode, day, className = '', titleId, onClose, on
       </div>
 
       <div className="p-4 overflow-y-auto space-y-3.5 text-xs select-text">
+        {detail && (
+          <section aria-label="Chi tiết nhánh" className="space-y-3 rounded-xl border border-indigo-100 bg-indigo-50 p-3 text-sm">
+            <button type="button" onClick={onClearDetail} className="font-semibold text-indigo-700">← Xem nhánh cha</button>
+            {detail.kind === 'l2' ? (
+              <ul className="list-disc space-y-2 pl-4">
+                {detail.items.map(item => <li key={item}>{item}</li>)}
+              </ul>
+            ) : (
+              <dl className="space-y-2">
+                {[
+                  ['Vấn đề', detail.problem], ['Cơ chế', detail.mechanism],
+                  ['Ví dụ', detail.example], ['Nguồn đối chiếu', detail.source],
+                ].filter(([, value]) => value).map(([label, value]) => (
+                  <div key={label}><dt className="font-semibold">{label}</dt><dd>{value}</dd></div>
+                ))}
+              </dl>
+            )}
+          </section>
+        )}
         {/* Key Quote Callout */}
         {selectedNode.source_ref?.key_quote && (
           <div className="bg-amber-50/90 border border-amber-200 border-l-4 border-l-amber-500 rounded-xl p-3">
@@ -581,7 +600,12 @@ function App() {
   const [day, setDay] = useState(1);
   const [showAllDays, setShowAllDays] = useState(false);
   const [workspace, setWorkspace] = useState(null);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedId, setConceptId] = useState(null);
+  const [selectedDetail, setSelectedDetail] = useState(null);
+  function setSelectedId(id, detail = null) {
+    setConceptId(id);
+    setSelectedDetail(detail);
+  }
   const tutorDraft = useRef(null);
   const [labCheckpoint, setLabCheckpoint] = useState(null);
   const [focusedCheckpoint, setFocusedCheckpoint] = useState(null);
@@ -1035,9 +1059,9 @@ function App() {
             selectedNodeId={selectedId}
             focusedCheckpoint={focusedCheckpoint}
             searchQuery={searchQuery}
-            onSelectConcept={(targetDay, nodeId) => {
+            onSelectConcept={(targetDay, nodeId, detail) => {
               setDay(targetDay);
-              setSelectedId(nodeId);
+              setSelectedId(nodeId, detail);
             }}
             onSelectDay={selectDay}
             onBackToLab={() => {
@@ -1053,6 +1077,8 @@ function App() {
         {view !== 'lab' && selectedNode && (
           <NodeInspector
             selectedNode={selectedNode}
+            detail={selectedDetail}
+            onClearDetail={() => setSelectedDetail(null)}
             day={day}
             className="node-inspector-drawer"
             onClose={() => setSelectedId(null)}

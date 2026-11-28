@@ -1,3 +1,4 @@
+import { DAY7_DEEP_BRANCHES, getLeafFocusedDetail } from './day07DeepBranches.js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { sizeMindmap } from './mindmapSizing.js';
 import { useMindmapViewport } from './useMindmapViewport.js';
@@ -114,6 +115,9 @@ function inferTopicLabel(chunk, parentTitle) {
 }
 
 export function extractSubBranches(node) {
+  const deepBranches = DAY7_DEEP_BRANCHES[node?.source_ref?.concept_id];
+  if (deepBranches) return deepBranches;
+
   const raw = (node?.text || '').trim();
   const lines = raw.split('\n').map(l => l.trim()).filter(l => l && l !== '—');
   const body = lines.slice(1).join(' ').trim();
@@ -306,6 +310,7 @@ function layoutSideBranches(branches, side, themes, nodeBox, expandedIds, hasSea
           id: l2Id,
           kind: 'l2',
           side,
+          detail: { kind: 'l2', title: sg.label, items: sg.leaves },
           conceptId: branch.conceptId,
           day: sg.dayOverride ?? branch.day,
           text: sg.label,
@@ -341,6 +346,7 @@ function layoutSideBranches(branches, side, themes, nodeBox, expandedIds, hasSea
         placedNodes.push({
           id: l3Id,
           kind: 'l3',
+            detail: getLeafFocusedDetail(leafText, sg.label),
           side,
           conceptId: branch.conceptId,
           day: sg.dayOverride ?? branch.day,
@@ -366,6 +372,7 @@ function layoutSideBranches(branches, side, themes, nodeBox, expandedIds, hasSea
         id: l2Id,
         kind: 'l2',
         side,
+        detail: { kind: 'l2', title: sg.label, items: sg.leaves },
         conceptId: branch.conceptId,
         day: sg.dayOverride ?? branch.day,
         text: sg.label,
@@ -638,7 +645,7 @@ export function CourseTree({
       return;
     }
     if (node.conceptId) {
-      onSelectConcept?.(node.day, node.conceptId);
+      onSelectConcept?.(node.day, node.conceptId, node.day === 7 ? node.detail : null);
       if (node.hasChildren && node.isCollapsed) {
         setExpandedIds(prev => {
           const next = new Set(prev);
